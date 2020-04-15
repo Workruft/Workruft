@@ -1,0 +1,17 @@
+{
+  "name": "workruft",
+  "version": "0.0.1",
+  "description": "Workruft!",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://Workruft@github.com/Workruft/Workruft.git"
+  },
+  "author": "AName",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Workruft/Workruft/issues"
+  },
+  "homepage": "https://github.com/Workruft/Workruft#readme"
+}
