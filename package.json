@@ -2,8 +2,10 @@
   "name": "workruft",
   "version": "0.0.1",
   "description": "Workruft!",
-  "main": "index.js",
-  "scripts": {},
+  "main": "Server/index.js",
+  "scripts": {
+    "start": "node 'Server/index.js'"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://Workruft@github.com/Workruft/Workruft.git"
@@ -13,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Workruft/Workruft/issues"
   },
-  "homepage": "https://github.com/Workruft/Workruft#readme"
+  "homepage": "https://github.com/Workruft/Workruft#readme",
+  "dependencies": {
+    "ws": "7.2.3"
+  }
 }
