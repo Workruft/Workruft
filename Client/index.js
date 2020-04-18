@@ -1,4 +1,5 @@
 let scene = new THREE.Scene();
+let clock = new THREE.Clock();
 
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -65,14 +66,20 @@ function createCustomCube() {
     return new THREE.Mesh(cubeGeometry, new THREE.MeshPhongMaterial({ color: 'green' }));
 }
 let customCubes = [];
-for (let x = -5; x < 5; ++x) {
-    for (let y = -5; y < 5; ++y) {
+for (let x = -5; x <= 5; ++x) {
+    for (let y = -5; y <= 5; ++y) {
         let customCube = createCustomCube();
-        customCube.position.set(x * 2, y * 2, 0);
+        customCube.position.set(x * 2, y * 2, -10);
         customCubes.push(customCube);
         scene.add(customCube);
     }
 }
+
+function createSphere() {
+    return new THREE.Mesh(new THREE.SphereBufferGeometry(1, 15, 15), new THREE.MeshPhongMaterial({ color: 'yellow' }));
+}
+let sphere = createSphere();
+scene.add(sphere);
 
 let ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
 scene.add(ambientLight);
@@ -81,17 +88,19 @@ let directionalLight = new THREE.DirectionalLight('white', 0.5);
 directionalLight.position.set(100, 100, 100);
 scene.add(directionalLight);
 
-let pointLight = new THREE.PointLight('blue', 5, 10);
+let pointLight = new THREE.PointLight('blue', 5, 20);
 pointLight.position.set(0, 0, 1, 0.5);
 scene.add(pointLight);
 
 
 function animate() {
     requestAnimationFrame(animate);
+    let elapsedTime = clock.getElapsedTime();
     for (let i = 0; i < customCubes.length; ++i) {
         customCubes[i].rotation.x += 0.01;
         customCubes[i].rotation.y += 0.01;
     }
+    sphere.position.set(15.0 * Math.cos(elapsedTime), 5.0 * Math.sin(elapsedTime * 0.1), 5.0 * Math.sin(elapsedTime) + 10.0);
     renderer.render(scene, camera);
 }
 animate();
