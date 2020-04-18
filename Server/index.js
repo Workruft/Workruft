@@ -10,7 +10,9 @@ const server = new WebSocket.Server({ port: serverPort, clientTracking: true }, 
     serverAddress = server.address();
     console.log('Server ready and listening! ' + JSON.stringify(serverAddress));
     console.log();
-}).on('connection', function(socket, request) {
+});
+
+server.on('connection', function(socket, request) {
     //On client connected.
     let clientAddress = request.connection.remoteAddress;
     console.log();
@@ -25,7 +27,7 @@ const server = new WebSocket.Server({ port: serverPort, clientTracking: true }, 
         console.log('Client disconnected! Address: ' + clientAddress + ' Code: ' + code + ' (' + getStatusCodeString(code) + ')');
     }).on('error', function(error) {
         //On client error.
-        console.log('Client Error encountered! Address: ' + clientAddress + ' Error: ' + error.name + ': ' + error.message);
+        console.log('Client error encountered! Address: ' + clientAddress + ' Error: ' + error.name + ': ' + error.message);
     });
 
     socket.send(JSON.stringify({
@@ -33,12 +35,16 @@ const server = new WebSocket.Server({ port: serverPort, clientTracking: true }, 
     }), function() {
         console.log('I writed data!');
     });
-}).on('close', function() {
+});
+
+server.on('close', function() {
     //On server shutdown.
     console.log('Server shutdown!');
-}).on('error', function(error) {
+});
+
+server.on('error', function(error) {
     //On server error.
-    console.log('Server Error encountered: ' + error.name + ': ' + error.message);
+    console.log('Server error encountered: ' + error.name + ': ' + error.message);
 });
 
 //Nice:

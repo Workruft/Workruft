@@ -1,6 +1,3 @@
-Chat.print({ message: 'Herro!' });
-//Chat.clear();
-
 let scene = new THREE.Scene();
 
 let renderer = new THREE.WebGLRenderer();
@@ -68,17 +65,26 @@ function animate() {
 }
 animate();
 
+
+
+Chat.print({ message: 'Herro!' });
+//Chat.clear();
+
 const socket = new WebSocket('ws://localhost:1337');
 
 socket.onopen = function() {
-    Chat.print({ message: 'Connected!' });
+    Chat.print({ message: 'Connected to server!' });
     socket.send(Date.now());
 };
 
-socket.onclose = function() {
-    Chat.print({ message: 'Disconnected!' });
+socket.onmessage = function(message) {
+    Chat.print({ message: 'Server message received: ' + message.data });
 };
 
-socket.onmessage = function(message) {
-    Chat.print({ message: 'Message received: ' + message.data });
+socket.onclose = function() {
+    Chat.print({ message: 'Disconnected from server!' });
+};
+
+socket.onerror = function() {
+    Chat.print({ message: 'Server connection error encountered!' });
 };
