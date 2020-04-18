@@ -4,19 +4,6 @@ require('../Common/statusCodes');
 let serverPort = 1337;
 let messageOfTheDay = 'Why, hello, and welcome to my crap server!';
 
-const getCircularReplacer = () => {
-const seen = new WeakSet();
-    return (key, value) => {
-        if (typeof value === "object" && value !== null) {
-            if (seen.has(value)) {
-                return;
-            }
-            seen.add(value);
-        }
-        return value;
-    };
-};
-
 let serverAddress;
 const server = new WebSocket.Server({ port: serverPort, clientTracking: true }, function() {
     //On server listening.
