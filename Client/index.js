@@ -76,9 +76,14 @@ for (let x = -5; x < 5; ++x) {
 
 let ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
 scene.add(ambientLight);
+
 let directionalLight = new THREE.DirectionalLight('white', 0.5);
 directionalLight.position.set(100, 100, 100);
 scene.add(directionalLight);
+
+let pointLight = new THREE.PointLight('blue', 5, 10);
+pointLight.position.set(0, 0, 1, 0.5);
+scene.add(pointLight);
 
 
 function animate() {
