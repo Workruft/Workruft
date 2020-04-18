@@ -1,3 +1,6 @@
+Chat.print({ message: 'Herro!' });
+//Chat.clear();
+
 let scene = new THREE.Scene();
 
 let renderer = new THREE.WebGLRenderer();
@@ -21,15 +24,15 @@ for (let x = -5; x < 5; ++x) {
     }
 }
 
-function createLines() {
-    return new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(-10, 0, 1),
-        new THREE.Vector3(0, 10, 1),
-        new THREE.Vector3(10, 0, 1)
-    ]), new THREE.LineBasicMaterial({ color: 'blue' }));
-}
-let lines = createLines();
-scene.add(lines);
+// function createLines() {
+//     return new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+//         new THREE.Vector3(-10, 0, 1),
+//         new THREE.Vector3(0, 10, 1),
+//         new THREE.Vector3(10, 0, 1)
+//     ]), new THREE.LineBasicMaterial({ color: 'blue' }));
+// }
+// let lines = createLines();
+// scene.add(lines);
 
 // function createGround() {
 //     let groundGeo = new THREE.PlaneBufferGeometry(10000, 10000);
@@ -68,14 +71,14 @@ animate();
 const socket = new WebSocket('ws://localhost:1337');
 
 socket.onopen = function() {
-    alert('connected!');
+    Chat.print({ message: 'Connected!' });
     socket.send(Date.now());
 };
 
 socket.onclose = function() {
-    alert('disconnected!');
+    Chat.print({ message: 'Disconnected!' });
 };
 
 socket.onmessage = function(message) {
-    alert('message received: ' + message.data + ', ' + message.origin + ', ' + message.lastEventId + ', ' + message.source + ', ' + message.ports);
+    Chat.print({ message: 'Message received: ' + message.data });
 };

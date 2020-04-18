@@ -1,0 +1,34 @@
+html {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    color: white;
+}
+
+canvas {
+    display: block;
+}
+
+#chatBox {
+    margin: 0;
+    padding: 0px 0px 4px 4px;
+    position: absolute;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column-reverse;
+    flex-wrap: nowrap;
+    top: 0px;
+    bottom: 0px;
+    z-index: 100;
+}
+
+.chatMessage {
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}

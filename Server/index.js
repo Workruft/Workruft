@@ -4,6 +4,19 @@ require('../Common/statusCodes');
 let serverPort = 1337;
 let messageOfTheDay = 'Why, hello, and welcome to my crap server!';
 
+const getCircularReplacer = () => {
+const seen = new WeakSet();
+    return (key, value) => {
+        if (typeof value === "object" && value !== null) {
+            if (seen.has(value)) {
+                return;
+            }
+            seen.add(value);
+        }
+        return value;
+    };
+};
+
 let serverAddress;
 const server = new WebSocket.Server({ port: serverPort, clientTracking: true }, function() {
     //On server listening.
@@ -12,17 +25,20 @@ const server = new WebSocket.Server({ port: serverPort, clientTracking: true }, 
     console.log();
 }).on('connection', function(socket, request) {
     //On client connected.
-    console.log('Client connected! Headers: ' + JSON.stringify(request.headers));
+    let clientAddress = request.connection.remoteAddress;
+    console.log();
+    console.log('Client connected! Address: ' + clientAddress + ' Headers: ' + JSON.stringify(request.headers));
 
     socket.on('message', function(message) {
         //On client message received.
-        console.log('Client message received: ' + message);
+        console.log('Client message received! Address: ' + clientAddress + ' Message: ' + message);
     }).on('close', function(code) {
         //On client disconnected.
-        console.log('Client disconnected! ' + code + ' (' + getStatusCodeString(code) + ')');
+        console.log();
+        console.log('Client disconnected! Address: ' + clientAddress + ' Code: ' + code + ' (' + getStatusCodeString(code) + ')');
     }).on('error', function(error) {
         //On client error.
-        console.log('Client Error encountered: ' + error.name + ': ' + error.message);
+        console.log('Client Error encountered! Address: ' + clientAddress + ' Error: ' + error.name + ': ' + error.message);
     });
 
     socket.send(JSON.stringify({

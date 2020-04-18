@@ -3,50 +3,13 @@
     <head>
         <meta charset="UTF-8"/>
         <title>Workruft</title>
+        <link rel="stylesheet" href="main.css"/>
         <script src="three.js" defer></script>
+        <script src="../Common/statusCodes.js" defer></script>
+        <script src="Chat.js" defer></script>
         <script src="index.js" defer></script>
-        <style>
-            html {
-                margin: 0;
-                padding: 0;
-            }
-
-            body {
-                margin: 0;
-                padding: 0;
-                background-color: black;
-                color: white;
-            }
-
-            canvas {
-                display: block;
-            }
-
-            #chatBox {
-                margin: 0;
-                padding: 0px 0px 4px 4px;
-                position: absolute;
-                display: flex;
-                align-items: flex-end;
-                flex-direction: column-reverse;
-                flex-wrap: nowrap;
-                top: 0px;
-                bottom: 0px;
-                z-index: 100;
-            }
-
-            .chatMessage {
-                margin: 0;
-                padding: 0;
-                text-align: left;
-            }
-        </style>
     </head>
     <body>
-        <div id="chatBox">
-            <p class="chatMessage">User: Blahblahblah!</p>
-            <p class="chatMessage">User: Blahblahblah!</p>
-            <p class="chatMessage">User: Blahblahblah!</p>
-        </div>
+        <div id="chatBox"></div>
     </body>
 </html>
