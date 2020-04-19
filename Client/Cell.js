@@ -1,12 +1,12 @@
 //Each cell is a cube with top corner shearing.
 //(Its top corners can have different heights.)
 class Cell {
-    constructor(x, z, vio) {
+    constructor(x, z, heights, vio) {
         this.x = x;
         this.z = z;
         //Vertex Index Offset.
         this.vio = vio;
-        this.createVertices();
+        this.createVertices(heights);
         this.createFaces();
     }
 
@@ -20,17 +20,17 @@ class Cell {
     //|/   |/ Right
     //0----1
     //Front
-    createVertices() {
+    createVertices(heights) {
         //In order from 0-7:
         this.vertices = [
-            new THREE.Vector3(this.x - HalfCellSize,        MapBottomY, this.z + HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,        MapBottomY, this.z + HalfCellSize),
-            new THREE.Vector3(this.x - HalfCellSize,  MapMinimumHeight, this.z + HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,  MapMinimumHeight, this.z + HalfCellSize),
-            new THREE.Vector3(this.x - HalfCellSize,        MapBottomY, this.z - HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,        MapBottomY, this.z - HalfCellSize),
-            new THREE.Vector3(this.x - HalfCellSize,  MapMinimumHeight, this.z - HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,  MapMinimumHeight, this.z - HalfCellSize)
+            new THREE.Vector3(this.x - HalfCellSize,                     MapBottomY, this.z + HalfCellSize),
+            new THREE.Vector3(this.x + HalfCellSize,                     MapBottomY, this.z + HalfCellSize),
+            new THREE.Vector3(this.x - HalfCellSize,  MapMinimumHeight + heights[0], this.z + HalfCellSize),
+            new THREE.Vector3(this.x + HalfCellSize,  MapMinimumHeight + heights[1], this.z + HalfCellSize),
+            new THREE.Vector3(this.x - HalfCellSize,                     MapBottomY, this.z - HalfCellSize),
+            new THREE.Vector3(this.x + HalfCellSize,                     MapBottomY, this.z - HalfCellSize),
+            new THREE.Vector3(this.x - HalfCellSize,  MapMinimumHeight + heights[2], this.z - HalfCellSize),
+            new THREE.Vector3(this.x + HalfCellSize,  MapMinimumHeight + heights[3], this.z - HalfCellSize)
         ];
     }
 

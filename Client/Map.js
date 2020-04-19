@@ -23,7 +23,12 @@ class Map {
             let column = {};
             this.grid[x] = column;
             for (let z = -this.halfSizeZ; z <= this.halfSizeZ; z += CellSize) {
-                column[z] = new Cell(x, z, vio);
+                column[z] = new Cell(x, z, [
+                    Math.random() * 4.0,
+                    Math.random() * 4.0,
+                    Math.random() * 4.0,
+                    Math.random() * 4.0
+                ], vio);
                 this.geometry.vertices.push(...column[z].vertices);
                 this.geometry.faces.push(...column[z].faces);
                 vio += column[z].vertices.length;
