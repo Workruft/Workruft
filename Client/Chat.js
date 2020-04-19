@@ -8,6 +8,7 @@ class Chat {
         }
         this.chatEntryBox = HTML.chatEntryBox;
         this.chatEntryBox.value = '';
+        this.chatEntryBox.addEventListener('focusout', this.onChatEntryFocusOut.bind(this));
     }
 
     clear() {
@@ -17,10 +18,10 @@ class Chat {
     }
 
     print({ message }) {
-        let chatSpan = document.createElement('span');
-        chatSpan.classList = [ 'chatMessage' ];
-        chatSpan.innerHTML = message;
-        this.chatBox.prepend(chatSpan);
+        let chatPre = document.createElement('pre');
+        chatPre.classList = [ 'chatMessage' ];
+        chatPre.innerHTML = message;
+        this.chatBox.prepend(chatPre);
     }
 
     toggleChatEntryBox() {
@@ -31,8 +32,22 @@ class Chat {
             if (this.chatEntryBox.value.length > 0) {
                 this.onChatEntry(this.chatEntryBox.value);
             }
-            this.chatEntryBox.style.display = 'none';
-            this.chatEntryBox.value = '';
+            this.hideChatEntryBox();
         }
+    }
+
+    hideChatEntryBox() {
+        this.chatEntryBox.style.display = 'none';
+        this.chatEntryBox.value = '';
+    }
+
+    focusChatEntryBoxIfOpen() {
+        if (this.chatEntryBox.style.display != 'none') {
+            this.chatEntryBox.focus();
+        }
+    }
+
+    onChatEntryFocusOut() {
+        this.hideChatEntryBox();
     }
 }

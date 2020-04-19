@@ -35,11 +35,18 @@ class Workruft {
             case 'Enter':
                 this.chat.toggleChatEntryBox();
                 break;
+            case 'Escape':
+                this.chat.hideChatEntryBox();
+                break;
         }
     }
 
     onKeyUp(event) {
-
+        switch (event.key) {
+            case 'Tab':
+                this.chat.focusChatEntryBoxIfOpen();
+                break;
+        }
     }
 
     onChatEntry(text) {
