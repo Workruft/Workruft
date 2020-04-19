@@ -1,12 +1,14 @@
 let cubeGeometry = new THREE.Geometry();
 //Corners:
+//    Top
 //  6----7
 // /|   /|
-//2----3 |
+//2----3 | Right
 //| |  | |
 //| 4--|-5
-//|/   |/
+//|/   |/ Right
 //0----1
+//Front
 cubeGeometry.vertices.push(
     //In order from 0-7:
     new THREE.Vector3(-1, -1,  1),
@@ -43,9 +45,12 @@ cubeGeometry.faces.push(
 //For lighting.
 cubeGeometry.computeFaceNormals();
 function createCustomCube() {
-    return new THREE.Mesh(cubeGeometry, new THREE.MeshPhongMaterial({ color: 'green' }));
+    return new THREE.Mesh(cubeGeometry,
+        new THREE.MeshPhongMaterial({ color: 'green' }));
 }
 
 function createSphere() {
-    return new THREE.Mesh(new THREE.SphereBufferGeometry(1, 15, 15), new THREE.MeshPhongMaterial({ color: 'yellow' }));
+    return new THREE.Mesh(
+        new THREE.SphereBufferGeometry(1, 15, 15),
+        new THREE.MeshPhongMaterial({ color: 'yellow' }));
 }

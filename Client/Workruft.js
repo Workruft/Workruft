@@ -17,13 +17,10 @@ class Workruft {
     }
 
     onUpdate(elapsedTimeMS) {
-        for (let i = 0; i < this.world.customCubes.length; ++i) {
-            this.world.customCubes[i].rotation.x += 0.01;
-            this.world.customCubes[i].rotation.y += 0.01;
-        }
-        this.world.sphere.position.set(
+        this.world.camera.position.set(
             15.0 * Math.cos(elapsedTimeMS * 0.001),
-            5.0 * Math.sin(elapsedTimeMS * 0.0001),
-            5.0 * Math.sin(elapsedTimeMS * 0.001) + 10.0);
+            30,
+            15.0 * Math.sin(elapsedTimeMS * 0.001));
+        this.world.camera.lookAt(0, 0, 0);
     }
 }
