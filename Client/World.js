@@ -1,26 +1,28 @@
+//Directions:
+//  -Z    /\+Y
+//-X  +X  ||
+//  +Z    \/-Y
+
 class World {
-    constructor(chat) {
+    constructor(chat, onUpdate) {
         this.chat = chat;
+        this.onUpdate = onUpdate;
+        this.boundGraphicsLoop = this.graphicsLoop.bind(this);
 
-        let scene = new THREE.Scene();
-        let clock = new THREE.Clock();
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(this.renderer.domElement);
 
-        let renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        //Directions:
-        //  -Z    /\+Y
-        //-X  +X  ||
-        //  +Z    \/-Y
+        this.scene = new THREE.Scene();
+        this.clock = new THREE.Clock();
 
         let fieldOfView = 75;
         let aspectRatio = window.innerWidth / window.innerHeight;
         let near = 0.1;
         let far = 1000;
-        let camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, near, far);
-        camera.position.set(0, 0, 30);
-        camera.lookAt(0, 0, 0);
+        this.camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, near, far);
+        this.camera.position.set(0, 0, 30);
+        this.camera.lookAt(0, 0, 0);
 
         let cubeGeometry = new THREE.Geometry();
         //Corners:
@@ -75,7 +77,7 @@ class World {
                 let customCube = createCustomCube();
                 customCube.position.set(x * 2, y * 2, -10);
                 customCubes.push(customCube);
-                scene.add(customCube);
+                this.scene.add(customCube);
             }
         }
 
@@ -83,30 +85,23 @@ class World {
             return new THREE.Mesh(new THREE.SphereBufferGeometry(1, 15, 15), new THREE.MeshPhongMaterial({ color: 'yellow' }));
         }
         let sphere = createSphere();
-        scene.add(sphere);
+        this.scene.add(sphere);
 
         let ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
-        scene.add(ambientLight);
+        this.scene.add(ambientLight);
 
         let directionalLight = new THREE.DirectionalLight('white', 0.5);
         directionalLight.position.set(100, 100, 100);
-        scene.add(directionalLight);
+        this.scene.add(directionalLight);
 
         let pointLight = new THREE.PointLight('blue', 5, 20);
         pointLight.position.set(0, 0, 1, 0.5);
-        scene.add(pointLight);
+        this.scene.add(pointLight);
+    }
 
-
-        function animate() {
-            requestAnimationFrame(animate);
-            let elapsedTime = clock.getElapsedTime();
-            for (let i = 0; i < customCubes.length; ++i) {
-                customCubes[i].rotation.x += 0.01;
-                customCubes[i].rotation.y += 0.01;
-            }
-            sphere.position.set(15.0 * Math.cos(elapsedTime), 5.0 * Math.sin(elapsedTime * 0.1), 5.0 * Math.sin(elapsedTime) + 10.0);
-            renderer.render(scene, camera);
-        }
-        animate();
+    graphicsLoop(elapsedTime) {
+        this.renderer.render(this.scene, this.camera);
+        this.onUpdate(elapsedTime);
+        requestAnimationFrame(this.boundGraphicsLoop);
     }
 }
