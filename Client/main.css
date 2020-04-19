@@ -16,19 +16,32 @@ canvas {
 
 #chatBox {
     margin: 0;
-    padding: 0px 0px 4px 4px;
+    padding: 0px 0px 4px 6px;
     position: absolute;
     display: flex;
     align-items: flex-start;
     flex-direction: column-reverse;
     flex-wrap: nowrap;
     top: 0px;
-    bottom: 0px;
+    bottom: 28px;
     z-index: 100;
+    font-family: Montserrat, Open Sans, Verdana;
+    font-size: 16px;
 }
 
 .chatMessage {
     margin: 0;
     padding: 0;
     text-align: left;
+}
+
+#chatEntryBox {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    width: calc(50%);
+    bottom: 5px;
+    left: 4px;
+    font-family: Montserrat, Open Sans, Verdana;
+    font-size: 16px;
 }
