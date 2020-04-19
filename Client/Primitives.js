@@ -44,13 +44,13 @@ cubeGeometry.faces.push(
 );
 //For lighting.
 cubeGeometry.computeFaceNormals();
-function createCustomCube() {
+function createCustomCube(color) {
     return new THREE.Mesh(cubeGeometry,
-        new THREE.MeshPhongMaterial({ color: 'green' }));
+        new THREE.MeshPhongMaterial({ color }));
 }
 
-function createSphere() {
+function createSphere(color) {
     return new THREE.Mesh(
         new THREE.SphereBufferGeometry(1, 15, 15),
-        new THREE.MeshPhongMaterial({ color: 'yellow' }));
+        new THREE.MeshPhongMaterial({ color }));
 }

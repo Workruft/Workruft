@@ -31,23 +31,21 @@ class World {
         let near = 0.1;
         let far = 1000;
         this.camera = new THREE.PerspectiveCamera(fieldOfView, this.aspectRatio, near, far);
-        this.camera.position.set(0, 30, 30);
-        this.camera.lookAt(0, 0, 0);
 
         //Action.
         // this.customCubes = [];
         // for (let x = -5; x <= 5; ++x) {
         //     for (let y = -5; y <= 5; ++y) {
-        //         let customCube = createCustomCube();
+        //         let customCube = createCustomCube('green');
         //         customCube.position.set(x * 2, y * 2, -10);
         //         this.customCubes.push(customCube);
         //         this.scene.add(customCube);
         //     }
         // }
-        this.sphere = createSphere();
+        this.sphere = createSphere('#777');
         this.sphere.position.y = 5.0;
         this.scene.add(this.sphere);
-        this.map = new Map(50, 50);
+        this.map = new Map(150, 150);
         this.scene.add(this.map.mesh);
     }
 
