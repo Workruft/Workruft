@@ -8,8 +8,11 @@ class Workruft {
 
         document.addEventListener('keydown', this.onKeyDown.bind(this));
         document.addEventListener('keyup', this.onKeyUp.bind(this));
-        document.addEventListener('click', this.onClick.bind(this));
+        document.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+        });
         document.addEventListener('mousedown', this.onMouseDown.bind(this));
+        document.addEventListener('mousemove', this.onMouseMove.bind(this));
         document.addEventListener('mouseup', this.onMouseUp.bind(this));
         document.addEventListener('wheel', this.onWheel.bind(this));
     }
@@ -80,11 +83,30 @@ class Workruft {
         this.chat.print({ message: 'You: ' + text });
     }
 
-    onClick(event) {
+    onMouseDown(event) {
+        switch (event.button) {
+            case 0:
+                //Left click.
+                let canvasRect = this.world.canvas.getBoundingClientRect();
+                let normalizedX = (event.clientX - canvasRect.left) / canvasRect.width * 2.0 - 1.0;
+                let normalizedY = (event.clientY - canvasRect.top) / canvasRect.height * -2.0 + 1.0;
+                let pickedObjectArray = this.world.pickObjects([ this.world.clickablePlayerObjects ], { x: normalizedX, y: normalizedY });
+                if (pickedObjectArray.length > 0) {
+                    alert('Clicked!');
+                }
+                break;
+            case 1:
+                //Middle click.
 
+                break;
+            case 2:
+                //Right click.
+
+                break;
+        }
     }
 
-    onMouseDown(event) {
+    onMouseMove(event) {
 
     }
 

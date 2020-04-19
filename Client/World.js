@@ -10,10 +10,10 @@ class World {
         this.boundGraphicsLoop = this.graphicsLoop.bind(this);
 
         //WebGL.
-        this.renderer = new THREE.WebGLRenderer();
+        this.canvas = HTML.gameCanvas;
+        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
         this.onResize();
         window.addEventListener('resize', this.onResize);
-        document.body.appendChild(this.renderer.domElement);
 
         this.scene = new THREE.Scene();
         this.clock = new THREE.Clock();
@@ -31,8 +31,26 @@ class World {
         let near = 0.1;
         let far = 1000;
         this.camera = new THREE.PerspectiveCamera(fieldOfView, this.aspectRatio, near, far);
+        //For picking.
+        this.raycaster = new THREE.Raycaster();
+        this.raycaster.near = near;
+        this.raycaster.far = far;
+        //TODO: Why does this not work?
+        this.raycaster.params.Mesh.threshold = 30000;
 
         //Action.
+        //Map.
+        this.map = new Map(150, 150);
+        this.scene.add(this.map.mesh);
+        //Game objects.
+        this.gameObjects = new THREE.Group();
+        this.clickableObjects = new THREE.Group();
+        this.clickablePlayerObjects = new THREE.Group();
+        this.clickableDoodadObjects = new THREE.Group();
+        this.scene.add(this.gameObjects);
+        this.gameObjects.add(this.clickableObjects);
+        this.clickableObjects.add(this.clickablePlayerObjects);
+        this.clickableObjects.add(this.clickableDoodadObjects);
         // this.customCubes = [];
         // for (let x = -5; x <= 5; ++x) {
         //     for (let y = -5; y <= 5; ++y) {
@@ -42,11 +60,8 @@ class World {
         //         this.scene.add(customCube);
         //     }
         // }
-        this.sphere = createSphere('#777');
-        this.sphere.position.y = 5.0;
-        this.scene.add(this.sphere);
-        this.map = new Map(150, 150);
-        this.scene.add(this.map.mesh);
+        this.playerUnit = new GameUnit({ mesh: createSphere('#777'), x: 0.0, y: 5.0, z: 0.0 });
+        this.clickablePlayerObjects.add(this.playerUnit.mesh);
     }
 
     onResize() {
@@ -61,5 +76,31 @@ class World {
         this.renderer.render(this.scene, this.camera);
         this.onUpdate(elapsedTimeMS);
         requestAnimationFrame(this.boundGraphicsLoop);
+    }
+
+    //Object groups must be an array.
+    //Mouse position must be in canvas-relative coordinates with Y flipped.
+    //Objects returned are in order from nearest to farthest.
+    pickObjects(objectGroups, mousePositionVector) {
+        this.raycaster.setFromCamera(mousePositionVector, this.camera);
+        return this.raycaster.intersectObjects(objectGroups, true);
+
+        //From the docs: {
+            //distance – distance between the origin of the ray and the intersection
+            //point – point of intersection, in world coordinates
+            //face – intersected face
+            //faceIndex – index of the intersected face
+            //object – the intersected object
+            //uv - U,V coordinates at point of intersection
+            //uv2 - Second set of U,V coordinates at point of intersection
+            //instanceId – The index number of the instance where the ray intersects the InstancedMesh
+        //}
+        //Raycaster delegates to the raycast method of the passed object,
+        //when evaluating whether the ray intersects the object or not.
+        //This allows meshes to respond differently to ray casting than lines and pointclouds.
+        //Note that for meshes, faces must be pointed towards the origin of the ray in order to be detected;
+        //intersections of the ray passing through the back of a face will not be detected.
+        //To raycast against both faces of an object,
+        //you'll want to set the material's side property to THREE.DoubleSide.
     }
 }
