@@ -18,9 +18,9 @@ class Workruft {
 
     onUpdate(elapsedTimeMS) {
         this.world.camera.position.set(
-            15.0 * Math.cos(elapsedTimeMS * 0.001),
+            15.0 * Math.cos(elapsedTimeMS * 0.0002),
             30,
-            15.0 * Math.sin(elapsedTimeMS * 0.001));
+            15.0 * Math.sin(elapsedTimeMS * 0.0002));
         this.world.camera.lookAt(0, 0, 0);
     }
 }

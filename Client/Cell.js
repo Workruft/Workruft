@@ -1,12 +1,16 @@
+let GrassColor = new THREE.Color('#0c4013');
+let DirtColor = new THREE.Color('#2b3c1f');
+
 //Each cell is a cube with top corner shearing.
 //(Its top corners can have different heights.)
 class Cell {
     constructor(x, z, heights, vio) {
         this.x = x;
         this.z = z;
+        this.heights = heights;
         //Vertex Index Offset.
         this.vio = vio;
-        this.createVertices(heights);
+        this.createVertices();
         this.createFaces();
     }
 
@@ -20,17 +24,18 @@ class Cell {
     //|/   |/ Right
     //0----1
     //Front
-    createVertices(heights) {
+    createVertices() {
+        //Heights: [ 2, 3, 7, 6 ]
         //In order from 0-7:
         this.vertices = [
-            new THREE.Vector3(this.x - HalfCellSize,                     MapBottomY, this.z + HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,                     MapBottomY, this.z + HalfCellSize),
-            new THREE.Vector3(this.x - HalfCellSize,  MapMinimumHeight + heights[0], this.z + HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,  MapMinimumHeight + heights[1], this.z + HalfCellSize),
-            new THREE.Vector3(this.x - HalfCellSize,                     MapBottomY, this.z - HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,                     MapBottomY, this.z - HalfCellSize),
-            new THREE.Vector3(this.x - HalfCellSize,  MapMinimumHeight + heights[2], this.z - HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,  MapMinimumHeight + heights[3], this.z - HalfCellSize)
+            new THREE.Vector3(this.x - HalfCellSize,                     MapBottomY,      this.z + HalfCellSize),
+            new THREE.Vector3(this.x + HalfCellSize,                     MapBottomY,      this.z + HalfCellSize),
+            new THREE.Vector3(this.x - HalfCellSize,  MapMinimumHeight + this.heights[0], this.z + HalfCellSize),
+            new THREE.Vector3(this.x + HalfCellSize,  MapMinimumHeight + this.heights[1], this.z + HalfCellSize),
+            new THREE.Vector3(this.x - HalfCellSize,                     MapBottomY,      this.z - HalfCellSize),
+            new THREE.Vector3(this.x + HalfCellSize,                     MapBottomY,      this.z - HalfCellSize),
+            new THREE.Vector3(this.x - HalfCellSize,  MapMinimumHeight + this.heights[3], this.z - HalfCellSize),
+            new THREE.Vector3(this.x + HalfCellSize,  MapMinimumHeight + this.heights[2], this.z - HalfCellSize)
         ];
     }
 
@@ -52,12 +57,17 @@ class Cell {
             //Left.
             new THREE.Face3(vio + 4, vio + 2, vio + 6),
             new THREE.Face3(vio + 4, vio + 0, vio + 2),
-            //Top.
-            new THREE.Face3(vio + 2, vio + 7, vio + 6),
-            new THREE.Face3(vio + 2, vio + 3, vio + 7),
             //Bottom.
             new THREE.Face3(vio + 4, vio + 1, vio + 0),
             new THREE.Face3(vio + 4, vio + 5, vio + 1),
+            //Top.
+            new THREE.Face3(vio + 2, vio + 7, vio + 6),
+            new THREE.Face3(vio + 2, vio + 3, vio + 7),
         ];
+        for (let faceIndex = 0; faceIndex < 10; ++faceIndex) {
+            this.faces[faceIndex].color = DirtColor;
+        }
+        this.faces[10].color = GrassColor;
+        this.faces[11].color = GrassColor;
     }
 }

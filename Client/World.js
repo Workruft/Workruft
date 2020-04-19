@@ -19,15 +19,12 @@ class World {
         this.clock = new THREE.Clock();
 
         //Lights.
-        this.ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
+        this.ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.0);
         this.scene.add(this.ambientLight);
         //"Sun".
-        this.directionalLight = new THREE.DirectionalLight('white', 0.5);
-        this.directionalLight.position.set(100, 100, 100);
+        this.directionalLight = new THREE.DirectionalLight('white', 1.0);
+        this.directionalLight.position.set(0, 100, 0);
         this.scene.add(this.directionalLight);
-        this.pointLight = new THREE.PointLight('blue', 5, 20);
-        this.pointLight.position.set(0, 0, 1, 0.5);
-        this.scene.add(this.pointLight);
 
         //Camera.
         let fieldOfView = 75;
