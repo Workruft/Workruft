@@ -2,6 +2,8 @@ let CellSize = 1.0;
 let HalfCellSize = CellSize * 0.5;
 let MapBottomY = -CellSize;
 let MapMinimumHeight = 0.0;
+let MinCameraHeight = 30.0;
+let MaxCameraHeight = 500.0;
 
 // Store all of the HTML DOM elements in the body of the page as an HTMLCollection.
 // Any element with an ID can now simply be accessed by HTML.theID or HTML['theID'].
