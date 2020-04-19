@@ -7,6 +7,7 @@ class Workruft {
         this.keysDown = {};
 
         document.addEventListener('keydown', this.onKeyDown.bind(this));
+        document.addEventListener('keyup', this.onKeyUp.bind(this));
         document.addEventListener('click', this.onClick.bind(this));
         document.addEventListener('mousedown', this.onMouseDown.bind(this));
         document.addEventListener('mouseup', this.onMouseUp.bind(this));
@@ -21,31 +22,24 @@ class Workruft {
     }
 
     onSetup() {
-        this.world.camera.position.set(0, 100, 0);
-        this.world.camera.lookAt(0, 0, this.world.camera.position.z - 1);
+        this.world.camera.position.set(0, 75, 10);
+        this.world.camera.lookAt(0, 0, this.world.camera.position.z - 10);
         //this.network.connect();
     }
 
     onUpdate(elapsedTimeMS) {
-        // this.world.camera.position.set(
-        //     75.0 * Math.cos(elapsedTimeMS * 0.0002),
-        //     100,
-        //     75.0 * Math.sin(elapsedTimeMS * 0.0002));
-        // this.world.camera.lookAt(
-        //     50.0 * Math.cos(elapsedTimeMS * 0.0002),
-        //     50,
-        //     50.0 * Math.sin(elapsedTimeMS * 0.0002));
+        let cameraMoveAmount = Math.tan(Math.PI * 0.005) * this.world.camera.position.y;
         if (this.keysDown.w) {
-            this.world.camera.position.z -= 1.0;
+            this.world.camera.position.z -= cameraMoveAmount;
         }
         if (this.keysDown.s) {
-            this.world.camera.position.z += 1.0;
+            this.world.camera.position.z += cameraMoveAmount;
         }
         if (this.keysDown.a) {
-            this.world.camera.position.x -= 1.0;
+            this.world.camera.position.x -= cameraMoveAmount;
         }
         if (this.keysDown.d) {
-            this.world.camera.position.x += 1.0;
+            this.world.camera.position.x += cameraMoveAmount;
         }
     }
 
