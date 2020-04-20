@@ -1,56 +1,22 @@
-let cubeGeometry = new THREE.Geometry();
-//Corners:
-//    Top
-//  6----7
-// /|   /|
-//2----3 | Right
-//| |  | |
-//| 4--|-5
-//|/   |/ Right
-//0----1
-//Front
-cubeGeometry.vertices.push(
-    //In order from 0-7:
-    new THREE.Vector3(-1, -1,  1),
-    new THREE.Vector3( 1, -1,  1),
-    new THREE.Vector3(-1,  1,  1),
-    new THREE.Vector3( 1,  1,  1),
-    new THREE.Vector3(-1, -1, -1),
-    new THREE.Vector3( 1, -1, -1),
-    new THREE.Vector3(-1,  1, -1),
-    new THREE.Vector3( 1,  1, -1)
-);
-//Faces. Must be in counter-clockwise direction to be facing outside.
-//Each integer is merely referencing a corner vertex.
-cubeGeometry.faces.push(
-    //Front.
-    new THREE.Face3(0, 3, 2),
-    new THREE.Face3(0, 1, 3),
-    //Right.
-    new THREE.Face3(1, 7, 3),
-    new THREE.Face3(1, 5, 7),
-    //Back.
-    new THREE.Face3(5, 6, 7),
-    new THREE.Face3(5, 4, 6),
-    //Left.
-    new THREE.Face3(4, 2, 6),
-    new THREE.Face3(4, 0, 2),
-    //Top.
-    new THREE.Face3(2, 7, 6),
-    new THREE.Face3(2, 3, 7),
-    //Bottom.
-    new THREE.Face3(4, 1, 0),
-    new THREE.Face3(4, 5, 1),
-);
-//For lighting.
-cubeGeometry.computeFaceNormals();
-function createCustomCube(color) {
-    return new THREE.Mesh(cubeGeometry,
-        new THREE.MeshPhongMaterial({ color }));
-}
+let TinySphereGeometry = new THREE.SphereBufferGeometry(HalfTinySize, 15, 15);
+let SmallSphereGeometry = new THREE.SphereBufferGeometry(TinySize, 15, 15);
+let TinyCubeGeometry = new THREE.BoxGeometry(TinySize, TinySize, TinySize);
+let SmallCubeGeometry = new THREE.BoxGeometry(SmallSize, SmallSize, SmallSize);
 
-function createSphere(color) {
-    return new THREE.Mesh(
-        new THREE.SphereBufferGeometry(1, 15, 15),
-        new THREE.MeshPhongMaterial({ color }));
+function createCircleGeometry(radius) {
+    let circleGeometry = new THREE.Geometry();
+    for (let rotation = 0; rotation < Math.PI * 2.0; rotation += Math.PI * 0.01) {
+        circleGeometry.vertices.push(
+            new THREE.Vector3(radius * Math.cos(rotation), radius * Math.sin(rotation), 0.0));
+    }
+    circleGeometry.vertices.push(circleGeometry.vertices[0]);
+    let circleLine = new MeshLine();
+    circleLine.setGeometry(circleGeometry);
+    //Parabolic width.
+    //circleLine.setGeometry(circleGeometry, function(point) {
+    //    return Math.pow(4 * point * (1 - point), 1);
+    //});
+    return circleLine.geometry;
 }
+let TinyCircleGeometry = createCircleGeometry(SelectionExtraRadius + HalfTinySize);
+let SmallCircleGeometry = createCircleGeometry(SelectionExtraRadius + TinySize);

@@ -28,14 +28,14 @@ class Cell {
         //Heights: [ 2, 3, 7, 6 ]
         //In order from 0-7:
         this.vertices = [
-            new THREE.Vector3(this.x - HalfCellSize,                     MapBottomY,      this.z + HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,                     MapBottomY,      this.z + HalfCellSize),
-            new THREE.Vector3(this.x - HalfCellSize,  MapMinimumHeight + this.heights[0], this.z + HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,  MapMinimumHeight + this.heights[1], this.z + HalfCellSize),
-            new THREE.Vector3(this.x - HalfCellSize,                     MapBottomY,      this.z - HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,                     MapBottomY,      this.z - HalfCellSize),
-            new THREE.Vector3(this.x - HalfCellSize,  MapMinimumHeight + this.heights[3], this.z - HalfCellSize),
-            new THREE.Vector3(this.x + HalfCellSize,  MapMinimumHeight + this.heights[2], this.z - HalfCellSize)
+            new THREE.Vector3(this.x,            MapBottomY,                         this.z + CellSize),
+            new THREE.Vector3(this.x + CellSize, MapBottomY,                         this.z + CellSize),
+            new THREE.Vector3(this.x,            MapMinimumHeight + this.heights[0], this.z + CellSize),
+            new THREE.Vector3(this.x + CellSize, MapMinimumHeight + this.heights[1], this.z + CellSize),
+            new THREE.Vector3(this.x,            MapBottomY,                         this.z),
+            new THREE.Vector3(this.x + CellSize, MapBottomY,                         this.z),
+            new THREE.Vector3(this.x,            MapMinimumHeight + this.heights[3], this.z),
+            new THREE.Vector3(this.x + CellSize, MapMinimumHeight + this.heights[2], this.z)
         ];
     }
 
@@ -69,5 +69,9 @@ class Cell {
         }
         this.faces[10].color = GrassColor;
         this.faces[11].color = GrassColor;
+    }
+
+    getMaxHeight() {
+        return Math.max(this.vertices[2].y, this.vertices[3].y, this.vertices[7].y, this.vertices[6].y);
     }
 }

@@ -85,4 +85,8 @@ class Map {
             this.geometry,
             new THREE.MeshPhongMaterial({ vertexColors: THREE.FaceColors }));
     }
+
+    getCell({ integerX, integerZ }) {
+        return this.grid[integerX][integerZ];
+    }
 }

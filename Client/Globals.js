@@ -1,7 +1,16 @@
 let CellSize = 1.0;
 let HalfCellSize = CellSize * 0.5;
+let QuarterCellSize = HalfCellSize * 0.5;
+
+let HalfTinySize = CellSize;
+let TinySize = CellSize * 2.0;
+let SmallSize = TinySize * 2.0;
+
+let SelectionExtraRadius = QuarterCellSize;
+
 let MapBottomY = -CellSize;
 let MapMinimumHeight = 0.0;
+
 let MinCameraHeight = 30.0;
 let MaxCameraHeight = 500.0;
 
@@ -12,3 +21,16 @@ let MaxCameraHeight = 500.0;
 // If accessing HTML elements by class, use:
 // Array.from(document.getElementsByClassName('className')).forEach(function (className) {
 let HTML = document.body.getElementsByTagName('*');
+
+//Make sure to delete it as well!
+function DisposeThreeObject(disposeMe) {
+    if (disposeMe == null) {
+        return;
+    }
+    if (disposeMe.parent) {
+        disposeMe.parent.remove(disposeMe);
+    }
+    if (disposeMe.dispose) {
+        disposeMe.dispose();
+    }
+}

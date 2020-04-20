@@ -28,6 +28,16 @@ class Workruft {
         this.world.camera.position.set(0, 75, 10);
         this.world.camera.lookAt(0, 0, this.world.camera.position.z - 10);
         //this.network.connect();
+
+        //Game units etc.
+        //TODO: Handle object group inside GameUnit.
+        this.playerUnit = new GameUnit({
+            gameModel: this.world.sheepModel,
+            x: 0.0,
+            y: this.world.map.getCell({ integerX: 0, integerZ: 0 }).getMaxHeight() + this.world.sheepModel.size,
+            z: 0.0
+        });
+        this.world.clickablePlayerObjects.add(this.playerUnit.mesh);
     }
 
     onUpdate(elapsedTimeMS) {
@@ -61,6 +71,15 @@ class Workruft {
                 case 'd':
                     this.keysDown[event.key] = true;
                     break;
+                case 'F5':
+                    if (event.ctrlKey) {
+                        //For Ctrl+F5, force a full page reload.
+                        window.location.reload(true);
+                    } else {
+                        //Disable regular F5.
+                        //event.preventDefault();
+                    }
+                    break;
             }
         }
     }
@@ -92,7 +111,16 @@ class Workruft {
                 let normalizedY = (event.clientY - canvasRect.top) / canvasRect.height * -2.0 + 1.0;
                 let pickedObjectArray = this.world.pickObjects([ this.world.clickablePlayerObjects ], { x: normalizedX, y: normalizedY });
                 if (pickedObjectArray.length > 0) {
-                    alert('Clicked!');
+                    let pickedGameObject = pickedObjectArray[0].object.userData;
+                    if (pickedGameObject.isSelected) {
+                        pickedGameObject.deselect({ world: this.world });
+                    } else {
+                        pickedGameObject.select({
+                            world: this.world,
+                            selectionModel: this.world.tinySelectionCircleModel,
+                            objectGroup: this.world.selectionCircles
+                        });
+                    }
                 }
                 break;
             case 1:
