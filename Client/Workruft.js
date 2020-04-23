@@ -42,7 +42,7 @@ class Workruft {
 
     onUpdate(elapsedTimeMS) {
         if (!this.chat.isChatEntryBoxOpen()) {
-            let cameraMoveAmount = Math.tan(Math.PI * 0.005) * this.world.camera.position.y;
+            let cameraMoveAmount = Math.tan(Math.PI * 0.01) * this.world.camera.position.y;
             if (this.keysDown.w) {
                 this.world.camera.position.z -= cameraMoveAmount;
             }

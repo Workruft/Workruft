@@ -47,6 +47,27 @@ class World {
         //Action.
         //Map.
         this.map = new Map(150, 150);
+        let currentCell;
+        let addBorder = function(currentCell) {
+            this.map.geometry.vertices[currentCell.vio + 0].y = 1.0;
+            this.map.geometry.vertices[currentCell.vio + 1].y = 1.0;
+            this.map.geometry.vertices[currentCell.vio + 2].y = 1.0;
+            this.map.geometry.vertices[currentCell.vio + 3].y = 1.0;
+        }.bind(this);
+        for (let x = this.map.minX; x <= this.map.maxX; x += CellSize) {
+            addBorder(this.map.getCell({ x, z: this.map.minZ }));
+            addBorder(this.map.getCell({ x, z: this.map.minZ + 1 }));
+            addBorder(this.map.getCell({ x, z: this.map.maxZ - 1 }));
+            addBorder(this.map.getCell({ x, z: this.map.maxZ }));
+        }
+        for (let z = this.map.minZ; z <= this.map.maxZ; z += CellSize) {
+            addBorder(this.map.getCell({ x: this.map.minX, z }));
+            addBorder(this.map.getCell({ x: this.map.minX + 1, z }));
+            addBorder(this.map.getCell({ x: this.map.maxX - 1, z }));
+            addBorder(this.map.getCell({ x: this.map.maxX, z }));
+        }
+        this.map.geometry.verticesNeedUpdate = true;
+        this.map.updateCliffs({ lowX: this.map.minX, lowZ: this.map.minZ, highX: this.map.maxX, highZ: this.map.maxZ });
         this.scene.add(this.map.mesh);
         //Game models.
         this.setupGameModels();

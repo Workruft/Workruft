@@ -30,18 +30,6 @@ class Map {
                 vio = this.geometry.vertices.length;
                 column[z] = {
                     vio,
-                    //Corners:
-                    //        Back
-                    //      0-----1
-                    //Left / Top / Right
-                    //    3-----2
-                    //    Front
-                    vertices: [
-                        new THREE.Vector3(x,            MapBottomY + Math.random() * 2.0, z),
-                        new THREE.Vector3(x + CellSize, MapBottomY + Math.random() * 2.0, z),
-                        new THREE.Vector3(x + CellSize, MapBottomY + Math.random() * 2.0, z + CellSize),
-                        new THREE.Vector3(x,            MapBottomY + Math.random() * 2.0, z + CellSize),
-                    ],
                     //Faces must be in counter-clockwise direction to be facing outside.
                     //Each integer is merely referencing a corner vertex.
                     faces: {
@@ -53,12 +41,24 @@ class Map {
                 };
                 column[z].faces.top[0].color = GrassColor;
                 column[z].faces.top[1].color = GrassColor;
-                this.geometry.vertices.push(...column[z].vertices);
+                //Corners:
+                //        Back
+                //      0-----1
+                //Left / Top / Right
+                //    3-----2
+                //    Front
+                this.geometry.vertices.push(
+                    new THREE.Vector3(x,            MapBottomY, z),
+                    new THREE.Vector3(x + CellSize, MapBottomY, z),
+                    new THREE.Vector3(x + CellSize, MapBottomY, z + CellSize),
+                    new THREE.Vector3(x,            MapBottomY, z + CellSize)
+                );
                 this.geometry.faces.push(...column[z].faces.top);
             }
         }
 
-        this.updateCliffs({ lowX: this.minX, lowZ: this.minZ, highX: this.maxX, highZ: this.maxZ });
+        //For lighting.
+        this.geometry.computeFaceNormals();
 
         this.mesh = new THREE.Mesh(
             this.geometry,
@@ -86,7 +86,7 @@ class Map {
             for (let z = lowZ; z < highZ; z += CellSize) {
                 currentCell = this.getCell({ x, z });
                 //Right.
-                if (x < highX - 1) {
+                if (x < highX) {
                     this.updateFaces({
                         currentCell, otherX: x + 1, otherZ: z,
                         direction: 'right',
@@ -95,7 +95,7 @@ class Map {
                     });
                 }
                 //Front.
-                if (z < highZ - 1) {
+                if (z < highZ) {
                     this.updateFaces({
                         currentCell, otherX: x, otherZ: z + 1,
                         direction: 'front',
@@ -134,15 +134,15 @@ class Map {
         }
         let newFaces = [];
         //Each integer is merely referencing a corner vertex.
-        if (currentCell.vertices[currentVertexA].y > otherCell.vertices[otherVertexA].y &&
-            currentCell.vertices[currentVertexB].y > otherCell.vertices[otherVertexB].y) {
+        if (this.geometry.vertices[currentCell.vio + currentVertexA].y > this.geometry.vertices[otherCell.vio + otherVertexA].y &&
+            this.geometry.vertices[currentCell.vio + currentVertexB].y > this.geometry.vertices[otherCell.vio + otherVertexB].y) {
             //Current side > other side.
             newFaces.push(new THREE.Face3(
                 currentCell.vio + currentVertexA, currentCell.vio + currentVertexB, otherCell.vio + otherVertexA));
             newFaces.push(new THREE.Face3(
                 otherCell.vio + otherVertexA, currentCell.vio + currentVertexB, otherCell.vio + otherVertexB));
-        } else if (currentCell.vertices[currentVertexA].y < otherCell.vertices[otherVertexA].y &&
-            currentCell.vertices[currentVertexB].y < otherCell.vertices[otherVertexB].y) {
+        } else if (this.geometry.vertices[currentCell.vio + currentVertexA].y < this.geometry.vertices[otherCell.vio + otherVertexA].y &&
+            this.geometry.vertices[currentCell.vio + currentVertexB].y < this.geometry.vertices[otherCell.vio + otherVertexB].y) {
             //Current side < other side.
             newFaces.push(new THREE.Face3(
                 currentCell.vio + currentVertexA, otherCell.vio + otherVertexA, currentCell.vio + currentVertexB));
@@ -150,8 +150,8 @@ class Map {
                 otherCell.vio + otherVertexA, otherCell.vio + otherVertexB, currentCell.vio + currentVertexB));
         } else {
             //Handle the corners individually.
-            if (currentCell.vertices[currentVertexA].y != otherCell.vertices[otherVertexA].y) {
-                if (currentCell.vertices[currentVertexA].y > otherCell.vertices[otherVertexA].y) {
+            if (this.geometry.vertices[currentCell.vio + currentVertexA].y != this.geometry.vertices[otherCell.vio + otherVertexA].y) {
+                if (this.geometry.vertices[currentCell.vio + currentVertexA].y > this.geometry.vertices[otherCell.vio + otherVertexA].y) {
                     newFaces.push(new THREE.Face3(
                         currentCell.vio + currentVertexA, currentCell.vio + currentVertexB, otherCell.vio + otherVertexA));
                 } else {
@@ -159,8 +159,8 @@ class Map {
                         currentCell.vio + currentVertexA, otherCell.vio + otherVertexA, currentCell.vio + currentVertexB));
                 }
             }
-            if (currentCell.vertices[currentVertexB].y != otherCell.vertices[otherVertexB].y) {
-                if (currentCell.vertices[currentVertexB].y > otherCell.vertices[otherVertexB].y) {
+            if (this.geometry.vertices[currentCell.vio + currentVertexB].y != this.geometry.vertices[otherCell.vio + otherVertexB].y) {
+                if (this.geometry.vertices[currentCell.vio + currentVertexB].y > this.geometry.vertices[otherCell.vio + otherVertexB].y) {
                     newFaces.push(new THREE.Face3(
                         currentCell.vio + currentVertexB, otherCell.vio + otherVertexB, currentCell.vio + currentVertexA));
                 } else {
