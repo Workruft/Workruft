@@ -32,7 +32,7 @@ class Workruft {
         this.playerUnit = new GameUnit({
             gameModel: this.world.sheepModel,
             x: 0.0,
-            y: 0.0,//this.world.map.getCell({ integerX: 0, integerZ: 0 }).getMaxHeight() + this.world.sheepModel.size,
+            y: 2.0,//this.world.map.getCell({ integerX: 0, integerZ: 0 }).getMaxHeight() + this.world.sheepModel.size,
             z: 0.0
         });
         this.playerUnit.addToGroup({ objectGroup: this.world.clickablePlayerObjects });

@@ -37,10 +37,10 @@ class Map {
                     //    3-----2
                     //    Front
                     vertices: [
-                        new THREE.Vector3(x,            MapBottomY + Math.random(), z),
-                        new THREE.Vector3(x + CellSize, MapBottomY + Math.random(), z),
-                        new THREE.Vector3(x + CellSize, MapBottomY + Math.random(), z + CellSize),
-                        new THREE.Vector3(x,            MapBottomY + Math.random(), z + CellSize),
+                        new THREE.Vector3(x,            MapBottomY + Math.random() * 2.0, z),
+                        new THREE.Vector3(x + CellSize, MapBottomY + Math.random() * 2.0, z),
+                        new THREE.Vector3(x + CellSize, MapBottomY + Math.random() * 2.0, z + CellSize),
+                        new THREE.Vector3(x,            MapBottomY + Math.random() * 2.0, z + CellSize),
                     ],
                     //Faces must be in counter-clockwise direction to be facing outside.
                     //Each integer is merely referencing a corner vertex.
@@ -127,65 +127,54 @@ class Map {
             return;
         }
         if (IsDefined(currentCell.faces[direction])) {
-            if (IsDefined(currentCell.faces[direction][0])) {
-                this.geometry.faces.splice(this.geometry.faces.indexOf(currentCell.faces[direction][0]), 1);
-            }
-            if (IsDefined(currentCell.faces[direction][1])) {
-                this.geometry.faces.splice(this.geometry.faces.indexOf(currentCell.faces[direction][1]), 1);
+            for (let face of currentCell.faces[direction]) {
+                this.geometry.faces.splice(this.geometry.faces.indexOf(face), 1);
             }
             delete currentCell.faces[direction];
         }
-        //Faces must be in counter-clockwise direction to be facing outside.
+        let newFaces = [];
         //Each integer is merely referencing a corner vertex.
         if (currentCell.vertices[currentVertexA].y > otherCell.vertices[otherVertexA].y &&
             currentCell.vertices[currentVertexB].y > otherCell.vertices[otherVertexB].y) {
             //Current side > other side.
-            currentCell.faces[direction] = [];
-            currentCell.faces[direction][0] = new THREE.Face3(
-                currentCell.vio + currentVertexA, currentCell.vio + ((currentVertexA + 1) % 4), otherCell.vio + otherVertexA);
-            currentCell.faces[direction][1] = new THREE.Face3(
-                otherCell.vio + otherVertexA, otherCell.vio + otherVertexB, currentCell.vio + ((currentVertexA + 1) % 4));
-            currentCell.faces[direction][0].color = DirtColor;
-            currentCell.faces[direction][1].color = DirtColor;
-            this.geometry.faces.push(currentCell.faces[direction][0]);
-            this.geometry.faces.push(currentCell.faces[direction][1]);
+            newFaces.push(new THREE.Face3(
+                currentCell.vio + currentVertexA, currentCell.vio + currentVertexB, otherCell.vio + otherVertexA));
+            newFaces.push(new THREE.Face3(
+                otherCell.vio + otherVertexA, currentCell.vio + currentVertexB, otherCell.vio + otherVertexB));
         } else if (currentCell.vertices[currentVertexA].y < otherCell.vertices[otherVertexA].y &&
             currentCell.vertices[currentVertexB].y < otherCell.vertices[otherVertexB].y) {
             //Current side < other side.
-            currentCell.faces[direction] = [];
-            currentCell.faces[direction][0] = new THREE.Face3(
-                currentCell.vio + currentVertexA, currentCell.vio + ((currentVertexA + 1) % 4), otherCell.vio + otherVertexA);
-            currentCell.faces[direction][1] = new THREE.Face3(
-                otherCell.vio + otherVertexA, otherCell.vio + otherVertexB, currentCell.vio + ((currentVertexA + 1) % 4));
-            currentCell.faces[direction][0].color = DirtColor;
-            currentCell.faces[direction][1].color = DirtColor;
-            this.geometry.faces.push(currentCell.faces[direction][0]);
-            this.geometry.faces.push(currentCell.faces[direction][1]);
+            newFaces.push(new THREE.Face3(
+                currentCell.vio + currentVertexA, otherCell.vio + otherVertexA, currentCell.vio + currentVertexB));
+            newFaces.push(new THREE.Face3(
+                otherCell.vio + otherVertexA, otherCell.vio + otherVertexB, currentCell.vio + currentVertexB));
         } else {
             //Handle the corners individually.
             if (currentCell.vertices[currentVertexA].y != otherCell.vertices[otherVertexA].y) {
-                currentCell.faces[direction] = [];
                 if (currentCell.vertices[currentVertexA].y > otherCell.vertices[otherVertexA].y) {
-                    currentCell.faces[direction][0] = new THREE.Face3(
-                        currentCell.vio + currentVertexA, currentCell.vio + ((currentVertexA + 1) % 4), otherCell.vio + otherVertexA);
+                    newFaces.push(new THREE.Face3(
+                        currentCell.vio + currentVertexA, currentCell.vio + currentVertexB, otherCell.vio + otherVertexA));
                 } else {
-                    currentCell.faces[direction][0] = new THREE.Face3(
-                        currentCell.vio + currentVertexA, otherCell.vio + otherVertexA, currentCell.vio + ((currentVertexA + 1) % 4));
+                    newFaces.push(new THREE.Face3(
+                        currentCell.vio + currentVertexA, otherCell.vio + otherVertexA, currentCell.vio + currentVertexB));
                 }
-                currentCell.faces[direction][0].color = DirtColor;
-                this.geometry.faces.push(currentCell.faces[direction][0]);
             }
             if (currentCell.vertices[currentVertexB].y != otherCell.vertices[otherVertexB].y) {
-                currentCell.faces[direction] = [];
                 if (currentCell.vertices[currentVertexB].y > otherCell.vertices[otherVertexB].y) {
-                    currentCell.faces[direction][1] = new THREE.Face3(
-                        currentCell.vio + currentVertexB, otherCell.vio + otherVertexB, currentCell.vio + ((currentVertexB + 3) % 4));
+                    newFaces.push(new THREE.Face3(
+                        currentCell.vio + currentVertexB, otherCell.vio + otherVertexB, currentCell.vio + currentVertexA));
                 } else {
-                    currentCell.faces[direction][1] = new THREE.Face3(
-                        currentCell.vio + currentVertexB, currentCell.vio + ((currentVertexB + 3) % 4), otherCell.vio + otherVertexB);
+                    newFaces.push(new THREE.Face3(
+                        currentCell.vio + currentVertexB, currentCell.vio + currentVertexA, otherCell.vio + otherVertexB));
                 }
-                currentCell.faces[direction][1].color = DirtColor;
-                this.geometry.faces.push(currentCell.faces[direction][1]);
+            }
+        }
+        if (newFaces.length > 0) {
+            currentCell.faces[direction] = [];
+            for (let newFace of newFaces) {
+                newFace.color = DirtColor;
+                currentCell.faces[direction].push(newFace);
+                this.geometry.faces.push(newFace);
             }
         }
     }
