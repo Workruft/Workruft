@@ -35,10 +35,12 @@ class World {
         let near = 0.1;
         let far = 1000;
         this.camera = new THREE.PerspectiveCamera(fieldOfView, this.aspectRatio, near, far);
+        this.camera.layers.enableAll();
         //For picking.
         this.raycaster = new THREE.Raycaster();
         this.raycaster.near = near;
         this.raycaster.far = far;
+        this.raycaster.layers.set(0);
         //TODO: Why does this not work?
         this.raycaster.params.Mesh.threshold = 30000;
 
@@ -54,8 +56,6 @@ class World {
         this.scene.add(this.gameObjects);
         this.unclickableObjects = new THREE.Group();
         this.gameObjects.add(this.unclickableObjects);
-        this.selectionCircles = new THREE.Group();
-        this.unclickableObjects.add(this.selectionCircles);
         this.clickableObjects = new THREE.Group();
         this.gameObjects.add(this.clickableObjects);
         this.clickablePlayerObjects = new THREE.Group();

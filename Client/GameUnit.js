@@ -2,11 +2,13 @@
 class GameUnit {
     constructor({ gameModel, x, y, z }) {
         this.gameModel = gameModel;
-        this.mesh = gameModel.createNewMesh();
-        this.mesh.position.x = x;
-        this.mesh.position.y = y;
-        this.mesh.position.z = z;
-        this.mesh.userData = this;
+        this.group = new THREE.Group();
+        this.position.set(x, y, z);
+        this.private = {
+            mesh: gameModel.createNewMesh()
+        };
+        this.private.mesh.userData = this;
+        this.group.add(this.private.mesh);
         this.isSelected = false;
     }
 
@@ -18,15 +20,17 @@ class GameUnit {
         }
     }
 
-    select({ world, selectionModel, objectGroup }) {
+    addToGroup({ objectGroup }) {
+        objectGroup.add(this.group);
+    }
+
+    select({ world, selectionModel }) {
         if (!this.isSelected) {
-            this.selectionCircle = selectionModel.createNewMesh();
-            this.selectionCircle.position.set(
-                this.mesh.position.x,
-                this.mesh.position.y - this.gameModel.size * 0.5,
-                this.mesh.position.z);
-            this.selectionCircle.rotation.x = Math.PI * 0.5;
-            objectGroup.add(this.selectionCircle);
+            this.private.selectionCircle = selectionModel.createNewMesh();
+            this.private.selectionCircle.layers.set(1);
+            this.private.selectionCircle.position.y = - this.gameModel.size * 0.5;
+            this.private.selectionCircle.rotation.x = Math.PI * 0.5;
+            this.group.add(this.private.selectionCircle);
             world.selectedObjectsMap[this] = true;
             this.isSelected = true;
         }
@@ -35,9 +39,13 @@ class GameUnit {
     deselect({ world }) {
         if (this.isSelected) {
             delete world.selectedObjectsMap[this];
-            DisposeThreeObject(this.selectionCircle);
-            delete this.selectionCircle;
+            DisposeThreeObject(this.private.selectionCircle);
+            delete this.private.selectionCircle;
             this.isSelected = false;
         }
+    }
+
+    get position() {
+        return this.group.position;
     }
 }

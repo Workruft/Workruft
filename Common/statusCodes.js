@@ -31,7 +31,7 @@ globalThis.getStatusCodeString = function(code) {
             return '(For applications)';
         }
     }
-    if (specificStatusCodeMappings[code] !== undefined) {
+    if (typeof specificStatusCodeMappings[code] !== 'undefined') {
         return specificStatusCodeMappings[code];
     }
     return '(Unknown)';

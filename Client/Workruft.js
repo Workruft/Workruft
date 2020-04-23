@@ -27,17 +27,17 @@ class Workruft {
     onSetup() {
         this.world.camera.position.set(0, 75, 10);
         this.world.camera.lookAt(0, 0, this.world.camera.position.z - 10);
-        //this.network.connect();
 
         //Game units etc.
-        //TODO: Handle object group inside GameUnit.
         this.playerUnit = new GameUnit({
             gameModel: this.world.sheepModel,
             x: 0.0,
             y: this.world.map.getCell({ integerX: 0, integerZ: 0 }).getMaxHeight() + this.world.sheepModel.size,
             z: 0.0
         });
-        this.world.clickablePlayerObjects.add(this.playerUnit.mesh);
+        this.playerUnit.addToGroup({ objectGroup: this.world.clickablePlayerObjects });
+
+        //this.network.connect();
     }
 
     onUpdate(elapsedTimeMS) {
@@ -117,8 +117,7 @@ class Workruft {
                     } else {
                         pickedGameObject.select({
                             world: this.world,
-                            selectionModel: this.world.tinySelectionCircleModel,
-                            objectGroup: this.world.selectionCircles
+                            selectionModel: this.world.tinySelectionCircleModel
                         });
                     }
                 }
