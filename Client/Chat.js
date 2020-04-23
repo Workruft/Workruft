@@ -24,15 +24,19 @@ class Chat {
         this.chatBox.prepend(chatPre);
     }
 
+    isChatEntryBoxOpen() {
+        return this.chatEntryBox.style.display != 'none';
+    }
+
     toggleChatEntryBox() {
-        if (this.chatEntryBox.style.display == 'none') {
-            this.chatEntryBox.style.display = 'block';
-            this.chatEntryBox.focus();
-        } else {
+        if (this.isChatEntryBoxOpen()) {
             if (this.chatEntryBox.value.length > 0) {
                 this.onChatEntry(this.chatEntryBox.value);
             }
             this.hideChatEntryBox();
+        } else {
+            this.chatEntryBox.style.display = 'block';
+            this.chatEntryBox.focus();
         }
     }
 
@@ -42,7 +46,7 @@ class Chat {
     }
 
     focusChatEntryBoxIfOpen() {
-        if (this.chatEntryBox.style.display != 'none') {
+        if (this.isChatEntryBoxOpen()) {
             this.chatEntryBox.focus();
         }
     }

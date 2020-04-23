@@ -41,24 +41,26 @@ class Workruft {
     }
 
     onUpdate(elapsedTimeMS) {
-        let cameraMoveAmount = Math.tan(Math.PI * 0.005) * this.world.camera.position.y;
-        if (this.keysDown.w) {
-            this.world.camera.position.z -= cameraMoveAmount;
-        }
-        if (this.keysDown.s) {
-            this.world.camera.position.z += cameraMoveAmount;
-        }
-        if (this.keysDown.a) {
-            this.world.camera.position.x -= cameraMoveAmount;
-        }
-        if (this.keysDown.d) {
-            this.world.camera.position.x += cameraMoveAmount;
-        }
-        if (this.keysDown.q) {
-            //this.world.camera.rotation.z += 0.01;
-        }
-        if (this.keysDown.e) {
-            //this.world.camera.rotation.z -= 0.01;
+        if (!this.chat.isChatEntryBoxOpen()) {
+            let cameraMoveAmount = Math.tan(Math.PI * 0.005) * this.world.camera.position.y;
+            if (this.keysDown.w) {
+                this.world.camera.position.z -= cameraMoveAmount;
+            }
+            if (this.keysDown.s) {
+                this.world.camera.position.z += cameraMoveAmount;
+            }
+            if (this.keysDown.a) {
+                this.world.camera.position.x -= cameraMoveAmount;
+            }
+            if (this.keysDown.d) {
+                this.world.camera.position.x += cameraMoveAmount;
+            }
+            if (this.keysDown.q) {
+                //this.world.camera.rotation.z += 0.01;
+            }
+            if (this.keysDown.e) {
+                //this.world.camera.rotation.z -= 0.01;
+            }
         }
     }
 
