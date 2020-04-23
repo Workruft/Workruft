@@ -10,6 +10,8 @@ class Workruft {
         document.addEventListener('keyup', this.onKeyUp.bind(this));
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
+            event.stopPropagation();
+            return false;
         });
         document.addEventListener('mousedown', this.onMouseDown.bind(this));
         document.addEventListener('mousemove', this.onMouseMove.bind(this));
@@ -86,7 +88,7 @@ class Workruft {
                 case 'Escape':
                     this.chat.hideChatEntryBox();
                     break;
-                case 'w': case 'a': case 's': case 'd': case 'q': case 'e':
+                case 'Control': case 'w': case 'a': case 's': case 'd': case 'q': case 'e':
                     this.keysDown[event.key] = true;
                     break;
                 case 'F5':
@@ -108,7 +110,7 @@ class Workruft {
             case 'Tab':
                 this.chat.focusChatEntryBoxIfOpen();
                 break;
-            case 'w': case 'a': case 's': case 'd': case 'q': case 'e':
+            case 'Control': case 'w': case 'a': case 's': case 'd': case 'q': case 'e':
                 this.keysDown[event.key] = false;
                 break;
         }
@@ -157,13 +159,18 @@ class Workruft {
                     let clickedCell = this.world.map.getCell({ x: integerX, z: integerZ });
                     if (clickedCell) {
                         for (let selectedObject of this.selectedObjects) {
-                            selectedObject.issueReplacementOrder({
+                            let newOrderObject = {
                                 workruft: this,
                                 order: new Order({
                                     type: Enums.OrderTypes.Move,
                                     data: { x: clickCoordinates.x, z: clickCoordinates.z }
                                 })
-                            });
+                            };
+                            if (this.keysDown.Control) {
+                                selectedObject.issueAdditionalOrder(newOrderObject);
+                            } else {
+                                selectedObject.issueReplacementOrder(newOrderObject);
+                            }
                         }
                     }
                 }

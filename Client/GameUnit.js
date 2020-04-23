@@ -31,6 +31,11 @@ class GameUnit {
         this.private.orders.push(order);
     }
 
+    issueAdditionalOrder({ workruft, order }) {
+        workruft.objectsToUpdate.add(this);
+        this.private.orders.push(order);
+    }
+
     update({ workruft, deltaTimeMS }) {
         let updated = false;
         while (this.private.orders.length > 0) {
@@ -44,6 +49,7 @@ class GameUnit {
                     if (distance < maxTravelDistance) {
                         this.position.x = currentOrder.data.x;
                         this.position.z = currentOrder.data.z;
+                        deltaTimeMS -= (maxTravelDistance - distance) / this.private.speed;
                         this.private.orders.splice(0, 1);
                     } else {
                         let manhattanDistance = Math.abs(xDistance) + Math.abs(zDistance);
