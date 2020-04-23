@@ -11,7 +11,7 @@ let SelectionExtraRadius = QuarterCellSize;
 let MapBottomY = -CellSize;
 let MapMinimumHeight = 0.0;
 
-let MinCameraHeight = 15.0;
+let MinCameraHeight = 3.0;
 let MaxCameraHeight = 500.0;
 
 let GrassColor = new THREE.Color('#0c4013');
@@ -36,4 +36,12 @@ function DisposeThreeObject(disposeMe) {
     if (disposeMe.dispose) {
         disposeMe.dispose();
     }
+}
+
+function IsUndefined(checkMe) {
+    return typeof checkMe == 'undefined';
+}
+
+function IsDefined(checkMe) {
+    return typeof checkMe !== 'undefined';
 }
