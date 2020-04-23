@@ -30,14 +30,17 @@ class Workruft {
     }
 
     onSetup() {
+        this.selectedObjects = new Set();
+        this.objectsToUpdate = new Set();
+
         this.world.camera.position.set(0, 75, 10);
         this.world.camera.lookAt(0, 0, this.world.camera.position.z - 10);
 
         //Game units etc.
         this.playerUnit = new GameUnit({
+            workruft: this,
             gameModel: this.world.sheepModel,
             x: 0.0,
-            y: this.world.map.getAverageHeight({ cell: this.world.map.getCell({ x: 0, z: 0 }) }),
             z: 0.0
         });
         this.playerUnit.addToGroup({ objectGroup: this.world.playerObjects });
@@ -45,7 +48,12 @@ class Workruft {
         //this.network.connect();
     }
 
-    onUpdate(elapsedTimeMS) {
+    onUpdate() {
+        let deltaTimeMS = this.world.clock.getDelta();
+        for (let objectToUpdate of this.objectsToUpdate) {
+            objectToUpdate.update({ workruft: this, deltaTimeMS });
+        }
+
         if (!this.chat.isChatEntryBoxOpen()) {
             let cameraMoveAmount = Math.tan(Math.PI * 0.01) * this.world.camera.position.y;
             if (this.keysDown.w) {
@@ -136,10 +144,10 @@ class Workruft {
                 if (pickedObjectArray.length > 0) {
                     let pickedGameObject = pickedObjectArray[0].object.userData;
                     if (pickedGameObject.isSelected) {
-                        pickedGameObject.deselect({ world: this.world });
+                        pickedGameObject.deselect({ workruft: this });
                     } else {
                         pickedGameObject.select({
-                            world: this.world,
+                            workruft: this,
                             selectionModel: this.world.tinySelectionCircleModel
                         });
                     }
@@ -154,15 +162,18 @@ class Workruft {
                 let pickedMapObjectArray = this.world.pickMap(this.getNormalizedCanvasMouse(event));
                 if (pickedMapObjectArray.length > 0) {
                     let clickCoordinates = pickedMapObjectArray[0].point;
-                    let integerX = Math.round(pickedMapObjectArray[0].point.x);
-                    let integerZ = Math.round(pickedMapObjectArray[0].point.z);
+                    let integerX = Math.round(clickCoordinates.x);
+                    let integerZ = Math.round(clickCoordinates.z);
                     let clickedCell = this.world.map.getCell({ x: integerX, z: integerZ });
                     if (clickedCell) {
-                        for (let selectedObject of this.world.selectedObjects) {
-                            selectedObject.position.set(
-                                clickCoordinates.x,
-                                this.world.map.getAverageHeight({ cell: clickedCell }),
-                                clickCoordinates.z);
+                        for (let selectedObject of this.selectedObjects) {
+                            selectedObject.issueReplacementOrder({
+                                workruft: this,
+                                order: new Order({
+                                    type: Enums.OrderTypes.Move,
+                                    data: { x: clickCoordinates.x, z: clickCoordinates.z }
+                                })
+                            });
                         }
                     }
                 }

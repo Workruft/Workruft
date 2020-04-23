@@ -105,8 +105,6 @@ class World {
         this.gameObjects.add(this.clickableObjects);
         this.unclickableObjects.add(this.doodadObjects);
         this.clickableObjects.add(this.playerObjects);
-        //Selection.
-        this.selectedObjects = new Set();
     }
 
     deconstruct() {
@@ -161,15 +159,12 @@ class World {
         });
     }
 
-    graphicsLoop(elapsedTimeMS) {
+    graphicsLoop() {
         if (this.isDeconstructing) {
             return;
         }
-        if (elapsedTimeMS == null) {
-            elapsedTimeMS = 0.0;
-        }
         this.renderer.render(this.scene, this.camera);
-        this.onUpdate(elapsedTimeMS);
+        this.onUpdate();
         requestAnimationFrame(this.boundGraphicsLoop);
     }
 
