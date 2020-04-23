@@ -18,63 +18,37 @@ class Map {
         this.geometry = new THREE.Geometry();
 
         //Vertex Index Offset.
-        let vio = 0;
-        let heightVariance = 4.0;
-        for (let x = -this.halfSizeX; x <= this.halfSizeX; x += CellSize * 2) {
-            let column1 = {};
-            let column2 = {};
-            this.grid[x] = column1;
-            this.grid[x + 1] = column2;
-            for (let z = -this.halfSizeZ; z <= this.halfSizeZ; z += CellSize * 2) {
-                let type = Math.random();
-                let heights;
-                if (type >= 0.9) {
-                    let height = Math.round(Math.random() * heightVariance * 0.25) * 4.0;
-                    heights = [ height, height, height, height ];
-                } else if (type >= 0.8) {
-                    let height1 = Math.round(Math.random() * heightVariance * 0.25) * 4.0;
-                    let height2 = height1 + (1.0 * Math.sign(Math.random() - 0.5));
-                    if (type >= 0.875) {
-                        heights = [ height1, height1, height2, height2 ];
-                    } else if (type >= 0.85) {
-                        heights = [ height2, height1, height1, height2 ];
-                    } else if (type >= 0.825) {
-                        heights = [ height2, height2, height1, height1 ];
-                    } else {
-                        heights = [ height1, height2, height2, height1 ];
-                    }
-                } else {
-                    let height = heightVariance * 0.5;
-                    heights = [ height, height, height, height ];
-                }
-
-                column1[z] = new Cell(x, z, [
-                    (heights[0] + heights[3]) * 0.5, (heights[1] + heights[3]) * 0.5, (heights[2] + heights[3]) * 0.5, heights[3]
-                ], vio);
-                this.geometry.vertices.push(...column1[z].vertices);
-                this.geometry.faces.push(...column1[z].faces);
-                vio += column1[z].vertices.length;
-
-                column1[z + 1] = new Cell(x, z + 1, [
-                    heights[0], (heights[1] + heights[0]) * 0.5, (heights[2] + heights[0]) * 0.5, (heights[3] + heights[0]) * 0.5
-                ], vio);
-                this.geometry.vertices.push(...column1[z + 1].vertices);
-                this.geometry.faces.push(...column1[z + 1].faces);
-                vio += column1[z + 1].vertices.length;
-
-                column2[z] = new Cell(x + 1, z, [
-                    (heights[0] + heights[2]) * 0.5, (heights[1] + heights[2]) * 0.5, heights[2], (heights[3] + heights[2]) * 0.5
-                ], vio);
-                this.geometry.vertices.push(...column2[z].vertices);
-                this.geometry.faces.push(...column2[z].faces);
-                vio += column2[z].vertices.length;
-
-                column2[z + 1] = new Cell(x + 1, z + 1, [
-                    (heights[0] + heights[1]) * 0.5, heights[1], (heights[2] + heights[1]) * 0.5, (heights[3] + heights[1]) * 0.5
-                ], vio);
-                this.geometry.vertices.push(...column2[z + 1].vertices);
-                this.geometry.faces.push(...column2[z + 1].faces);
-                vio += column2[z + 1].vertices.length;
+        let vio;
+        for (let x = -this.halfSizeX; x <= this.halfSizeX; x += CellSize) {
+            let column = {};
+            this.grid[x] = column;
+            for (let z = -this.halfSizeZ; z <= this.halfSizeZ; z += CellSize) {
+                vio = this.geometry.vertices.length;
+                column[z] = {
+                    //Corners:
+                    //        Back
+                    //      0-----1
+                    //Left / Top / Right
+                    //    3-----2
+                    //    Front
+                    vertices: [
+                        new THREE.Vector3(x,            MapBottomY, z),
+                        new THREE.Vector3(x + CellSize, MapBottomY, z),
+                        new THREE.Vector3(x + CellSize, MapBottomY, z + CellSize),
+                        new THREE.Vector3(x,            MapBottomY, z + CellSize),
+                    ],
+                    //Faces must be in counter-clockwise direction to be facing outside.
+                    //Each integer is merely referencing a corner vertex.
+                    faces: [
+                        //Top.
+                        new THREE.Face3(vio,     vio + 3, vio + 1),
+                        new THREE.Face3(vio + 2, vio + 1, vio + 3)
+                    ]
+                };
+                column[z].faces[0].color = GrassColor;
+                column[z].faces[1].color = GrassColor;
+                this.geometry.vertices.push(...column[z].vertices);
+                this.geometry.faces.push(...column[z].faces);
             }
         }
 

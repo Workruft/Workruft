@@ -11,8 +11,11 @@ let SelectionExtraRadius = QuarterCellSize;
 let MapBottomY = -CellSize;
 let MapMinimumHeight = 0.0;
 
-let MinCameraHeight = 30.0;
+let MinCameraHeight = 15.0;
 let MaxCameraHeight = 500.0;
+
+let GrassColor = new THREE.Color('#0c4013');
+let DirtColor = new THREE.Color('#2b3c1f');
 
 // Store all of the HTML DOM elements in the body of the page as an HTMLCollection.
 // Any element with an ID can now simply be accessed by HTML.theID or HTML['theID'].

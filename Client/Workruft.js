@@ -32,7 +32,7 @@ class Workruft {
         this.playerUnit = new GameUnit({
             gameModel: this.world.sheepModel,
             x: 0.0,
-            y: this.world.map.getCell({ integerX: 0, integerZ: 0 }).getMaxHeight() + this.world.sheepModel.size,
+            y: 0.0,//this.world.map.getCell({ integerX: 0, integerZ: 0 }).getMaxHeight() + this.world.sheepModel.size,
             z: 0.0
         });
         this.playerUnit.addToGroup({ objectGroup: this.world.clickablePlayerObjects });
@@ -54,6 +54,12 @@ class Workruft {
         if (this.keysDown.d) {
             this.world.camera.position.x += cameraMoveAmount;
         }
+        if (this.keysDown.q) {
+            //this.world.camera.rotation.z += 0.01;
+        }
+        if (this.keysDown.e) {
+            //this.world.camera.rotation.z -= 0.01;
+        }
     }
 
     onKeyDown(event) {
@@ -69,6 +75,8 @@ class Workruft {
                 case 'a':
                 case 's':
                 case 'd':
+                case 'q':
+                case 'e':
                     this.keysDown[event.key] = true;
                     break;
                 case 'F5':
@@ -93,6 +101,8 @@ class Workruft {
             case 'a':
             case 's':
             case 'd':
+            case 'q':
+            case 'e':
                 this.keysDown[event.key] = false;
                 break;
         }
