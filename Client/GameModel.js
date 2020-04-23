@@ -1,4 +1,5 @@
 class GameModel {
+    //Takes ownership of the geometry and material!
     constructor({ geometry, material, size }) {
         this.geometry = geometry;
         this.material = material;
@@ -7,6 +8,13 @@ class GameModel {
     }
 
     createNewMesh() {
-        return new THREE.Mesh(this.geometry, this.material);
+        let newMesh = new THREE.Mesh(this.geometry, this.material);
+        newMesh.castShadow = true;
+        return newMesh;
+    }
+
+    deconstruct() {
+        DisposeThreeObject(this.geometry);
+        DisposeThreeObject(this.material);
     }
 }

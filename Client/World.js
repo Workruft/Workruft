@@ -16,6 +16,8 @@ class World {
             antialias: true,
             powerPreference: 'high-performance'
         });
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.onResize();
         window.addEventListener('resize', this.onResize);
 
@@ -27,8 +29,19 @@ class World {
         this.scene.add(this.ambientLight);
         //"Sun".
         this.directionalLight = new THREE.DirectionalLight('white', 1.0);
+        this.directionalLight.castShadow = true;
         this.directionalLight.position.set(0, 100, 0);
         this.scene.add(this.directionalLight);
+        this.directionalLight.shadow.camera.left = -100.0;
+        this.directionalLight.shadow.camera.right = 100.0;
+        this.directionalLight.shadow.camera.top = 100.0;
+        this.directionalLight.shadow.camera.bottom = -100.0;
+        this.directionalLight.shadow.camera.far = 1000.0;
+        this.directionalLight.shadow.camera.updateProjectionMatrix();
+        this.directionalLight.shadow.mapSize.width = 2048.0;
+        this.directionalLight.shadow.mapSize.height = 2048.0;
+        //To see the directional light's shadow camera bounds.
+        //this.scene.add(new THREE.CameraHelper(this.directionalLight.shadow.camera));
 
         //Camera.
         let fieldOfView = 75;
@@ -53,11 +66,12 @@ class World {
         //Map.
         this.map = new Map(150, 150);
         let currentCell;
+        //Border wall.
         let addBorder = function(currentCell) {
-            this.map.geometry.vertices[currentCell.vio + 0].y = 1.0;
-            this.map.geometry.vertices[currentCell.vio + 1].y = 1.0;
-            this.map.geometry.vertices[currentCell.vio + 2].y = 1.0;
-            this.map.geometry.vertices[currentCell.vio + 3].y = 1.0;
+            this.map.getBackLeftVertex({ cell: currentCell }).y = 1.0;
+            this.map.getBackRightVertex({ cell: currentCell }).y = 1.0;
+            this.map.getFrontRightVertex({ cell: currentCell }).y = 1.0;
+            this.map.getFrontLeftVertex({ cell: currentCell }).y = 1.0;
         }.bind(this);
         for (let x = this.map.minX; x <= this.map.maxX; x += CellSize) {
             addBorder(this.map.getCell({ x, z: this.map.minZ }));
@@ -79,17 +93,32 @@ class World {
         //Game objects.
         //Groups.
         this.gameObjects = new THREE.Group();
-        this.scene.add(this.gameObjects);
+        //Unclickables.
         this.unclickableObjects = new THREE.Group();
-        this.gameObjects.add(this.unclickableObjects);
+        this.doodadObjects = new THREE.Group();
+        //Clickables.
         this.clickableObjects = new THREE.Group();
+        this.playerObjects = new THREE.Group();
+        //Group hierarchy.
+        this.scene.add(this.gameObjects);
+        this.gameObjects.add(this.unclickableObjects);
         this.gameObjects.add(this.clickableObjects);
-        this.clickablePlayerObjects = new THREE.Group();
-        this.clickableObjects.add(this.clickablePlayerObjects);
-        this.clickableDoodadObjects = new THREE.Group();
-        this.clickableObjects.add(this.clickableDoodadObjects);
+        this.unclickableObjects.add(this.doodadObjects);
+        this.clickableObjects.add(this.playerObjects);
         //Selection.
         this.selectedObjects = new Set();
+    }
+
+    deconstruct() {
+        this.isDeconstructing = true;
+
+        //Geometries, materials, textures, render targets, scenes, and anything else with dispose().
+        DisposeThreeObject(this.selectionCircleMaterial);
+        DisposeThreeObject(this.tinySelectionCircleModel);
+        this.sheepModel.deconstruct();
+        this.buildingModel.deconstruct();
+        DisposeThreeObject(this.scene);
+        DisposeThreeObject(this.renderer);
     }
 
     onResize() {
@@ -100,9 +129,8 @@ class World {
     }
 
     setupResizeGameModels() {
-        if (this.selectionCircleMaterial) {
-            DisposeThreeObject(this.selectionCircleMaterial);
-        }
+        DisposeThreeObject(this.selectionCircleMaterial);
+        DisposeThreeObject(this.tinySelectionCircleModel);
         this.selectionCircleMaterial = new MeshLineMaterial({
             color: 'blue',
             resolution: new THREE.Vector2(this.canvas.width, this.canvas.height),
@@ -120,22 +148,23 @@ class World {
     }
 
     setupGameModels() {
-        this.sheepMaterial = new THREE.MeshPhongMaterial({ color: '#777' });
         this.sheepModel = new GameModel({
             geometry: TinySphereGeometry,
-            material: this.sheepMaterial,
+            material: new THREE.MeshPhongMaterial({ color: '#777' }),
             size: TinySize
         });
 
-        this.buildingMaterial = new THREE.MeshPhongMaterial({ color: 'black' });
         this.buildingModel = new GameModel({
             geometry: SmallCubeGeometry,
-            material: this.buildingMaterial,
+            material: new THREE.MeshPhongMaterial({ color: 'black' }),
             size: SmallSize
         });
     }
 
     graphicsLoop(elapsedTimeMS) {
+        if (this.isDeconstructing) {
+            return;
+        }
         if (elapsedTimeMS == null) {
             elapsedTimeMS = 0.0;
         }

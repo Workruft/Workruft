@@ -19,11 +19,11 @@
         });
 ```
 
+- Buildings, other units, and path finding!
+
 - More mouse and keyboard controls.
 
 - Update THREE.MeshLine.js to fork.
-
-- Improve GameUnit positioning (including selection circle!).
 
 - Properly cleanup the game on close and consider replacing F5 or Ctrl+F5.
 

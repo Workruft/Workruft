@@ -20,3 +20,12 @@ function createCircleGeometry(radius) {
 }
 let TinyCircleGeometry = createCircleGeometry(SelectionExtraRadius + HalfTinySize);
 let SmallCircleGeometry = createCircleGeometry(SelectionExtraRadius + TinySize);
+
+function DeconstructPrimitives() {
+    DisposeThreeObject(TinySphereGeometry);
+    DisposeThreeObject(SmallSphereGeometry);
+    DisposeThreeObject(TinyCubeGeometry);
+    DisposeThreeObject(SmallCubeGeometry);
+    DisposeThreeObject(TinyCircleGeometry);
+    DisposeThreeObject(SmallCircleGeometry);
+}

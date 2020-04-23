@@ -24,6 +24,11 @@ class Workruft {
         this.world.graphicsLoop();
     }
 
+    deconstruct() {
+        this.world.deconstruct();
+        this.network.deconstruct();
+    }
+
     onSetup() {
         this.world.camera.position.set(0, 75, 10);
         this.world.camera.lookAt(0, 0, this.world.camera.position.z - 10);
@@ -32,10 +37,10 @@ class Workruft {
         this.playerUnit = new GameUnit({
             gameModel: this.world.sheepModel,
             x: 0.0,
-            y: 2.0,//this.world.map.getCell({ integerX: 0, integerZ: 0 }).getMaxHeight() + this.world.sheepModel.size,
+            y: this.world.map.getAverageHeight({ cell: this.world.map.getCell({ x: 0, z: 0 }) }),
             z: 0.0
         });
-        this.playerUnit.addToGroup({ objectGroup: this.world.clickablePlayerObjects });
+        this.playerUnit.addToGroup({ objectGroup: this.world.playerObjects });
 
         //this.network.connect();
     }
@@ -84,10 +89,11 @@ class Workruft {
                 case 'F5':
                     if (event.ctrlKey) {
                         //For Ctrl+F5, force a full page reload.
+                        DestroyAll();
                         window.location.reload(true);
                     } else {
                         //Disable regular F5.
-                        //event.preventDefault();
+                        event.preventDefault();
                     }
                     break;
             }
@@ -125,7 +131,7 @@ class Workruft {
         switch (event.button) {
             case 0:
                 //Left click.
-                let pickedObjectArray = this.world.pickObjects([ this.world.clickablePlayerObjects ],
+                let pickedObjectArray = this.world.pickObjects([ this.world.playerObjects ],
                     this.getNormalizedCanvasMouse(event));
                 if (pickedObjectArray.length > 0) {
                     let pickedGameObject = pickedObjectArray[0].object.userData;
@@ -148,8 +154,16 @@ class Workruft {
                 let pickedMapObjectArray = this.world.pickMap(this.getNormalizedCanvasMouse(event));
                 if (pickedMapObjectArray.length > 0) {
                     let clickCoordinates = pickedMapObjectArray[0].point;
-                    for (let selectedObject of this.world.selectedObjects) {
-                        selectedObject.position.set(clickCoordinates.x, clickCoordinates.y, clickCoordinates.z);
+                    let integerX = Math.round(pickedMapObjectArray[0].point.x);
+                    let integerZ = Math.round(pickedMapObjectArray[0].point.z);
+                    let clickedCell = this.world.map.getCell({ x: integerX, z: integerZ });
+                    if (clickedCell) {
+                        for (let selectedObject of this.world.selectedObjects) {
+                            selectedObject.position.set(
+                                clickCoordinates.x,
+                                this.world.map.getAverageHeight({ cell: clickedCell }),
+                                clickCoordinates.z);
+                        }
                     }
                 }
                 break;

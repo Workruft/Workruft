@@ -8,7 +8,7 @@ let SmallSize = TinySize * 2.0;
 
 let SelectionExtraRadius = QuarterCellSize;
 
-let MapBottomY = -CellSize;
+let MapBottomY = 0.0;
 let MapMinimumHeight = 0.0;
 
 let MinCameraHeight = 3.0;

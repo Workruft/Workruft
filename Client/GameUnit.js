@@ -7,6 +7,7 @@ class GameUnit {
         this.private = {
             mesh: gameModel.createNewMesh()
         };
+        this.private.mesh.position.y = this.gameModel.halfSize;
         this.private.mesh.userData = this;
         this.group.add(this.private.mesh);
         this.isSelected = false;
@@ -28,7 +29,7 @@ class GameUnit {
         if (!this.isSelected) {
             this.private.selectionCircle = selectionModel.createNewMesh();
             this.private.selectionCircle.layers.set(1);
-            this.private.selectionCircle.position.y = - this.gameModel.size * 0.5;
+            this.private.selectionCircle.position.y = 0.5;
             this.private.selectionCircle.rotation.x = Math.PI * 0.5;
             this.group.add(this.private.selectionCircle);
             world.selectedObjects.add(this);

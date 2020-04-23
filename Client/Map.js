@@ -63,6 +63,12 @@ class Map {
         this.mesh = new THREE.Mesh(
             this.geometry,
             new THREE.MeshPhongMaterial({ vertexColors: THREE.FaceColors, side: THREE.DoubleSide }));
+        this.mesh.receiveShadow = true;
+    }
+
+    deconstruct() {
+        DisposeThreeObject(this.geometry);
+        DisposeThreeObject(this.mesh.material);
     }
 
     getCell({ x, z }) {
@@ -71,6 +77,30 @@ class Map {
         } else {
             return undefined;
         }
+    }
+
+    getBackLeftVertex({ cell }) {
+        return this.geometry.vertices[cell.vio];
+    }
+
+    getBackRightVertex({ cell }) {
+        return this.geometry.vertices[cell.vio + 1];
+    }
+
+    getFrontRightVertex({ cell }) {
+        return this.geometry.vertices[cell.vio + 2];
+    }
+
+    getFrontLeftVertex({ cell }) {
+        return this.geometry.vertices[cell.vio + 3];
+    }
+
+    getAverageHeight({ cell }) {
+        return (this.geometry.vertices[cell.vio].y +
+            this.geometry.vertices[cell.vio + 1].y +
+            this.geometry.vertices[cell.vio + 2].y +
+            this.geometry.vertices[cell.vio + 3].y)
+            * 0.25;
     }
 
     //Corners:
