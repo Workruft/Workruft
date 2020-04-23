@@ -114,14 +114,19 @@ class Workruft {
         this.chat.print({ message: 'You: ' + text });
     }
 
+    getNormalizedCanvasMouse(event) {
+        let canvasRect = this.world.canvas.getBoundingClientRect();
+        let normalizedX = (event.clientX - canvasRect.left) / canvasRect.width * 2.0 - 1.0;
+        let normalizedY = (event.clientY - canvasRect.top) / canvasRect.height * -2.0 + 1.0;
+        return { x: normalizedX, y: normalizedY };
+    }
+
     onMouseDown(event) {
         switch (event.button) {
             case 0:
                 //Left click.
-                let canvasRect = this.world.canvas.getBoundingClientRect();
-                let normalizedX = (event.clientX - canvasRect.left) / canvasRect.width * 2.0 - 1.0;
-                let normalizedY = (event.clientY - canvasRect.top) / canvasRect.height * -2.0 + 1.0;
-                let pickedObjectArray = this.world.pickObjects([ this.world.clickablePlayerObjects ], { x: normalizedX, y: normalizedY });
+                let pickedObjectArray = this.world.pickObjects([ this.world.clickablePlayerObjects ],
+                    this.getNormalizedCanvasMouse(event));
                 if (pickedObjectArray.length > 0) {
                     let pickedGameObject = pickedObjectArray[0].object.userData;
                     if (pickedGameObject.isSelected) {
@@ -140,7 +145,13 @@ class Workruft {
                 break;
             case 2:
                 //Right click.
-
+                let pickedMapObjectArray = this.world.pickMap(this.getNormalizedCanvasMouse(event));
+                if (pickedMapObjectArray.length > 0) {
+                    let clickCoordinates = pickedMapObjectArray[0].point;
+                    for (let selectedObject of this.world.selectedObjects) {
+                        selectedObject.position.set(clickCoordinates.x, clickCoordinates.y, clickCoordinates.z);
+                    }
+                }
                 break;
         }
     }

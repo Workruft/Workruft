@@ -36,13 +36,18 @@ class World {
         let far = 1000;
         this.camera = new THREE.PerspectiveCamera(fieldOfView, this.aspectRatio, near, far);
         this.camera.layers.enableAll();
-        //For picking.
-        this.raycaster = new THREE.Raycaster();
-        this.raycaster.near = near;
-        this.raycaster.far = far;
-        this.raycaster.layers.set(0);
+        //For terrain picking.
+        this.mapRaycaster = new THREE.Raycaster();
+        this.mapRaycaster.near = near;
+        this.mapRaycaster.far = far;
+        this.mapRaycaster.layers.set(0);
+        //For object picking.
+        this.objectsRaycaster = new THREE.Raycaster();
+        this.objectsRaycaster.near = near;
+        this.objectsRaycaster.far = far;
+        this.objectsRaycaster.layers.set(0);
         //TODO: Why does this not work?
-        this.raycaster.params.Mesh.threshold = 30000;
+        this.objectsRaycaster.params.Mesh.threshold = 30000;
 
         //Action.
         //Map.
@@ -84,7 +89,7 @@ class World {
         this.clickableDoodadObjects = new THREE.Group();
         this.clickableObjects.add(this.clickableDoodadObjects);
         //Selection.
-        this.selectedObjectsMap = {};
+        this.selectedObjects = new Set();
     }
 
     onResize() {
@@ -143,25 +148,28 @@ class World {
     //Mouse position must be in canvas-relative coordinates with Y flipped.
     //Objects returned are in order from nearest to farthest.
     pickObjects(objectGroups, mousePositionVector) {
-        this.raycaster.setFromCamera(mousePositionVector, this.camera);
-        return this.raycaster.intersectObjects(objectGroups, true);
-
-        //From the docs: {
-            //distance – distance between the origin of the ray and the intersection
-            //point – point of intersection, in world coordinates
-            //face – intersected face
-            //faceIndex – index of the intersected face
-            //object – the intersected object
-            //uv - U,V coordinates at point of intersection
-            //uv2 - Second set of U,V coordinates at point of intersection
-            //instanceId – The index number of the instance where the ray intersects the InstancedMesh
-        //}
-        //Raycaster delegates to the raycast method of the passed object,
-        //when evaluating whether the ray intersects the object or not.
-        //This allows meshes to respond differently to ray casting than lines and pointclouds.
-        //Note that for meshes, faces must be pointed towards the origin of the ray in order to be detected;
-        //intersections of the ray passing through the back of a face will not be detected.
-        //To raycast against both faces of an object,
-        //you'll want to set the material's side property to THREE.DoubleSide.
+        this.objectsRaycaster.setFromCamera(mousePositionVector, this.camera);
+        return this.objectsRaycaster.intersectObjects(objectGroups, true);
     }
+    pickMap(mousePositionVector) {
+        this.mapRaycaster.setFromCamera(mousePositionVector, this.camera);
+        return this.mapRaycaster.intersectObjects([ this.map.mesh ], true);
+    }
+    //From the docs: {
+        //distance – distance between the origin of the ray and the intersection
+        //point – point of intersection, in world coordinates
+        //face – intersected face
+        //faceIndex – index of the intersected face
+        //object – the intersected object
+        //uv - U,V coordinates at point of intersection
+        //uv2 - Second set of U,V coordinates at point of intersection
+        //instanceId – The index number of the instance where the ray intersects the InstancedMesh
+    //}
+    //Raycaster delegates to the raycast method of the passed object,
+    //when evaluating whether the ray intersects the object or not.
+    //This allows meshes to respond differently to ray casting than lines and pointclouds.
+    //Note that for meshes, faces must be pointed towards the origin of the ray in order to be detected;
+    //intersections of the ray passing through the back of a face will not be detected.
+    //To raycast against both faces of an object,
+    //you'll want to set the material's side property to THREE.DoubleSide.
 }

@@ -31,14 +31,14 @@ class GameUnit {
             this.private.selectionCircle.position.y = - this.gameModel.size * 0.5;
             this.private.selectionCircle.rotation.x = Math.PI * 0.5;
             this.group.add(this.private.selectionCircle);
-            world.selectedObjectsMap[this] = true;
+            world.selectedObjects.add(this);
             this.isSelected = true;
         }
     }
 
     deselect({ world }) {
         if (this.isSelected) {
-            delete world.selectedObjectsMap[this];
+            world.selectedObjects.delete(this);
             DisposeThreeObject(this.private.selectionCircle);
             delete this.private.selectionCircle;
             this.isSelected = false;
