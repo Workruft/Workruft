@@ -86,12 +86,7 @@ class Workruft {
                 case 'Escape':
                     this.chat.hideChatEntryBox();
                     break;
-                case 'w':
-                case 'a':
-                case 's':
-                case 'd':
-                case 'q':
-                case 'e':
+                case 'w': case 'a': case 's': case 'd': case 'q': case 'e':
                     this.keysDown[event.key] = true;
                     break;
                 case 'F5':
@@ -113,12 +108,7 @@ class Workruft {
             case 'Tab':
                 this.chat.focusChatEntryBoxIfOpen();
                 break;
-            case 'w':
-            case 'a':
-            case 's':
-            case 'd':
-            case 'q':
-            case 'e':
+            case 'w': case 'a': case 's': case 'd': case 'q': case 'e':
                 this.keysDown[event.key] = false;
                 break;
         }

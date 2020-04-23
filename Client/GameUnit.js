@@ -8,7 +8,8 @@ class GameUnit {
             orders: [],
             speed: 50.0
         };
-        this.private.mesh.position.y = this.gameModel.halfSize;
+        this.private.mesh.geometry.computeBoundingBox();
+        this.private.mesh.position.y = this.gameModel.halfYSize;
         this.private.mesh.userData = this;
         this.autoSetHeight({ workruft });
         this.group.add(this.private.mesh);
@@ -94,8 +95,6 @@ class GameUnit {
         return this.group.position;
     }
 
-    //TODO: Proper calculation would actually require determining whether the unit
-    //is above several cells at once. Also factor in varying sizes!
     autoSetHeight({ workruft }) {
         let integerX = Math.round(this.position.x);
         let integerZ = Math.round(this.position.z);

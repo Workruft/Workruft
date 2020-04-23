@@ -141,7 +141,10 @@ class World {
         this.tinySelectionCircleModel = new GameModel({
             geometry: TinyCircleGeometry,
             material: this.selectionCircleMaterial,
-            size: TinySize
+            xSize: TinySize,
+            ySize: 0.0,
+            zSize: TinySize,
+            isCircular: true
         });
     }
 
@@ -149,13 +152,19 @@ class World {
         this.sheepModel = new GameModel({
             geometry: TinySphereGeometry,
             material: new THREE.MeshPhongMaterial({ color: '#777' }),
-            size: TinySize
+            xSize: TinySize,
+            ySize: TinySize,
+            zSize: TinySize,
+            isCircular: true
         });
 
         this.buildingModel = new GameModel({
             geometry: SmallCubeGeometry,
             material: new THREE.MeshPhongMaterial({ color: 'black' }),
-            size: SmallSize
+            xSize: SmallSize,
+            ySize: SmallSize,
+            zSize: SmallSize,
+            isCircular: false
         });
     }
 
