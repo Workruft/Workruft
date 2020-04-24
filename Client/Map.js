@@ -29,7 +29,7 @@ class Map {
             for (let z = this.minZ; z <= this.maxZ; z += CellSize) {
                 vio = this.geometry.vertices.length;
                 column[z] = {
-                    vio,
+                    x, z, vio,
                     //Faces must be in counter-clockwise direction to be facing outside.
                     //Each integer is merely referencing a corner vertex.
                     faces: {
@@ -37,7 +37,9 @@ class Map {
                             new THREE.Face3(vio,     vio + 3, vio + 1),
                             new THREE.Face3(vio + 2, vio + 1, vio + 3)
                         ]
-                    }
+                    },
+                    rightTraversible: x != this.maxX,
+                    frontTraversible: z != this.maxZ
                 };
                 column[z].faces.top[0].color = GrassColor;
                 column[z].faces.top[1].color = GrassColor;
@@ -103,13 +105,33 @@ class Map {
             * 0.25;
     }
 
+    isBackTraversible({ cell }) {
+        let backCell = this.getCell({ x: cell.x, z: cell.z - 1 });
+        return IsDefined(backCell) && this.isFrontTraversible({ backCell });
+    }
+
+    isRightTraversible({ cell }) {
+        return cell.rightTraversible;
+    }
+
+    isFrontTraversible({ cell }) {
+        return cell.frontTraversible;
+    }
+
+    isLeftTraversible({ cell }) {
+        let leftCell = this.getCell({ x: cell.x - 1, z: cell.z });
+        return IsDefined(leftCell) && this.isRightTraversible({ leftCell });
+    }
+
+    //Make sure that these bounds wrap around (inclusively) all of the cells involved!
+    //
     //Corners:
     //        Back
     //      0-----1
     //Left / Top / Right
     //    3-----2
     //    Front
-    updateCliffs({ lowX, lowZ, highX, highZ }) {
+    updateCells({ lowX, lowZ, highX, highZ }) {
         let currentCell;
         //Go through each side within the bounds.
         for (let x = lowX; x < highX; x += CellSize) {
@@ -117,21 +139,33 @@ class Map {
                 currentCell = this.getCell({ x, z });
                 //Right.
                 if (x < highX) {
-                    this.updateFaces({
-                        currentCell, otherX: x + 1, otherZ: z,
-                        direction: 'right',
-                        currentVertexA: 1, otherVertexA: 0,
-                        currentVertexB: 2, otherVertexB: 3
-                    });
+                    let otherCell = this.getCell({ x: x + 1, z });
+                    if (IsDefined(otherCell)) {
+                        currentCell.rightTraversible =
+                            this.getBackRightVertex({ cell: currentCell }).y == this.getBackLeftVertex({ cell: otherCell }).y &&
+                            this.getFrontRightVertex({ cell: currentCell }).y == this.getFrontLeftVertex({ cell: otherCell }).y;
+                        this.updateFaces({
+                            currentCell, otherCell,
+                            direction: 'right',
+                            currentVertexA: 1, otherVertexA: 0,
+                            currentVertexB: 2, otherVertexB: 3
+                        });
+                    }
                 }
                 //Front.
                 if (z < highZ) {
-                    this.updateFaces({
-                        currentCell, otherX: x, otherZ: z + 1,
-                        direction: 'front',
-                        currentVertexA: 2, otherVertexA: 1,
-                        currentVertexB: 3, otherVertexB: 0
-                    });
+                    let otherCell = this.getCell({ x, z: z + 1 });
+                    if (IsDefined(otherCell)) {
+                        currentCell.frontTraversible =
+                            this.getFrontRightVertex({ cell: currentCell }).y == this.getBackRightVertex({ cell: otherCell }).y &&
+                            this.getFrontLeftVertex({ cell: currentCell }).y == this.getBackLeftVertex({ cell: otherCell }).y;
+                        this.updateFaces({
+                            currentCell, otherCell,
+                            direction: 'front',
+                            currentVertexA: 2, otherVertexA: 1,
+                            currentVertexB: 3, otherVertexB: 0
+                        });
+                    }
                 }
             }
         }
@@ -147,15 +181,11 @@ class Map {
     //    3-----2
     //    Front
     updateFaces({
-        currentCell, otherX, otherZ,
+        currentCell, otherCell,
         direction,
         currentVertexA, otherVertexA,
         currentVertexB, otherVertexB
     }) {
-        let otherCell = this.getCell({ x: otherX, z: otherZ });
-        if (IsUndefined(otherCell)) {
-            return;
-        }
         if (IsDefined(currentCell.faces[direction])) {
             for (let face of currentCell.faces[direction]) {
                 this.geometry.faces.splice(this.geometry.faces.indexOf(face), 1);

@@ -130,6 +130,7 @@ class Workruft {
     onMouseDown(event) {
         switch (event.button) {
             case 0:
+            {
                 //Left click.
                 let pickedObjectArray = this.world.pickObjects([ this.world.playerObjects ],
                     this.getNormalizedCanvasMouse(event));
@@ -143,13 +144,29 @@ class Workruft {
                             selectionModel: this.world.tinySelectionCircleModel
                         });
                     }
+                } else {
+                    for (let selectedObject of this.selectedObjects) {
+                        selectedObject.deselect({ workruft: this });
+                    }
+                    this.selectedObjects.clear();
                 }
                 break;
+            }
             case 1:
+            {
                 //Middle click.
-
-                break;
+                // let pickedMapObjectArray = this.world.pickMap(this.getNormalizedCanvasMouse(event));
+                // if (pickedMapObjectArray.length > 0) {
+                //     let clickCoordinates = pickedMapObjectArray[0].point;
+                //     let integerX = Math.round(clickCoordinates.x);
+                //     let integerZ = Math.round(clickCoordinates.z);
+                //     let clickedCell = this.world.map.getCell({ x: integerX, z: integerZ });
+                //     alert(JSON.stringify(clickedCell.rightTraversible) + " + " + JSON.stringify(clickedCell.frontTraversible));
+                // }
+                // break;
+            }
             case 2:
+            {
                 //Right click.
                 let pickedMapObjectArray = this.world.pickMap(this.getNormalizedCanvasMouse(event));
                 if (pickedMapObjectArray.length > 0) {
@@ -175,6 +192,7 @@ class Workruft {
                     }
                 }
                 break;
+            }
         }
     }
 
