@@ -110,6 +110,10 @@ class World {
                     this.map.getBackRightVertex({ cell: currentCell }).y = (rampIncline * 7.0) - (rampZOffset + 1) * rampIncline;
                 }
             }
+            this.map.getFrontLeftVertex({ cell: this.map.getCell({ x: wholeRampXOffset - 1, z: -15 }) }).y = rampIncline;
+            this.map.getFrontRightVertex({ cell: this.map.getCell({ x: wholeRampXOffset - 1, z: -15 }) }).y = rampIncline;
+            this.map.getFrontLeftVertex({ cell: this.map.getCell({ x: wholeRampXOffset, z: -15 }) }).y = rampIncline;
+            this.map.getFrontRightVertex({ cell: this.map.getCell({ x: wholeRampXOffset, z: -15 }) }).y = rampIncline;
         }
         this.map.geometry.verticesNeedUpdate = true;
         this.map.updateCliffs({ lowX: this.map.minX, lowZ: this.map.minZ, highX: this.map.maxX, highZ: this.map.maxZ });
