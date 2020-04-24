@@ -85,6 +85,32 @@ class World {
             addBorder(this.map.getCell({ x: this.map.maxX - 1, z }));
             addBorder(this.map.getCell({ x: this.map.maxX, z }));
         }
+        //Rampsnstuff.
+        let rampIncline = 0.5;
+        for (let wholeRampXOffset = -8; wholeRampXOffset <= 8; wholeRampXOffset += 4) {
+            this.map.getBackLeftVertex({ cell: this.map.getCell({ x: wholeRampXOffset - 1, z: -4 }) }).y = rampIncline;
+            this.map.getBackRightVertex({ cell: this.map.getCell({ x: wholeRampXOffset - 1, z: -4 }) }).y = rampIncline;
+            this.map.getBackLeftVertex({ cell: this.map.getCell({ x: wholeRampXOffset, z: -4 }) }).y = rampIncline;
+            this.map.getBackRightVertex({ cell: this.map.getCell({ x: wholeRampXOffset, z: -4 }) }).y = rampIncline;
+            for (let rampXOffset = 0; rampXOffset <= 1; ++rampXOffset) {
+                for (let rampZOffset = 1; rampZOffset <= 5; ++rampZOffset) {
+                    let currentCell = this.map.getCell({ x: wholeRampXOffset - rampXOffset, z: -4 - rampZOffset });
+                    this.map.getFrontLeftVertex({ cell: currentCell }).y = rampZOffset * rampIncline;
+                    this.map.getFrontRightVertex({ cell: currentCell }).y = rampZOffset * rampIncline;
+                    this.map.getBackLeftVertex({ cell: currentCell }).y = (rampZOffset + 1) * rampIncline;
+                    this.map.getBackRightVertex({ cell: currentCell }).y = (rampZOffset + 1) * rampIncline;
+                }
+            }
+            for (let rampXOffset = 0; rampXOffset <= 1; ++rampXOffset) {
+                for (let rampZOffset = 1; rampZOffset <= 5; ++rampZOffset) {
+                    let currentCell = this.map.getCell({ x: wholeRampXOffset - rampXOffset, z: -9 - rampZOffset });
+                    this.map.getFrontLeftVertex({ cell: currentCell }).y = (rampIncline * 7.0) - rampZOffset * rampIncline;
+                    this.map.getFrontRightVertex({ cell: currentCell }).y = (rampIncline * 7.0) - rampZOffset * rampIncline;
+                    this.map.getBackLeftVertex({ cell: currentCell }).y = (rampIncline * 7.0) - (rampZOffset + 1) * rampIncline;
+                    this.map.getBackRightVertex({ cell: currentCell }).y = (rampIncline * 7.0) - (rampZOffset + 1) * rampIncline;
+                }
+            }
+        }
         this.map.geometry.verticesNeedUpdate = true;
         this.map.updateCliffs({ lowX: this.map.minX, lowZ: this.map.minZ, highX: this.map.maxX, highZ: this.map.maxZ });
         this.scene.add(this.map.mesh);

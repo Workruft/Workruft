@@ -48,10 +48,10 @@ class Map {
                 //    3-----2
                 //    Front
                 this.geometry.vertices.push(
-                    new THREE.Vector3(x,            MapBottomY, z),
-                    new THREE.Vector3(x + CellSize, MapBottomY, z),
-                    new THREE.Vector3(x + CellSize, MapBottomY, z + CellSize),
-                    new THREE.Vector3(x,            MapBottomY, z + CellSize)
+                    new THREE.Vector3(x - HalfCellSize, MapBottomY, z - HalfCellSize),
+                    new THREE.Vector3(x + HalfCellSize, MapBottomY, z - HalfCellSize),
+                    new THREE.Vector3(x + HalfCellSize, MapBottomY, z + HalfCellSize),
+                    new THREE.Vector3(x - HalfCellSize, MapBottomY, z + HalfCellSize)
                 );
                 this.geometry.faces.push(...column[z].faces.top);
             }
