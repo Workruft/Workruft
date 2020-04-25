@@ -26,14 +26,13 @@ class GameUnit {
     }
 
     issueReplacementOrder({ workruft, order }) {
-        workruft.objectsToUpdate.add(this);
         this.private.orders = [];
-        this.private.orders.push(order);
+        this.issueAdditionalOrder({ workruft, order });
     }
 
     issueAdditionalOrder({ workruft, order }) {
-        workruft.objectsToUpdate.add(this);
         this.private.orders.push(order);
+        workruft.objectsToUpdate.add(this);
     }
 
     update({ workruft, deltaTimeMS }) {

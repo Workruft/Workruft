@@ -1,6 +1,6 @@
 Enums.create({
     name: 'OrderTypes',
-    items: [ 'Move', 'Attack', 'AttackMove', 'HoldPosition', 'Build' ]
+    items: [ 'Move', 'Attack', 'AttackMove', 'HoldPosition', 'Patrol', 'Build' ]
 });
 
 class Order {
