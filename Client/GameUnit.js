@@ -101,10 +101,10 @@ class GameUnit {
     }
 
     autoSetHeight({ workruft }) {
-        let integerX = Math.round(this.position.x);
-        let integerZ = Math.round(this.position.z);
+        let cellX = AlignToCell(this.position.x);
+        let cellZ = AlignToCell(this.position.z);
         this.position.y = workruft.world.map.getAverageHeight({
-            cell: workruft.world.map.getCell({ x: integerX, z: integerZ })
+            cell: workruft.world.map.getCell({ x: cellX, z: cellZ })
         });
     }
 }

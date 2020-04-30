@@ -45,3 +45,7 @@ function IsUndefined(checkMe) {
 function IsDefined(checkMe) {
     return typeof checkMe !== 'undefined';
 }
+
+function AlignToCell(alignMe) {
+    return Math.round(alignMe / CellSize) * CellSize;
+}

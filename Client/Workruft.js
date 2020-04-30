@@ -158,10 +158,10 @@ class Workruft {
                 // let pickedMapObjectArray = this.world.pickMap(this.getNormalizedCanvasMouse(event));
                 // if (pickedMapObjectArray.length > 0) {
                 //     let clickCoordinates = pickedMapObjectArray[0].point;
-                //     let integerX = Math.round(clickCoordinates.x);
-                //     let integerZ = Math.round(clickCoordinates.z);
-                //     let clickedCell = this.world.map.getCell({ x: integerX, z: integerZ });
-                //     alert(JSON.stringify(clickedCell.rightTraversible) + " + " + JSON.stringify(clickedCell.frontTraversible));
+                //     let cellX = AlignToCell(clickCoordinates.x);
+                //     let cellZ = AlignToCell(clickCoordinates.z);
+                //     let clickedCell = this.world.map.getCell({ x: cellX, z: cellZ });
+                //     alert(JSON.stringify(clickedCell.rightTraversable) + " + " + JSON.stringify(clickedCell.frontTraversable));
                 // }
                 // break;
             }
@@ -171,9 +171,9 @@ class Workruft {
                 let pickedMapObjectArray = this.world.pickMap(this.getNormalizedCanvasMouse(event));
                 if (pickedMapObjectArray.length > 0) {
                     let clickCoordinates = pickedMapObjectArray[0].point;
-                    let integerX = Math.round(clickCoordinates.x);
-                    let integerZ = Math.round(clickCoordinates.z);
-                    let clickedCell = this.world.map.getCell({ x: integerX, z: integerZ });
+                    let cellX = AlignToCell(clickCoordinates.x);
+                    let cellZ = AlignToCell(clickCoordinates.z);
+                    let clickedCell = this.world.map.getCell({ x: cellX, z: cellZ });
                     if (clickedCell) {
                         for (let selectedObject of this.selectedObjects) {
                             let newOrderObject = {
