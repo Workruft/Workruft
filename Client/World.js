@@ -141,9 +141,14 @@ class World {
         this.isDeconstructing = true;
 
         //Geometries, materials, textures, render targets, scenes, and anything else with dispose().
-        DisposeThreeObject(this.selectionCircleMaterial);
-        DisposeThreeObject(this.tinySelectionCircleModel);
+        if (this.tinySelectionCircleModel) {
+            this.tinySelectionCircleModel.deconstruct();
+        }
+        if (this.smallSelectionCircleModel) {
+            this.smallSelectionCircleModel.deconstruct();
+        }
         this.sheepModel.deconstruct();
+        this.wolfModel.deconstruct();
         this.buildingModel.deconstruct();
         DisposeThreeObject(this.scene);
         DisposeThreeObject(this.renderer);
@@ -156,9 +161,14 @@ class World {
         this.setupResizeGameModels();
     }
 
+    //Make sure to update deconstruct!
     setupResizeGameModels() {
-        DisposeThreeObject(this.selectionCircleMaterial);
-        DisposeThreeObject(this.tinySelectionCircleModel);
+        if (this.tinySelectionCircleModel) {
+            this.tinySelectionCircleModel.deconstruct();
+        }
+        if (this.smallSelectionCircleModel) {
+            this.smallSelectionCircleModel.deconstruct();
+        }
         this.selectionCircleMaterial = new MeshLineMaterial({
             color: 'blue',
             resolution: new THREE.Vector2(this.canvas.width, this.canvas.height),
@@ -174,14 +184,27 @@ class World {
             xzSize: TinySize,
             ySize: 0.0
         });
+        this.smallSelectionCircleModel = new GameModel({
+            geometry: SmallCircleGeometry,
+            material: this.selectionCircleMaterial,
+            xzSize: SmallSize,
+            ySize: 0.0
+        });
     }
 
+    //Make sure to update deconstruct!
     setupGameModels() {
         this.sheepModel = new GameModel({
             geometry: TinySphereGeometry,
             material: new THREE.MeshPhongMaterial({ color: '#777' }),
             xzSize: TinySize,
             ySize: TinySize
+        });
+        this.wolfModel = new GameModel({
+            geometry: SmallSphereGeometry,
+            material: new THREE.MeshPhongMaterial({ color: '#555' }),
+            xzSize: SmallSize,
+            ySize: SmallSize
         });
 
         this.buildingModel = new GameModel({

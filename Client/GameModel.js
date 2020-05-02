@@ -6,7 +6,7 @@ class GameModel {
 
         this.xzSize = xzSize;
         this.halfXZSize = xzSize * 0.5;
-        this.numberOfExtraPathingLines = Math.max(0, this.xzSize / CellSize - 1);
+        this.numberOfExtraPathingLines = Math.max(0, this.xzSize / CellSize);
         this.ySize = ySize;
         this.halfYSize = ySize * 0.5;
     }

@@ -106,8 +106,8 @@ class GameUnit {
                     for (let pathingLine of pathingLines) {
                         currentCellsPathable = 0;
                         currentCell = worldMap.getCell({
-                            x: AlignToCell(pathingLine.currentX),
-                            z: AlignToCell(pathingLine.currentZ)
+                            x: FloorToCell(pathingLine.currentX),
+                            z: FloorToCell(pathingLine.currentZ)
                         });
                         currentCell.faces.top[0].color = BlueColor;
                         currentCell.faces.top[1].color = BlueColor;
