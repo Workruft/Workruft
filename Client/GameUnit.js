@@ -108,15 +108,21 @@ class GameUnit {
                             x: AlignToCell(pathingLine.currentX),
                             z: AlignToCell(pathingLine.currentZ)
                         });
+                        currentCell.faces.top[0].color = BlueColor;
+                        currentCell.faces.top[1].color = BlueColor;
                         if (!IntersectLineWithGrid({
                             startX: pathingLine.currentX, startZ: pathingLine.currentZ,
                             endX: pathingLine.finalX, endZ: pathingLine.finalZ,
                             cellCallback: function({ direction }) {
                                 if (worldMap.isTraversible({ cell: currentCell, direction })) {
                                     currentCell = currentCell.neighbors[direction];
+                                    currentCell.faces.top[0].color = BlueColor;
+                                    currentCell.faces.top[1].color = BlueColor;
                                     ++currentCellsPathable;
                                     return true;
                                 } else {
+                                    currentCell.neighbors[direction].faces.top[0].color = RedColor;
+                                    currentCell.neighbors[direction].faces.top[1].color = RedColor;
                                     return false;
                                 }
                             }
@@ -128,6 +134,7 @@ class GameUnit {
                             }
                         }
                     }
+                    worldMap.geometry.elementsNeedUpdate = true;
 
                     let distanceTraveled;
                     if (minPathable.cellCount == Infinity) {

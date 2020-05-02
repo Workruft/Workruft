@@ -16,6 +16,8 @@ let MaxCameraHeight = 500.0;
 
 let GrassColor = new THREE.Color('#0c4013');
 let DirtColor = new THREE.Color('#2b3c1f');
+let RedColor = new THREE.Color('red');
+let BlueColor = new THREE.Color('blue');
 
 let HalfPI = Math.PI * 0.5;
 
