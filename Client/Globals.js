@@ -85,10 +85,9 @@ function LimitDistance({ startX, startZ, endX, endZ, maxDistance }) {
 }
 
 //Starts at the first cell past the starting cell towards the end position if any.
-//Calls the provided cellCallback function, passing the direction of the cell from
-//the previous cell. Every cell traveled is guaranteed to be in one of the 4
-//cardinal directions from the previous cell.
-function IntersectLineWithGrid({ startX, startZ, endX, endZ, cellCallback }) {
+//Yields the direction of the cell from the previous cell. Every cell traveled is
+//guaranteed to be in one of the 4 cardinal directions from the previous cell.
+function* IntersectLineWithGrid({ startX, startZ, endX, endZ }) {
     let cellX = FloorToCell(startX);
     let cellZ = FloorToCell(startZ);
     let diffX = endX - startX;
@@ -123,15 +122,10 @@ function IntersectLineWithGrid({ startX, startZ, endX, endZ, cellCallback }) {
         //Only move in either X or Z coordinates, not both.
         if (Math.abs(tMaxX) < Math.abs(tMaxZ)) {
             tMaxX += tDeltaX;
-            if (!cellCallback({ direction: xDirection })) {
-                return false;
-            }
+            yield xDirection;
         } else {
             tMaxZ += tDeltaZ;
-            if (!cellCallback({ direction: yDirection })) {
-                return false;
-            }
+            yield yDirection;
         }
     }
-    return true;
 }

@@ -111,28 +111,32 @@ class GameUnit {
                         });
                         currentCell.faces.top[0].color = BlueColor;
                         currentCell.faces.top[1].color = BlueColor;
-                        if (!IntersectLineWithGrid({
+                        let intersection = IntersectLineWithGrid({
                             startX: pathingLine.currentX, startZ: pathingLine.currentZ,
-                            endX: pathingLine.finalX, endZ: pathingLine.finalZ,
-                            cellCallback: function({ direction }) {
-                                if (worldMap.isTraversible({ cell: currentCell, direction })) {
-                                    currentCell = currentCell.neighbors[direction];
-                                    currentCell.faces.top[0].color = BlueColor;
-                                    currentCell.faces.top[1].color = BlueColor;
-                                    ++currentCellsPathable;
-                                    return true;
-                                } else {
-                                    currentCell.neighbors[direction].faces.top[0].color = RedColor;
-                                    currentCell.neighbors[direction].faces.top[1].color = RedColor;
-                                    return false;
+                            endX: pathingLine.finalX, endZ: pathingLine.finalZ
+                        });
+                        let direction;
+                        let intersectionResult = intersection.next();
+                        while (!intersectionResult.done) {
+                            direction = intersectionResult.value;
+                            if (worldMap.isTraversible({ cell: currentCell, direction })) {
+                                //Still pathable.
+                                currentCell = currentCell.neighbors[direction];
+                                currentCell.faces.top[0].color = BlueColor;
+                                currentCell.faces.top[1].color = BlueColor;
+                                ++currentCellsPathable;
+                            } else {
+                                //Obstruction found!
+                                currentCell.neighbors[direction].faces.top[0].color = RedColor;
+                                currentCell.neighbors[direction].faces.top[1].color = RedColor;
+                                if (currentCellsPathable < minPathable.cellCount) {
+                                    minPathable.cellCount = currentCellsPathable;
+                                    minPathable.pathingLine = pathingLine;
+                                    minPathable.lastCell = currentCell;
                                 }
+                                break;
                             }
-                        })) {
-                            if (currentCellsPathable < minPathable.cellCount) {
-                                minPathable.cellCount = currentCellsPathable;
-                                minPathable.pathingLine = pathingLine;
-                                minPathable.lastCell = currentCell;
-                            }
+                            intersectionResult = intersection.next();
                         }
                     }
                     worldMap.geometry.elementsNeedUpdate = true;
@@ -172,6 +176,7 @@ class GameUnit {
                         }
                         distanceTraveled = newLimitedDistance;
                         //Order cannot be completed, so cancel all orders!
+                        deltaTimeMS = -Infinity;
                         this.private.orders = [];
                     }
                     deltaTimeMS -= distanceTraveled / this.private.speed;
