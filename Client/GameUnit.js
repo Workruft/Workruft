@@ -64,19 +64,20 @@ class GameUnit {
                     let movementAngle = Math.atan2(-fullZDistance, fullXDistance);
                     let minusAngle = movementAngle - HalfPI;
                     let plusAngle = movementAngle + HalfPI;
+                    let underRadius = this.gameModel.halfXZSize - 0.5;
                     //Start with the outermost points.
                     let pathingLines = [
                         {
-                            currentX: this.position.x + this.gameModel.halfXZSize * Math.cos(minusAngle),
-                            currentZ: this.position.z - this.gameModel.halfXZSize * Math.sin(minusAngle),
-                            finalX: newX + this.gameModel.halfXZSize * Math.cos(minusAngle),
-                            finalZ: newZ - this.gameModel.halfXZSize * Math.sin(minusAngle)
+                            currentX: this.position.x + underRadius * Math.cos(minusAngle),
+                            currentZ: this.position.z - underRadius * Math.sin(minusAngle),
+                            finalX: newX + underRadius * Math.cos(minusAngle),
+                            finalZ: newZ - underRadius * Math.sin(minusAngle)
                         },
                         {
-                            currentX: this.position.x + this.gameModel.halfXZSize * Math.cos(plusAngle),
-                            currentZ: this.position.z - this.gameModel.halfXZSize * Math.sin(plusAngle),
-                            finalX: newX + this.gameModel.halfXZSize * Math.cos(plusAngle),
-                            finalZ: newZ - this.gameModel.halfXZSize * Math.sin(plusAngle)
+                            currentX: this.position.x + underRadius * Math.cos(plusAngle),
+                            currentZ: this.position.z - underRadius * Math.sin(plusAngle),
+                            finalX: newX + underRadius * Math.cos(plusAngle),
+                            finalZ: newZ - underRadius * Math.sin(plusAngle)
                         }
                     ];
                     //Add any inner points.
@@ -86,10 +87,10 @@ class GameUnit {
                         for (let extraPathingLineNum = 1; extraPathingLineNum <= this.gameModel.numberOfExtraPathingLines; ++extraPathingLineNum) {
                             currentAngleOffset = extraPathingLineNum * angleInterval;
                             pathingLines.push({
-                                currentX: this.position.x + this.gameModel.halfXZSize * Math.cos(minusAngle + currentAngleOffset),
-                                currentZ: this.position.z - this.gameModel.halfXZSize * Math.sin(minusAngle + currentAngleOffset),
-                                finalX: newX + this.gameModel.halfXZSize * Math.cos(minusAngle + currentAngleOffset),
-                                finalZ: newZ - this.gameModel.halfXZSize * Math.sin(minusAngle + currentAngleOffset)
+                                currentX: this.position.x + underRadius * Math.cos(minusAngle - currentAngleOffset),
+                                currentZ: this.position.z - underRadius * Math.sin(minusAngle - currentAngleOffset),
+                                finalX: newX + underRadius * Math.cos(minusAngle + currentAngleOffset),
+                                finalZ: newZ - underRadius * Math.sin(minusAngle + currentAngleOffset)
                             });
                         }
                     }
