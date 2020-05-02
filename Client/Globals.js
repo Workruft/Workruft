@@ -78,46 +78,49 @@ function LimitDistance({ startX, startZ, endX, endZ, maxDistance }) {
     return { limitedX, limitedZ, limitedDistance };
 }
 
-function IntersectLineWithGrid({ startX, startY, endX, endY, cellCallback }) {
-    let currentX = AlignToCell(start.x);
-    let currentY = AlignToCell(start.y);
+//Starts at the first cell past the starting cell towards the end position if any.
+//Calls the provided cellCallback function, passing the direction of the cell from
+//the previous cell. Every cell traveled is guaranteed to be in one of the 4
+//cardinal directions from the previous cell.
+function IntersectLineWithGrid({ startX, startZ, endX, endZ, cellCallback }) {
+    let cellX = AlignToCell(start.x);
+    let cellZ = AlignToCell(start.z);
     let diffX = end.x - start.x;
-    let diffY = end.y - start.y;
-    let stepX = Math.sign(diffX);
-    let stepY = Math.sign(diffY);
+    let diffZ = end.z - start.z;
+    let xDirection = (Math.sign(diffX) >= 0 ? 'right' : 'left');
+    let yDirection = (Math.sign(diffZ) >= 0 ? 'front' : 'back');
 
     //Straight distance to the first vertical grid boundary.
     let xOffset = end.x > start.x ?
         (AlignToNextCell(start.x) - start.x) :
-        (start.x - currentX);
+        (start.x - cellX);
     //Straight distance to the first horizontal grid boundary.
-    let yOffset = end.y > start.y ?
-        (AlignToNextCell(start.y) - start.y) :
-        (start.y - currentY);
+    let yOffset = end.z > start.z ?
+        (AlignToNextCell(start.z) - start.z) :
+        (start.z - cellZ);
     //Angle of ray/slope.
-    let angle = Math.atan2(-diffY, diffX);
+    let angle = Math.atan2(-diffZ, diffX);
     //Note: These can be divide by 0's, but JS just yields Infinity! :)
     //How far to move along the ray to cross the first vertical grid cell boundary.
     let tMaxX = xOffset / Math.cos(angle);
     //How far to move along the ray to cross the first horizontal grid cell boundary.
-    let tMaxY = yOffset / Math.sin(angle);
+    let tMaxZ = yOffset / Math.sin(angle);
     //How far to move along the ray to move horizontally 1 grid cell.
     let tDeltaX = 1.0 / Math.cos(angle);
     //How far to move along the ray to move vertically 1 grid cell.
-    let tDeltaY = 1.0 / Math.sin(angle);
+    let tDeltaZ = 1.0 / Math.sin(angle);
 
     //Travel one grid cell at a time.
-    let manhattanDistance = Math.abs(AlignToCell(end.x) - currentX) +
-        Math.abs(AlignToCell(end.y) - currentY);
+    let manhattanDistance = Math.abs(AlignToCell(end.x) - cellX) +
+        Math.abs(AlignToCell(end.z) - cellZ);
     for (let t = 0; t < manhattanDistance; ++t) {
-        //Only move in either X or Y coordinates, not both.
-        if (Math.abs(tMaxX) < Math.abs(tMaxY)) {
+        //Only move in either X or Z coordinates, not both.
+        if (Math.abs(tMaxX) < Math.abs(tMaxZ)) {
             tMaxX += tDeltaX;
-            currentX += stepX;
+            cellCallback({ direction: xDirection });
         } else {
-            tMaxY += tDeltaY;
-            currentY += stepY;
+            tMaxZ += tDeltaZ;
+            cellCallback({ direction: yDirection });
         }
-        cellCallback({ currentX, currentY });
     }
 }
