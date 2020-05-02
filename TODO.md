@@ -1,5 +1,11 @@
 # TODO
 
+- Implement A* with immediate linear optimization.
+
+  - Buildings and other units need to be factored in.
+
+    - Add in buildings and other units...
+
 - Send and check for pings server<->client both, to ensure livelihood of connection in silent disconnection cases. (Check on both ends, but only send a ping on receiving a ping - except for the very first, of course.)
 
 - Establish some kind of protocol for the messages. Put the common parts in /Common/ and the rest in /Client/ and /Server/ individually.
@@ -18,8 +24,6 @@
           });
         });
 ```
-
-- Buildings, other units, and path finding!
 
 - More mouse and keyboard controls.
 

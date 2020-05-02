@@ -37,24 +37,137 @@ class GameUnit {
 
     update({ workruft, deltaTimeMS }) {
         let updated = false;
-        while (this.private.orders.length > 0) {
+        while (this.private.orders.length > 0 && deltaTimeMS > 0) {
             let currentOrder = this.private.orders[0];
             switch (currentOrder.type) {
                 case Enums.OrderTypes.Move:
-                    let maxTravelDistance = this.private.speed * deltaTimeMS;
-                    let xDistance = currentOrder.data.x - this.position.x;
-                    let zDistance = currentOrder.data.z - this.position.z;
-                    let distance = Math.sqrt(Math.pow(xDistance, 2.0) + Math.pow(zDistance, 2.0));
-                    if (distance < maxTravelDistance) {
-                        this.position.x = currentOrder.data.x;
-                        this.position.z = currentOrder.data.z;
-                        deltaTimeMS -= (maxTravelDistance - distance) / this.private.speed;
+                    if (this.private.speed <= 0.0) {
                         this.private.orders.splice(0, 1);
-                    } else {
-                        let manhattanDistance = Math.abs(xDistance) + Math.abs(zDistance);
-                        this.position.x += maxTravelDistance * xDistance / manhattanDistance;
-                        this.position.z += maxTravelDistance * zDistance / manhattanDistance;
                     }
+
+                    let maxDistance = this.private.speed * deltaTimeMS;
+                    let {
+                        limitedX: newX, limitedZ: newZ, limitedDistance,
+                        fullXDistance, fullZDistance, fullManhattanDistance
+                    } = LimitDistance({
+                        startX: this.position.x,
+                        startZ: this.position.z,
+                        endX: currentOrder.data.x,
+                        endZ: currentOrder.data.z,
+                        maxDistance
+                    });
+
+                    //Create path-testing lines. The first two lines start and end at the outermost points of the circle
+                    //parallel to the slope of the unit's trajectory. The inner lines, if any, start and end at evenly
+                    //distributed angles between the outermost lines, on the circle's perimeter, on the side closest to
+                    //the other circle.
+                    let movementAngle = Math.atan2(-fullZDistance, fullXDistance);
+                    let minusAngle = movementAngle - HalfPI;
+                    let plusAngle = movementAngle + HalfPI;
+                    //Start with the outermost points.
+                    let pathingLines = [
+                        {
+                            currentX: this.position.x + this.gameModel.halfXZSize * Math.cos(minusAngle),
+                            currentZ: this.position.z - this.gameModel.halfXZSize * Math.sin(minusAngle),
+                            finalX: newX + this.gameModel.halfXZSize * Math.cos(minusAngle),
+                            finalZ: newZ - this.gameModel.halfXZSize * Math.sin(minusAngle)
+                        },
+                        {
+                            currentX: this.position.x + this.gameModel.halfXZSize * Math.cos(plusAngle),
+                            currentZ: this.position.z - this.gameModel.halfXZSize * Math.sin(plusAngle),
+                            finalX: newX + this.gameModel.halfXZSize * Math.cos(plusAngle),
+                            finalZ: newZ - this.gameModel.halfXZSize * Math.sin(plusAngle)
+                        }
+                    ];
+                    //Add any inner points.
+                    if (this.gameModel.numberOfExtraPathingLines > 0) {
+                        let angleInterval = Math.PI / (this.gameModel.numberOfExtraPathingLines + 1.0);
+                        let currentAngleOffset;
+                        for (let extraPathingLineNum = 1; extraPathingLineNum <= this.gameModel.numberOfExtraPathingLines; ++extraPathingLineNum) {
+                            currentAngleOffset = extraPathingLineNum * angleInterval;
+                            pathingLines.push({
+                                currentX: this.position.x + this.gameModel.halfXZSize * Math.cos(minusAngle + currentAngleOffset),
+                                currentZ: this.position.z - this.gameModel.halfXZSize * Math.sin(minusAngle + currentAngleOffset),
+                                finalX: newX + this.gameModel.halfXZSize * Math.cos(minusAngle + currentAngleOffset),
+                                finalZ: newZ - this.gameModel.halfXZSize * Math.sin(minusAngle + currentAngleOffset)
+                            });
+                        }
+                    }
+                    //Check every cell that each of the lines intersects with, to see how many cells away from the unit are pathable.
+                    let minPathable = {
+                        cellCount: Infinity,
+                        pathingLine: null,
+                        lastCell: null
+                    };
+                    let currentCellsPathable;
+                    let currentCell;
+                    let worldMap = workruft.world.map;
+                    for (let pathingLine of pathingLines) {
+                        currentCellsPathable = 0;
+                        currentCell = worldMap.getCell({
+                            x: AlignToCell(pathingLine.currentX),
+                            z: AlignToCell(pathingLine.currentZ)
+                        });
+                        if (!IntersectLineWithGrid({
+                            startX: pathingLine.currentX, startZ: pathingLine.currentZ,
+                            endX: pathingLine.finalX, endZ: pathingLine.finalZ,
+                            cellCallback: function({ direction }) {
+                                if (worldMap.isTraversible({ cell: currentCell, direction })) {
+                                    currentCell = currentCell.neighbors[direction];
+                                    ++currentCellsPathable;
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            }
+                        })) {
+                            if (currentCellsPathable < minPathable.cellCount) {
+                                minPathable.cellCount = currentCellsPathable;
+                                minPathable.pathingLine = pathingLine;
+                                minPathable.lastCell = currentCell;
+                            }
+                        }
+                    }
+
+                    let distanceTraveled;
+                    if (minPathable.cellCount == Infinity) {
+                        this.position.x = newX;
+                        this.position.z = newZ;
+                        distanceTraveled = limitedDistance;
+                        if (this.position.x == currentOrder.data.x && this.position.z == currentOrder.data.z) {
+                            //Order complete!
+                            this.private.orders.splice(0, 1);
+                        }
+                    } else {
+                        let {
+                            limitedDistance: newLimitedDistance
+                        } = LimitDistance({
+                            startX: FloorToCell(minPathable.pathingLine.currentX),
+                            startZ: FloorToCell(minPathable.pathingLine.currentZ),
+                            endX: minPathable.lastCell.x,
+                            endZ: minPathable.lastCell.z,
+                            maxDistance
+                        });
+                        newLimitedDistance = Math.max(0.0, newLimitedDistance - this.gameModel.xzSize);
+                        if (newLimitedDistance > 0.0) {
+                            let {
+                                limitedX: newLimitedX, limitedZ: newLimitedZ
+                            } = LimitDistance({
+                                startX: this.position.x,
+                                startZ: this.position.z,
+                                endX: currentOrder.data.x,
+                                endZ: currentOrder.data.z,
+                                maxDistance: newLimitedDistance
+                            });
+                            this.position.x = newLimitedX;
+                            this.position.z = newLimitedZ;
+                        }
+                        distanceTraveled = newLimitedDistance;
+                        //Order cannot be completed, so cancel all orders!
+                        this.private.orders = [];
+                    }
+                    deltaTimeMS -= distanceTraveled / this.private.speed;
+
                     this.autoSetHeight({ workruft });
                     updated = true;
                     break;
@@ -79,7 +192,7 @@ class GameUnit {
             this.private.selectionCircle = selectionModel.createNewMesh();
             this.private.selectionCircle.layers.set(1);
             this.private.selectionCircle.position.y = 0.5;
-            this.private.selectionCircle.rotation.x = Math.PI * 0.5;
+            this.private.selectionCircle.rotation.x = HalfPI;
             this.group.add(this.private.selectionCircle);
             workruft.selectedObjects.add(this);
             this.isSelected = true;

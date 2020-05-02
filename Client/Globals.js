@@ -52,30 +52,34 @@ function AlignToCell(alignMe) {
     return Math.round(alignMe / CellSize) * CellSize;
 }
 
-function AlignToNextCell(alignMe) {
-    return Math.round(alignMe / CellSize + 1.0) * CellSize;
+function FloorToCell(alignMe) {
+    return Math.floor(alignMe / CellSize) * CellSize;
+}
+
+function FloorToNextCell(alignMe) {
+    return Math.floor(alignMe / CellSize + 1.0) * CellSize;
 }
 
 function LimitDistance({ startX, startZ, endX, endZ, maxDistance }) {
     let limitedX;
     let limitedZ;
     let limitedDistance;
-    let xDistance = endX - startX;
-    let zDistance = endZ - startZ;
-    let distance = Math.hypot(xDistance, zDistance);
+    let fullXDistance = endX - startX;
+    let fullZDistance = endZ - startZ;
+    let distance = Math.hypot(fullXDistance, fullZDistance);
+    let fullManhattanDistance = Math.abs(fullXDistance) + Math.abs(fullZDistance);
     if (distance < maxDistance) {
         //Closer to the destination than the maximum distance.
-        limitedX = currentOrder.data.x;
-        limitedZ = currentOrder.data.z;
+        limitedX = endX;
+        limitedZ = endZ;
         limitedDistance = distance;
     } else {
         //Travel at the maximum distance.
-        let manhattanDistance = Math.abs(xDistance) + Math.abs(zDistance);
-        limitedX = startX + maxDistance * xDistance / manhattanDistance;
-        limitedZ = startZ + maxDistance * zDistance / manhattanDistance;
+        limitedX = startX + maxDistance * fullXDistance / fullManhattanDistance;
+        limitedZ = startZ + maxDistance * fullZDistance / fullManhattanDistance;
         limitedDistance = maxDistance;
     }
-    return { limitedX, limitedZ, limitedDistance };
+    return { limitedX, limitedZ, limitedDistance, fullXDistance, fullZDistance, fullManhattanDistance };
 }
 
 //Starts at the first cell past the starting cell towards the end position if any.
@@ -83,21 +87,21 @@ function LimitDistance({ startX, startZ, endX, endZ, maxDistance }) {
 //the previous cell. Every cell traveled is guaranteed to be in one of the 4
 //cardinal directions from the previous cell.
 function IntersectLineWithGrid({ startX, startZ, endX, endZ, cellCallback }) {
-    let cellX = AlignToCell(start.x);
-    let cellZ = AlignToCell(start.z);
-    let diffX = end.x - start.x;
-    let diffZ = end.z - start.z;
+    let cellX = FloorToCell(startX);
+    let cellZ = FloorToCell(startZ);
+    let diffX = endX - startX;
+    let diffZ = endZ - startZ;
     let xDirection = (Math.sign(diffX) >= 0 ? 'right' : 'left');
     let yDirection = (Math.sign(diffZ) >= 0 ? 'front' : 'back');
 
     //Straight distance to the first vertical grid boundary.
-    let xOffset = end.x > start.x ?
-        (AlignToNextCell(start.x) - start.x) :
-        (start.x - cellX);
+    let xOffset = endX > startX ?
+        (FloorToNextCell(startX) - startX) :
+        (startX - cellX);
     //Straight distance to the first horizontal grid boundary.
-    let yOffset = end.z > start.z ?
-        (AlignToNextCell(start.z) - start.z) :
-        (start.z - cellZ);
+    let yOffset = endZ > startZ ?
+        (FloorToNextCell(startZ) - startZ) :
+        (startZ - cellZ);
     //Angle of ray/slope.
     let angle = Math.atan2(-diffZ, diffX);
     //Note: These can be divide by 0's, but JS just yields Infinity! :)
@@ -111,16 +115,21 @@ function IntersectLineWithGrid({ startX, startZ, endX, endZ, cellCallback }) {
     let tDeltaZ = 1.0 / Math.sin(angle);
 
     //Travel one grid cell at a time.
-    let manhattanDistance = Math.abs(AlignToCell(end.x) - cellX) +
-        Math.abs(AlignToCell(end.z) - cellZ);
+    let manhattanDistance = Math.abs(FloorToCell(endX) - cellX) +
+        Math.abs(FloorToCell(endZ) - cellZ);
     for (let t = 0; t < manhattanDistance; ++t) {
         //Only move in either X or Z coordinates, not both.
         if (Math.abs(tMaxX) < Math.abs(tMaxZ)) {
             tMaxX += tDeltaX;
-            cellCallback({ direction: xDirection });
+            if (!cellCallback({ direction: xDirection })) {
+                return false;
+            }
         } else {
             tMaxZ += tDeltaZ;
-            cellCallback({ direction: yDirection });
+            if (!cellCallback({ direction: yDirection })) {
+                return false;
+            }
         }
     }
+    return true;
 }

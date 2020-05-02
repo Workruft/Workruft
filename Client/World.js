@@ -19,7 +19,7 @@ class World {
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.onResize();
-        window.addEventListener('resize', this.onResize);
+        window.addEventListener('resize', this.onResize.bind(this));
 
         this.scene = new THREE.Scene();
         this.clock = new THREE.Clock();

@@ -14,7 +14,7 @@ class Map {
         this.maxX = Math.ceil(halfSizeX);
         this.maxZ = Math.ceil(halfSizeZ);
 
-        this.cellClusterSizes = new Set([ 2 * CellSize, 3 * CellSize, 4 * CellSize ]);
+        //this.cellClusterSizes = new Set([ 2 * CellSize, 3 * CellSize, 4 * CellSize ]);
 
         this.generate();
     }
@@ -25,13 +25,13 @@ class Map {
 
         //Create border cell placeholder.
         this.borderCell = {
-            clusterTraversability: [],
+            //clusterTraversability: [],
             rightTraversable: false,
             frontTraversable: false
         };
-        for (let cellClusterSize of this.cellClusterSizes) {
-            this.borderCell.clusterTraversability.push(false);
-        }
+        // for (let cellClusterSize of this.cellClusterSizes) {
+        //     this.borderCell.clusterTraversability.push(false);
+        // }
 
         //Vertex Index Offset.
         let vio;
@@ -58,7 +58,7 @@ class Map {
                         front: this.borderCell,
                         left: this.borderCell
                     },
-                    clusterTraversability: [],
+                    //clusterTraversability: [],
                     rightTraversable: x != this.maxX,
                     frontTraversable: z != this.maxZ
                 };
@@ -95,9 +95,9 @@ class Map {
                 if (x != this.minX) {
                     column[z].neighbors.left = this.grid[x - CellSize][z];
                 }
-                for (let cellClusterSize of this.cellClusterSizes) {
-                    column[z].clusterTraversability.push(x - CellSize + cellClusterSize <= this.maxX && z - CellSize + cellClusterSize <= this.maxZ);
-                }
+                // for (let cellClusterSize of this.cellClusterSizes) {
+                //     column[z].clusterTraversability.push(x - CellSize + cellClusterSize <= this.maxX && z - CellSize + cellClusterSize <= this.maxZ);
+                // }
             }
         }
 
@@ -147,8 +147,26 @@ class Map {
             * 0.25;
     }
 
+    isTraversible({ cell, direction }) {
+        switch (direction) {
+            case 'back':
+                return this.isBackTraversable({ cell });
+                break;
+            case 'right':
+                return this.isRightTraversable({ cell });
+                break;
+            case 'front':
+                return this.isFrontTraversable({ cell });
+                break;
+            case 'left':
+                return this.isLeftTraversable({ cell });
+                break;
+        }
+        return false;
+    }
+
     isBackTraversable({ cell }) {
-        return this.isFrontTraversable({ cell: cell.neighbors[0] });
+        return this.isFrontTraversable({ cell: cell.neighbors.back });
     }
 
     isRightTraversable({ cell }) {
@@ -160,7 +178,7 @@ class Map {
     }
 
     isLeftTraversable({ cell }) {
-        return this.isRightTraversable({ cell: cell.neighbors[3] });
+        return this.isRightTraversable({ cell: cell.neighbors.left });
     }
 
     //Make sure that these bounds wrap around (inclusively) all of the cells involved!
@@ -180,7 +198,7 @@ class Map {
                 currentCell = this.getCell({ x, z });
                 //Right.
                 if (x < highX) {
-                    let otherCell = this.getCell({ x: x + 1, z });
+                    let otherCell = currentCell.neighbors.right;
                     if (IsDefined(otherCell)) {
                         currentCell.rightTraversable =
                             this.getBackRightVertex({ cell: currentCell }).y == this.getBackLeftVertex({ cell: otherCell }).y &&
@@ -195,7 +213,7 @@ class Map {
                 }
                 //Front.
                 if (z < highZ) {
-                    let otherCell = this.getCell({ x, z: z + 1 });
+                    let otherCell = currentCell.neighbors.front;
                     if (IsDefined(otherCell)) {
                         currentCell.frontTraversable =
                             this.getFrontRightVertex({ cell: currentCell }).y == this.getBackRightVertex({ cell: otherCell }).y &&
@@ -209,24 +227,24 @@ class Map {
                     }
                 }
                 //Cluster traversability.
-                for (let cellClusterSize of this.cellClusterSizes) {
-                    if (x - cellClusterSize >= this.minX && z - cellClusterSize >= this.minZ) {
-                        isClusterTraversable = true;
-                        checkingCluster: {
-                            for (let clusterX = x + CellSize - cellClusterSize; clusterX <= x; clusterX += CellSize) {
-                                for (let clusterZ = z + CellSize - cellClusterSize; clusterZ <= z; clusterX += CellSize) {
-                                    if ((clusterX < x && !this.grid[clusterX][clusterZ].rightTraversable) ||
-                                        (clusterZ < z && !this.grid[clusterX][clusterZ].frontTraversable)) {
-                                        isClusterTraversable = false;
-                                        //This actually sends it to *after* the checkingCluster label...
-                                        break checkingCluster;
-                                    }
-                                }
-                            }
-                        }
-                        this.grid[x][z].clusterTraversability[cellClusterSize] = isClusterTraversable;
-                    }
-                }
+                // for (let cellClusterSize of this.cellClusterSizes) {
+                //     if (x - cellClusterSize >= this.minX && z - cellClusterSize >= this.minZ) {
+                //         isClusterTraversable = true;
+                //         checkingCluster: {
+                //             for (let clusterX = x + CellSize - cellClusterSize; clusterX <= x; clusterX += CellSize) {
+                //                 for (let clusterZ = z + CellSize - cellClusterSize; clusterZ <= z; clusterX += CellSize) {
+                //                     if ((clusterX < x && !this.grid[clusterX][clusterZ].rightTraversable) ||
+                //                         (clusterZ < z && !this.grid[clusterX][clusterZ].frontTraversable)) {
+                //                         isClusterTraversable = false;
+                //                         //This actually sends it to *after* the checkingCluster label...
+                //                         break checkingCluster;
+                //                     }
+                //                 }
+                //             }
+                //         }
+                //         this.grid[x][z].clusterTraversability[cellClusterSize] = isClusterTraversable;
+                //     }
+                // }
             }
         }
 
