@@ -193,16 +193,11 @@ class GameUnit {
                             this.private.orders.splice(0, 1);
                         }
                     } else {
-                        let {
-                            limitedDistance: newLimitedDistance
-                        } = LimitDistance({
-                            startX: FloorToCell(minPathable.pathingLine.currentX),
-                            startZ: FloorToCell(minPathable.pathingLine.currentZ),
-                            endX: minPathable.lastCell.x,
-                            endZ: minPathable.lastCell.z,
-                            maxDistance
-                        });
-                        newLimitedDistance = Math.max(0.0, newLimitedDistance - this.gameModel.xzSize);
+                        let newLimitedDistance = Math.hypot(
+                            minPathable.lastCell.x - minPathable.pathingLine.currentX,
+                            minPathable.lastCell.z - minPathable.pathingLine.currentZ);
+                        newLimitedDistance = Math.max(0.0, newLimitedDistance -
+                            (minPathable.pathingLine.isInner ? this.gameModel.xzSize : this.gameModel.xzSize * 1.5));
                         if (newLimitedDistance > 0.0) {
                             let {
                                 limitedX: newLimitedX, limitedZ: newLimitedZ
