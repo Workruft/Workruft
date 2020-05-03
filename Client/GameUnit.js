@@ -64,33 +64,54 @@ class GameUnit {
                     let movementAngle = Math.atan2(-fullZDistance, fullXDistance);
                     let minusAngle = movementAngle - HalfPI;
                     let plusAngle = movementAngle + HalfPI;
-                    let underRadius = this.gameModel.halfXZSize - 0.5;
+                    let unitRadius = this.gameModel.halfXZSize;
                     //Start with the outermost points.
-                    let pathingLines = [
+                    let pathingLines = new Set([
                         {
-                            currentX: this.position.x + underRadius * Math.cos(minusAngle),
-                            currentZ: this.position.z - underRadius * Math.sin(minusAngle),
-                            finalX: newX + underRadius * Math.cos(minusAngle),
-                            finalZ: newZ - underRadius * Math.sin(minusAngle)
+                            currentX: this.position.x + unitRadius * Math.cos(minusAngle),
+                            currentZ: this.position.z - unitRadius * Math.sin(minusAngle),
+                            finalX: newX + unitRadius * Math.cos(minusAngle),
+                            finalZ: newZ - unitRadius * Math.sin(minusAngle),
+                            isInner: false,
+                            intersection: {
+                                currentCellsPathable: 0,
+                                currentCell: null,
+                                generator: null,
+                                intersectionResult: null
+                            }
                         },
                         {
-                            currentX: this.position.x + underRadius * Math.cos(plusAngle),
-                            currentZ: this.position.z - underRadius * Math.sin(plusAngle),
-                            finalX: newX + underRadius * Math.cos(plusAngle),
-                            finalZ: newZ - underRadius * Math.sin(plusAngle)
+                            currentX: this.position.x + unitRadius * Math.cos(plusAngle),
+                            currentZ: this.position.z - unitRadius * Math.sin(plusAngle),
+                            finalX: newX + unitRadius * Math.cos(plusAngle),
+                            finalZ: newZ - unitRadius * Math.sin(plusAngle),
+                            isInner: false,
+                            intersection: {
+                                currentCellsPathable: 0,
+                                currentCell: null,
+                                generator: null,
+                                intersectionResult: null
+                            }
                         }
-                    ];
+                    ]);
                     //Add any inner points.
                     if (this.gameModel.numberOfExtraPathingLines > 0) {
                         let angleInterval = Math.PI / (this.gameModel.numberOfExtraPathingLines + 1.0);
                         let currentAngleOffset;
                         for (let extraPathingLineNum = 1; extraPathingLineNum <= this.gameModel.numberOfExtraPathingLines; ++extraPathingLineNum) {
                             currentAngleOffset = extraPathingLineNum * angleInterval;
-                            pathingLines.push({
-                                currentX: this.position.x + underRadius * Math.cos(minusAngle - currentAngleOffset),
-                                currentZ: this.position.z - underRadius * Math.sin(minusAngle - currentAngleOffset),
-                                finalX: newX + underRadius * Math.cos(minusAngle + currentAngleOffset),
-                                finalZ: newZ - underRadius * Math.sin(minusAngle + currentAngleOffset)
+                            pathingLines.add({
+                                currentX: this.position.x + unitRadius * Math.cos(minusAngle + currentAngleOffset),
+                                currentZ: this.position.z - unitRadius * Math.sin(minusAngle + currentAngleOffset),
+                                finalX: newX + unitRadius * Math.cos(minusAngle + currentAngleOffset),
+                                finalZ: newZ - unitRadius * Math.sin(minusAngle + currentAngleOffset),
+                                isInner: true,
+                                intersection: {
+                                    currentCellsPathable: 0,
+                                    currentCell: null,
+                                    generator: null,
+                                    intersectionResult: null
+                                }
                             });
                         }
                     }
@@ -100,45 +121,66 @@ class GameUnit {
                         pathingLine: null,
                         lastCell: null
                     };
-                    let currentCellsPathable;
-                    let currentCell;
                     let worldMap = workruft.world.map;
                     for (let pathingLine of pathingLines) {
-                        currentCellsPathable = 0;
-                        currentCell = worldMap.getCell({
+                        pathingLine.intersection.currentCell = worldMap.getCell({
                             x: FloorToCell(pathingLine.currentX),
                             z: FloorToCell(pathingLine.currentZ)
                         });
-                        currentCell.faces.top[0].color = BlueColor;
-                        currentCell.faces.top[1].color = BlueColor;
-                        let intersection = IntersectLineWithGrid({
+                        pathingLine.intersection.generator = IntersectLineWithGrid({
                             startX: pathingLine.currentX, startZ: pathingLine.currentZ,
                             endX: pathingLine.finalX, endZ: pathingLine.finalZ
                         });
-                        let direction;
-                        let intersectionResult = intersection.next();
-                        while (!intersectionResult.done) {
-                            direction = intersectionResult.value;
-                            if (worldMap.isTraversible({ cell: currentCell, direction })) {
+                    }
+                    let direction;
+                    let isCellTraversible;
+                    let isObstructed = false;
+                    let pathingLinesToDelete = new Set();
+                    //Check one pathing line at a time, one cell at a time, in sync.
+                    do {
+                        for (let pathingLine of pathingLines) {
+                            pathingLine.intersection.intersectionResult = pathingLine.intersection.generator.next();
+                            if (pathingLine.intersection.intersectionResult.done) {
+                                pathingLinesToDelete.add(pathingLine);
+                                continue;
+                            }
+                            direction = pathingLine.intersection.intersectionResult.value;
+                            if (pathingLine.isInner) {
+                                isCellTraversible =
+                                    worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction: 'back' }) &&
+                                    worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction: 'right' }) &&
+                                    worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction: 'front' }) &&
+                                    worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction: 'left' });
+                            } else {
+                                isCellTraversible = worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction });
+                            }
+                            if (isCellTraversible) {
                                 //Still pathable.
-                                currentCell = currentCell.neighbors[direction];
-                                currentCell.faces.top[0].color = BlueColor;
-                                currentCell.faces.top[1].color = BlueColor;
-                                ++currentCellsPathable;
+                                pathingLine.intersection.currentCell = pathingLine.intersection.currentCell.neighbors[direction];
+                                pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
+                                pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
+                                ++pathingLine.intersection.currentCellsPathable;
                             } else {
                                 //Obstruction found!
-                                currentCell.neighbors[direction].faces.top[0].color = RedColor;
-                                currentCell.neighbors[direction].faces.top[1].color = RedColor;
-                                if (currentCellsPathable < minPathable.cellCount) {
-                                    minPathable.cellCount = currentCellsPathable;
+                                pathingLine.intersection.currentCell.neighbors[direction].faces.top[0].color = RedColor;
+                                pathingLine.intersection.currentCell.neighbors[direction].faces.top[1].color = RedColor;
+                                if (pathingLine.intersection.currentCellsPathable < minPathable.cellCount) {
+                                    minPathable.cellCount = pathingLine.intersection.currentCellsPathable;
                                     minPathable.pathingLine = pathingLine;
-                                    minPathable.lastCell = currentCell;
+                                    minPathable.lastCell = pathingLine.intersection.currentCell;
                                 }
+                                isObstructed = true;
                                 break;
                             }
-                            intersectionResult = intersection.next();
                         }
-                    }
+                        if (isObstructed) {
+                            break;
+                        }
+                        for (let pathingLine of pathingLinesToDelete) {
+                            pathingLines.delete(pathingLine);
+                        }
+                        pathingLinesToDelete.clear();
+                    } while (pathingLines.size > 0);
                     worldMap.geometry.elementsNeedUpdate = true;
 
                     let distanceTraveled;
