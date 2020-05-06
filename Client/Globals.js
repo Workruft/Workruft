@@ -111,9 +111,9 @@ function* IntersectLineWithGrid({ startX, startZ, endX, endZ }) {
     //How far to move along the ray to cross the first horizontal grid cell boundary.
     let tMaxZ = yOffset / Math.sin(angle);
     //How far to move along the ray to move horizontally 1 grid cell.
-    let tDeltaX = 1.0 / Math.cos(angle);
+    let tDeltaX = CellSize / Math.cos(angle);
     //How far to move along the ray to move vertically 1 grid cell.
-    let tDeltaZ = 1.0 / Math.sin(angle);
+    let tDeltaZ = CellSize / Math.sin(angle);
 
     //Travel one grid cell at a time.
     let manhattanDistance = Math.abs(FloorToCell(endX) - cellX) +
