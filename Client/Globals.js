@@ -259,3 +259,70 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
     }
     return pathingLines;
 }
+//Test linear pathing for a unit and return the findings.
+function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRadius,
+    numberOfExtraPathingLines, worldMap }) {
+    let pathingLines = ComputePathTestingLines({
+        startX, startZ, endX, endZ, traversalAngle, unitRadius, numberOfExtraPathingLines, worldMap
+    });
+    //Check every cell that each of the lines intersects with, to see how many cells away from the unit are pathable.
+    let minPathable = {
+        cellCount: Infinity,
+        pathingLine: null,
+        obstructedCell: null
+    };
+    let direction;
+    let isCellTraversible;
+    let pathingLinesToDelete = new Set();
+    //Check one pathing line at a time, one cell at a time, in sync.
+    do {
+        for (let pathingLine of pathingLines) {
+            pathingLine.intersection.intersectionResult = pathingLine.intersection.generator.next();
+            if (pathingLine.intersection.intersectionResult.done || pathingLine.intersection.isObstructed) {
+                pathingLinesToDelete.add(pathingLine);
+                continue;
+            }
+            direction = pathingLine.intersection.intersectionResult.value;
+            if (pathingLine.isInner) {
+                isCellTraversible =
+                    worldMap.isTraversible({
+                        cell: pathingLine.intersection.currentCell,
+                        direction: Enums.CardinalDirections.back
+                    }) &&
+                    worldMap.isTraversible({
+                        cell: pathingLine.intersection.currentCell,
+                        direction: Enums.CardinalDirections.right
+                    }) &&
+                    worldMap.isTraversible({
+                        cell: pathingLine.intersection.currentCell,
+                        direction: Enums.CardinalDirections.front
+                    }) &&
+                    worldMap.isTraversible({
+                        cell: pathingLine.intersection.currentCell,
+                        direction: Enums.CardinalDirections.left
+                    });
+            } else {
+                isCellTraversible = worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction });
+            }
+            if (isCellTraversible) {
+                //Still pathable.
+                pathingLine.intersection.currentCell = pathingLine.intersection.currentCell.neighbors[direction];
+                ++pathingLine.intersection.currentCellsPathable;
+            } else {
+                //Obstruction found!
+                if (pathingLine.intersection.currentCellsPathable < minPathable.cellCount) {
+                    minPathable.cellCount = pathingLine.intersection.currentCellsPathable;
+                    minPathable.pathingLine = pathingLine;
+                    minPathable.obstructedCell = pathingLine.intersection.currentCell.neighbors[direction];
+                }
+                pathingLine.intersection.isObstructed = true;
+                break;
+            }
+        }
+        for (let pathingLine of pathingLinesToDelete) {
+            pathingLines.delete(pathingLine);
+        }
+        pathingLinesToDelete.clear();
+    } while (pathingLines.size > 0);
+    return minPathable;
+}
