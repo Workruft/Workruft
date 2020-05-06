@@ -1,9 +1,11 @@
 let CellSize = 1.0;
 let HalfCellSize = CellSize * 0.5;
 let QuarterCellSize = HalfCellSize * 0.5;
+let ThreeHalvesCellSize = CellSize * 1.5;
+let DoubleCellSize = CellSize * 2.0;
 
 let HalfTinySize = CellSize;
-let TinySize = CellSize * 2.0;
+let TinySize = DoubleCellSize;
 let SmallSize = TinySize * 2.0;
 
 let SelectionExtraRadius = QuarterCellSize;

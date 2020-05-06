@@ -162,13 +162,6 @@ class GameUnit {
                                 ++pathingLine.intersection.currentCellsPathable;
                             } else {
                                 //Obstruction found!
-                                if (window.blah) {
-                                    window.blah.faces.top[0].color = GrassColor;
-                                    window.blah.faces.top[1].color = GrassColor;
-                                }
-                                window.blah = pathingLine.intersection.currentCell.neighbors[direction];
-                                window.blah.faces.top[0].color = RedColor;
-                                window.blah.faces.top[1].color = RedColor;
                                 if (pathingLine.intersection.currentCellsPathable < minPathable.cellCount) {
                                     minPathable.cellCount = pathingLine.intersection.currentCellsPathable;
                                     minPathable.pathingLine = pathingLine;
@@ -183,7 +176,6 @@ class GameUnit {
                         }
                         pathingLinesToDelete.clear();
                     } while (pathingLines.size > 0);
-                    worldMap.geometry.elementsNeedUpdate = true;
 
                     if (minPathable.cellCount == Infinity) {
                         this.position.x = newX;
@@ -195,9 +187,9 @@ class GameUnit {
                         }
                     } else {
                         let newLimitedDistance = Math.hypot(
-                            minPathable.obstructedCell.x + HalfCellSize - this.position.x,
-                            minPathable.obstructedCell.z + HalfCellSize - this.position.z);
-                        newLimitedDistance = Math.max(0.0, newLimitedDistance - CellSize - this.gameModel.halfXZSize);
+                            minPathable.obstructedCell.x - minPathable.pathingLine.startX,
+                            minPathable.obstructedCell.z - minPathable.pathingLine.startZ);
+                        newLimitedDistance = Math.max(0.0, newLimitedDistance - ThreeHalvesCellSize - this.gameModel.halfXZSize);
                         if (newLimitedDistance > 0.0) {
                             let {
                                 limitedX: newLimitedX, limitedZ: newLimitedZ
