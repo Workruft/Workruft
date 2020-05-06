@@ -6,19 +6,21 @@ class GameModel {
 
         this.xzSize = xzSize;
         this.halfXZSize = xzSize * 0.5;
-        this.numberOfExtraPathingLines = Math.max(0, this.xzSize / CellSize);
+        this.numberOfExtraPathingLines = Math.max(0, Math.round(this.xzSize / CellSize));
         this.ySize = ySize;
         this.halfYSize = ySize * 0.5;
+
+        this.traversal = GetOrCreateTraversal({ unitRadius: this.halfXZSize });
+    }
+
+    deconstruct() {
+        DisposeThreeObject(this.geometry);
+        DisposeThreeObject(this.material);
     }
 
     createNewMesh() {
         let newMesh = new THREE.Mesh(this.geometry, this.material);
         newMesh.castShadow = true;
         return newMesh;
-    }
-
-    deconstruct() {
-        DisposeThreeObject(this.geometry);
-        DisposeThreeObject(this.material);
     }
 }

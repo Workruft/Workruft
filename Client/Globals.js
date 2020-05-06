@@ -57,6 +57,10 @@ function IsDefined(checkMe) {
     return typeof checkMe !== 'undefined';
 }
 
+function GenericRound(roundMe) {
+    return Math.round(roundMe / 0.001) * 0.001;
+}
+
 function AlignToCell(alignMe) {
     return Math.round(alignMe / CellSize) * CellSize;
 }
@@ -135,4 +139,44 @@ function* IntersectLineWithGrid({ startX, startZ, endX, endZ }) {
             yield yDirection;
         }
     }
+}
+
+//Calculate unit traversal offsets for each unit size for cardinal path finding navigation.
+let UnitTraversalOffsetsMap = {};
+function ComputeTraversalOffsets({ unitRadius, traversalAngle }) {
+    let traversalOffsets = {
+        offsetX: GenericRound(unitRadius * Math.cos(traversalAngle)),
+        offsetZ: GenericRound(-unitRadius * Math.sin(traversalAngle)),
+        cellOffsets: []
+    };
+    let numberOfCells = Math.max(2, Math.round(unitRadius * 2.0 / CellSize));
+    let angleInterval = Math.PI / (numberOfCells - 1.0);
+    let currentAngleOffset;
+    for (let cellIndex = 0; cellIndex < numberOfCells; ++cellIndex) {
+        currentAngleOffset = cellIndex * angleInterval;
+        traversalOffsets.cellOffsets.push({
+            offsetX: GenericRound(unitRadius * Math.cos(traversalAngle - HalfPI + currentAngleOffset)),
+            offsetZ: GenericRound(-unitRadius * Math.sin(traversalAngle - HalfPI + currentAngleOffset))
+        });
+    }
+    return traversalOffsets;
+}
+function GetOrCreateTraversal({ unitRadius }) {
+    if (IsUndefined(UnitTraversalOffsetsMap[unitRadius])) {
+        UnitTraversalOffsetsMap[unitRadius] = {
+            [Enums.CardinalDirections.back]: ComputeTraversalOffsets({
+                unitRadius, traversalAngle: Math.PI * 0.5
+            }),
+            [Enums.CardinalDirections.right]: ComputeTraversalOffsets({
+                unitRadius, traversalAngle: 0.0
+            }),
+            [Enums.CardinalDirections.front]: ComputeTraversalOffsets({
+                unitRadius, traversalAngle: Math.PI * 1.5
+            }),
+            [Enums.CardinalDirections.left]: ComputeTraversalOffsets({
+                unitRadius, traversalAngle: Math.PI
+            })
+        };
+    }
+    return UnitTraversalOffsetsMap[unitRadius];
 }
