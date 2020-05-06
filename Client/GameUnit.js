@@ -75,7 +75,8 @@ class GameUnit {
                             currentCellsPathable: 0,
                             currentCell: null,
                             generator: null,
-                            intersectionResult: null
+                            intersectionResult: null,
+                            isObstructed: false
                         }
                     };
                     let lastPathingLine = {
@@ -88,7 +89,8 @@ class GameUnit {
                             currentCellsPathable: 0,
                             currentCell: null,
                             generator: null,
-                            intersectionResult: null
+                            intersectionResult: null,
+                            isObstructed: false
                         }
                     };
                     let pathingLines = new Set();
@@ -109,7 +111,8 @@ class GameUnit {
                                     currentCellsPathable: 0,
                                     currentCell: null,
                                     generator: null,
-                                    intersectionResult: null
+                                    intersectionResult: null,
+                                    isObstructed: false
                                 }
                             });
                         }
@@ -134,13 +137,12 @@ class GameUnit {
                     }
                     let direction;
                     let isCellTraversible;
-                    let isObstructed = false;
                     let pathingLinesToDelete = new Set();
                     //Check one pathing line at a time, one cell at a time, in sync.
                     do {
                         for (let pathingLine of pathingLines) {
                             pathingLine.intersection.intersectionResult = pathingLine.intersection.generator.next();
-                            if (pathingLine.intersection.intersectionResult.done) {
+                            if (pathingLine.intersection.intersectionResult.done || pathingLine.intersection.isObstructed) {
                                 pathingLinesToDelete.add(pathingLine);
                                 continue;
                             }
@@ -157,26 +159,24 @@ class GameUnit {
                             if (isCellTraversible) {
                                 //Still pathable.
                                 pathingLine.intersection.currentCell = pathingLine.intersection.currentCell.neighbors[direction];
-                                if (pathingLine.isInner) {
-                                    pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
-                                    pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
-                                }
                                 ++pathingLine.intersection.currentCellsPathable;
                             } else {
                                 //Obstruction found!
-                                pathingLine.intersection.currentCell.neighbors[direction].faces.top[0].color = RedColor;
-                                pathingLine.intersection.currentCell.neighbors[direction].faces.top[1].color = RedColor;
+                                if (window.blah) {
+                                    window.blah.faces.top[0].color = GrassColor;
+                                    window.blah.faces.top[1].color = GrassColor;
+                                }
+                                window.blah = pathingLine.intersection.currentCell.neighbors[direction];
+                                window.blah.faces.top[0].color = RedColor;
+                                window.blah.faces.top[1].color = RedColor;
                                 if (pathingLine.intersection.currentCellsPathable < minPathable.cellCount) {
                                     minPathable.cellCount = pathingLine.intersection.currentCellsPathable;
                                     minPathable.pathingLine = pathingLine;
                                     minPathable.obstructedCell = pathingLine.intersection.currentCell.neighbors[direction];
                                 }
-                                isObstructed = true;
+                                pathingLine.intersection.isObstructed = true;
                                 break;
                             }
-                        }
-                        if (isObstructed) {
-                            break;
                         }
                         for (let pathingLine of pathingLinesToDelete) {
                             pathingLines.delete(pathingLine);
@@ -195,12 +195,10 @@ class GameUnit {
                         }
                     } else {
                         let newLimitedDistance = Math.hypot(
-                            minPathable.obstructedCell.x - minPathable.pathingLine.startX,
-                            minPathable.obstructedCell.z - minPathable.pathingLine.startZ);
-                        newLimitedDistance = Math.max(0.0, newLimitedDistance - 2.0 * CellSize - Math.hypot(
-                            minPathable.pathingLine.startX - this.position.x,
-                            minPathable.pathingLine.startZ - this.position.z));
-                        if (false && newLimitedDistance > 0.0) {
+                            minPathable.obstructedCell.x + HalfCellSize - this.position.x,
+                            minPathable.obstructedCell.z + HalfCellSize - this.position.z);
+                        newLimitedDistance = Math.max(0.0, newLimitedDistance - CellSize - this.gameModel.halfXZSize);
+                        if (newLimitedDistance > 0.0) {
                             let {
                                 limitedX: newLimitedX, limitedZ: newLimitedZ
                             } = LimitDistance({
