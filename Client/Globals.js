@@ -23,6 +23,11 @@ let BlueColor = new THREE.Color('blue');
 
 let HalfPI = Math.PI * 0.5;
 
+Enums.create({
+    name: 'CardinalDirections',
+    items: [ 'back', 'right', 'front', 'left' ]
+});
+
 // Store all of the HTML DOM elements in the body of the page as an HTMLCollection.
 // Any element with an ID can now simply be accessed by HTML.theID or HTML['theID'].
 // This HTMLCollection can also be iterated through, via.: for (... of ...) { }.
@@ -94,8 +99,8 @@ function* IntersectLineWithGrid({ startX, startZ, endX, endZ }) {
     let cellZ = FloorToCell(startZ);
     let diffX = endX - startX;
     let diffZ = endZ - startZ;
-    let xDirection = (Math.sign(diffX) >= 0 ? 'right' : 'left');
-    let yDirection = (Math.sign(diffZ) >= 0 ? 'front' : 'back');
+    let xDirection = (Math.sign(diffX) >= 0 ? Enums.CardinalDirections.right : Enums.CardinalDirections.left);
+    let yDirection = (Math.sign(diffZ) >= 0 ? Enums.CardinalDirections.front : Enums.CardinalDirections.back);
 
     //Straight distance to the first vertical grid boundary.
     let xOffset = endX > startX ?

@@ -149,10 +149,22 @@ class GameUnit {
                             direction = pathingLine.intersection.intersectionResult.value;
                             if (pathingLine.isInner) {
                                 isCellTraversible =
-                                    worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction: 'back' }) &&
-                                    worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction: 'right' }) &&
-                                    worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction: 'front' }) &&
-                                    worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction: 'left' });
+                                    worldMap.isTraversible({
+                                        cell: pathingLine.intersection.currentCell,
+                                        direction: Enums.CardinalDirections.back
+                                    }) &&
+                                    worldMap.isTraversible({
+                                        cell: pathingLine.intersection.currentCell,
+                                        direction: Enums.CardinalDirections.right
+                                    }) &&
+                                    worldMap.isTraversible({
+                                        cell: pathingLine.intersection.currentCell,
+                                        direction: Enums.CardinalDirections.front
+                                    }) &&
+                                    worldMap.isTraversible({
+                                        cell: pathingLine.intersection.currentCell,
+                                        direction: Enums.CardinalDirections.left
+                                    });
                             } else {
                                 isCellTraversible = worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction });
                             }
