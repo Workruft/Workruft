@@ -185,7 +185,8 @@ function GetOrCreateTraversal({ unitRadius }) {
 //parallel to the slope of the unit's trajectory. The inner lines start at the front of the starting
 //circle and end at the back of the ending circle, evenly distributed according to the number of
 //extra pathing lines.
-function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, unitRadius, numberOfExtraPathingLines }) {
+function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, unitRadius,
+    numberOfExtraPathingLines, worldMap }) {
     let minusAngle = traversalAngle - HalfPI;
     let plusAngle = traversalAngle + HalfPI;
     let minusOffsetX = unitRadius * Math.cos(minusAngle);
@@ -246,5 +247,15 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
         }
     }
     pathingLines.add(lastPathingLine);
+    for (let pathingLine of pathingLines) {
+        pathingLine.intersection.currentCell = worldMap.getCell({
+            x: FloorToCell(pathingLine.startX),
+            z: FloorToCell(pathingLine.startZ)
+        });
+        pathingLine.intersection.generator = IntersectLineWithGrid({
+            startX: pathingLine.startX, startZ: pathingLine.startZ,
+            endX: pathingLine.finalX, endZ: pathingLine.finalZ
+        });
+    }
     return pathingLines;
 }

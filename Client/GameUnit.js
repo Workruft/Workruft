@@ -57,6 +57,7 @@ class GameUnit {
                         endZ: currentOrder.data.z,
                         maxDistance
                     });
+                    let worldMap = workruft.world.map;
                     let pathingLines = ComputePathTestingLines({
                         startX: this.position.x,
                         startZ: this.position.z,
@@ -64,7 +65,8 @@ class GameUnit {
                         endZ: newZ,
                         traversalAngle: Math.atan2(-fullZDistance, fullXDistance),
                         unitRadius: this.gameModel.halfXZSize,
-                        numberOfExtraPathingLines: this.gameModel.numberOfExtraPathingLines
+                        numberOfExtraPathingLines: this.gameModel.numberOfExtraPathingLines,
+                        worldMap
                     });
                     //Check every cell that each of the lines intersects with, to see how many cells away from the unit are pathable.
                     let minPathable = {
@@ -72,17 +74,6 @@ class GameUnit {
                         pathingLine: null,
                         obstructedCell: null
                     };
-                    let worldMap = workruft.world.map;
-                    for (let pathingLine of pathingLines) {
-                        pathingLine.intersection.currentCell = worldMap.getCell({
-                            x: FloorToCell(pathingLine.startX),
-                            z: FloorToCell(pathingLine.startZ)
-                        });
-                        pathingLine.intersection.generator = IntersectLineWithGrid({
-                            startX: pathingLine.startX, startZ: pathingLine.startZ,
-                            endX: pathingLine.finalX, endZ: pathingLine.finalZ
-                        });
-                    }
                     let direction;
                     let isCellTraversible;
                     let pathingLinesToDelete = new Set();
