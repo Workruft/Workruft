@@ -95,18 +95,11 @@ class GameUnit {
                     pathingLines.add(firstPathingLine);
                     //Add any inner points.
                     if (this.gameModel.numberOfExtraPathingLines > 0) {
-                        //Simply linearly interpolate between the outermost points.
-                        let lerpRate = 1.0 / (this.gameModel.numberOfExtraPathingLines + 1.0) + 0.000001;
-                        let oneMinus;
                         let angleInterval = Math.PI / (this.gameModel.numberOfExtraPathingLines + 1.0);
                         let currentAngleOffset;
-                        let extraPathingLineNum = 1;
-                        for (let lerpFactor = lerpRate; lerpFactor < 1.0; lerpFactor += lerpRate) {
-                            oneMinus = 1.0 - lerpFactor;
+                        for (let extraPathingLineNum = 1; extraPathingLineNum <= this.gameModel.numberOfExtraPathingLines; ++extraPathingLineNum) {
                             currentAngleOffset = extraPathingLineNum * angleInterval;
                             pathingLines.add({
-                                // startX: oneMinus * firstPathingLine.startX + lerpFactor * lastPathingLine.startX,
-                                // startZ: oneMinus * firstPathingLine.startZ + lerpFactor * lastPathingLine.startZ,
                                 startX: this.position.x + unitRadius * Math.cos(minusAngle + currentAngleOffset),
                                 startZ: this.position.z - unitRadius * Math.sin(minusAngle + currentAngleOffset),
                                 finalX: newX + unitRadius * Math.cos(minusAngle + currentAngleOffset),
@@ -119,7 +112,6 @@ class GameUnit {
                                     intersectionResult: null
                                 }
                             });
-                            ++extraPathingLineNum
                         }
                     }
                     pathingLines.add(lastPathingLine);
@@ -165,10 +157,10 @@ class GameUnit {
                             if (isCellTraversible) {
                                 //Still pathable.
                                 pathingLine.intersection.currentCell = pathingLine.intersection.currentCell.neighbors[direction];
-                                //if (pathingLine.isInner) {
+                                if (pathingLine.isInner) {
                                     pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
                                     pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
-                                //}
+                                }
                                 ++pathingLine.intersection.currentCellsPathable;
                             } else {
                                 //Obstruction found!
