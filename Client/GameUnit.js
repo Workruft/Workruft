@@ -36,7 +36,9 @@ class GameUnit {
     }
 
     update({ workruft, deltaTimeMS }) {
-        let updated = false;
+        let lastPositionX = this.position.x;
+        let lastPositionZ = this.position.z;
+        let updateComplete = false;
         while (this.private.orders.length > 0 && deltaTimeMS > 0) {
             let currentOrder = this.private.orders[0];
             switch (currentOrder.type) {
@@ -46,6 +48,7 @@ class GameUnit {
                         this.private.orders.splice(0, 1);
                     }
 
+                    //Determine current movement step endpoints and related calculations.
                     let maxDistance = this.private.speed * deltaTimeMS;
                     let {
                         limitedX: newX, limitedZ: newZ, limitedDistance,
@@ -58,6 +61,8 @@ class GameUnit {
                         maxDistance
                     });
                     let worldMap = workruft.world.map;
+                    //Determine the minimum distance the unit can go towards the current movement step before reaching an
+                    //obstruction in the path.
                     let minPathable = ComputeMinPathable({
                         startX: this.position.x,
                         startZ: this.position.z,
@@ -69,20 +74,27 @@ class GameUnit {
                         worldMap
                     });
 
+                    //See if the unit's current movement step path is obstructed.
                     if (minPathable.cellCount == Infinity) {
+                        //Unobstructed; gogogo, full speed.
                         this.position.x = newX;
                         this.position.z = newZ;
                         deltaTimeMS -= limitedDistance / this.private.speed;
+                        //See if unit reached destination.
                         if (this.position.x == currentOrder.data.x && this.position.z == currentOrder.data.z) {
-                            //Order complete!
+                            //Order complete.
                             this.private.orders.splice(0, 1);
                         }
                     } else {
+                        //Obstructed; stop before the obstruction.
                         let newLimitedDistance = Math.hypot(
                             minPathable.obstructedCell.x - minPathable.pathingLine.startX,
                             minPathable.obstructedCell.z - minPathable.pathingLine.startZ);
                         newLimitedDistance = Math.max(0.0, newLimitedDistance - ThreeHalvesCellSize - this.gameModel.halfXZSize);
+                        //See if the unit can even move at all.
                         if (newLimitedDistance > 0.0) {
+                            //The unit can move some, just not all the way up to its speed potential.
+                            //Figure out where that is and move.
                             let {
                                 limitedX: newLimitedX, limitedZ: newLimitedZ
                             } = LimitDistance({
@@ -95,23 +107,24 @@ class GameUnit {
                             this.position.x = newLimitedX;
                             this.position.z = newLimitedZ;
                         }
-                        //Order cannot be completed, so cancel all orders!
+                        //Order cannot be completed, so cancel all orders (stop unit).
                         deltaTimeMS = -Infinity;
                         this.private.orders = [];
                     }
-
-                    this.autoSetHeight({ workruft });
-                    updated = true;
                     break;
-                }
+                } //case Enums.OrderTypes.Move
                 default:
                 {
-                    updated = true;
+                    updateComplete = true;
                 }
             }
-            if (updated) {
+            if (updateComplete) {
                 break;
             }
+        }
+        //If the unit has moved any, update its height.
+        if (this.position.x != lastPositionX || this.position.z != lastPositionZ) {
+            this.autoSetHeight({ workruft });
         }
         if (this.private.orders.length == 0) {
             workruft.objectsToUpdate.delete(this);
