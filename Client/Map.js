@@ -84,16 +84,16 @@ class Map {
             let column = this.grid[x];
             for (let z = this.minZ; z <= this.maxZ; z += CellSize) {
                 if (z != this.minZ) {
-                    column[z].neighbors.back = this.grid[x][z - CellSize];
+                    column[z].neighbors[Enums.CardinalDirections.back] = this.grid[x][z - CellSize];
                 }
                 if (x != this.maxX) {
-                    column[z].neighbors.right = this.grid[x + CellSize][z];
+                    column[z].neighbors[Enums.CardinalDirections.right] = this.grid[x + CellSize][z];
                 }
                 if (z != this.maxX) {
-                    column[z].neighbors.front = this.grid[x][z + CellSize];
+                    column[z].neighbors[Enums.CardinalDirections.front] = this.grid[x][z + CellSize];
                 }
                 if (x != this.minX) {
-                    column[z].neighbors.left = this.grid[x - CellSize][z];
+                    column[z].neighbors[Enums.CardinalDirections.left] = this.grid[x - CellSize][z];
                 }
                 // for (let cellClusterSize of this.cellClusterSizes) {
                 //     column[z].clusterTraversability.push(x - CellSize + cellClusterSize <= this.maxX && z - CellSize + cellClusterSize <= this.maxZ);
@@ -149,16 +149,16 @@ class Map {
 
     isTraversible({ cell, direction }) {
         switch (direction) {
-            case 'back':
+            case Enums.CardinalDirections.back:
                 return this.isBackTraversable({ cell });
                 break;
-            case 'right':
+            case Enums.CardinalDirections.right:
                 return this.isRightTraversable({ cell });
                 break;
-            case 'front':
+            case Enums.CardinalDirections.front:
                 return this.isFrontTraversable({ cell });
                 break;
-            case 'left':
+            case Enums.CardinalDirections.left:
                 return this.isLeftTraversable({ cell });
                 break;
         }
@@ -166,7 +166,7 @@ class Map {
     }
 
     isBackTraversable({ cell }) {
-        return this.isFrontTraversable({ cell: cell.neighbors.back });
+        return this.isFrontTraversable({ cell: cell.neighbors[Enums.CardinalDirections.back] });
     }
 
     isRightTraversable({ cell }) {
@@ -178,7 +178,7 @@ class Map {
     }
 
     isLeftTraversable({ cell }) {
-        return this.isRightTraversable({ cell: cell.neighbors.left });
+        return this.isRightTraversable({ cell: cell.neighbors[Enums.CardinalDirections.left] });
     }
 
     //Make sure that these bounds wrap around (inclusively) all of the cells involved!
@@ -198,7 +198,7 @@ class Map {
                 currentCell = this.getCell({ x, z });
                 //Right.
                 if (x < highX) {
-                    let otherCell = currentCell.neighbors.right;
+                    let otherCell = currentCell.neighbors[Enums.CardinalDirections.right];
                     if (IsDefined(otherCell)) {
                         currentCell.rightTraversable =
                             this.getBackRightVertex({ cell: currentCell }).y == this.getBackLeftVertex({ cell: otherCell }).y &&
@@ -213,7 +213,7 @@ class Map {
                 }
                 //Front.
                 if (z < highZ) {
-                    let otherCell = currentCell.neighbors.front;
+                    let otherCell = currentCell.neighbors[Enums.CardinalDirections.front];
                     if (IsDefined(otherCell)) {
                         currentCell.frontTraversable =
                             this.getFrontRightVertex({ cell: currentCell }).y == this.getBackRightVertex({ cell: otherCell }).y &&
