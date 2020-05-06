@@ -180,3 +180,71 @@ function GetOrCreateTraversal({ unitRadius }) {
     }
     return UnitTraversalOffsetsMap[unitRadius];
 }
+
+//Create path-testing lines. The first two lines start and end at the outermost points of the circle
+//parallel to the slope of the unit's trajectory. The inner lines start at the front of the starting
+//circle and end at the back of the ending circle, evenly distributed according to the number of
+//extra pathing lines.
+function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, unitRadius, numberOfExtraPathingLines }) {
+    let minusAngle = traversalAngle - HalfPI;
+    let plusAngle = traversalAngle + HalfPI;
+    let minusOffsetX = unitRadius * Math.cos(minusAngle);
+    let minusOffsetZ = -unitRadius * Math.sin(minusAngle);
+    let plusOffsetX = unitRadius * Math.cos(plusAngle);
+    let plusOffsetZ = -unitRadius * Math.sin(plusAngle);
+    //Outermost points.
+    let firstPathingLine = {
+        startX: startX + minusOffsetX,
+        startZ: startZ + minusOffsetZ,
+        finalX: endX + minusOffsetX,
+        finalZ: endZ + minusOffsetZ,
+        isInner: false,
+        intersection: {
+            currentCellsPathable: 0,
+            currentCell: null,
+            generator: null,
+            intersectionResult: null,
+            isObstructed: false
+        }
+    };
+    let lastPathingLine = {
+        startX: startX + plusOffsetX,
+        startZ: startZ + plusOffsetZ,
+        finalX: endX + plusOffsetX,
+        finalZ: endZ + plusOffsetZ,
+        isInner: false,
+        intersection: {
+            currentCellsPathable: 0,
+            currentCell: null,
+            generator: null,
+            intersectionResult: null,
+            isObstructed: false
+        }
+    };
+    let pathingLines = new Set();
+    pathingLines.add(firstPathingLine);
+    //Add any inner points.
+    if (numberOfExtraPathingLines > 0) {
+        let angleInterval = Math.PI / (numberOfExtraPathingLines + 1.0);
+        let currentAngleOffset;
+        for (let extraPathingLineNum = 1; extraPathingLineNum <= numberOfExtraPathingLines; ++extraPathingLineNum) {
+            currentAngleOffset = extraPathingLineNum * angleInterval;
+            pathingLines.add({
+                startX: startX + unitRadius * Math.cos(minusAngle + currentAngleOffset),
+                startZ: startZ - unitRadius * Math.sin(minusAngle + currentAngleOffset),
+                finalX: endX + unitRadius * Math.cos(minusAngle + currentAngleOffset),
+                finalZ: endZ - unitRadius * Math.sin(minusAngle + currentAngleOffset),
+                isInner: true,
+                intersection: {
+                    currentCellsPathable: 0,
+                    currentCell: null,
+                    generator: null,
+                    intersectionResult: null,
+                    isObstructed: false
+                }
+            });
+        }
+    }
+    pathingLines.add(lastPathingLine);
+    return pathingLines;
+}

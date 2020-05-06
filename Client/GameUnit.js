@@ -57,67 +57,15 @@ class GameUnit {
                         endZ: currentOrder.data.z,
                         maxDistance
                     });
-
-                    //Create path-testing lines. The first two lines start and end at the outermost points of the circle
-                    //parallel to the slope of the unit's trajectory.
-                    let movementAngle = Math.atan2(-fullZDistance, fullXDistance);
-                    let minusAngle = movementAngle - HalfPI;
-                    let plusAngle = movementAngle + HalfPI;
-                    let unitRadius = this.gameModel.halfXZSize;
-                    //Outermost points.
-                    let firstPathingLine = {
-                        startX: this.position.x + unitRadius * Math.cos(minusAngle),
-                        startZ: this.position.z - unitRadius * Math.sin(minusAngle),
-                        finalX: newX + unitRadius * Math.cos(minusAngle),
-                        finalZ: newZ - unitRadius * Math.sin(minusAngle),
-                        isInner: false,
-                        intersection: {
-                            currentCellsPathable: 0,
-                            currentCell: null,
-                            generator: null,
-                            intersectionResult: null,
-                            isObstructed: false
-                        }
-                    };
-                    let lastPathingLine = {
-                        startX: this.position.x + unitRadius * Math.cos(plusAngle),
-                        startZ: this.position.z - unitRadius * Math.sin(plusAngle),
-                        finalX: newX + unitRadius * Math.cos(plusAngle),
-                        finalZ: newZ - unitRadius * Math.sin(plusAngle),
-                        isInner: false,
-                        intersection: {
-                            currentCellsPathable: 0,
-                            currentCell: null,
-                            generator: null,
-                            intersectionResult: null,
-                            isObstructed: false
-                        }
-                    };
-                    let pathingLines = new Set();
-                    pathingLines.add(firstPathingLine);
-                    //Add any inner points.
-                    if (this.gameModel.numberOfExtraPathingLines > 0) {
-                        let angleInterval = Math.PI / (this.gameModel.numberOfExtraPathingLines + 1.0);
-                        let currentAngleOffset;
-                        for (let extraPathingLineNum = 1; extraPathingLineNum <= this.gameModel.numberOfExtraPathingLines; ++extraPathingLineNum) {
-                            currentAngleOffset = extraPathingLineNum * angleInterval;
-                            pathingLines.add({
-                                startX: this.position.x + unitRadius * Math.cos(minusAngle + currentAngleOffset),
-                                startZ: this.position.z - unitRadius * Math.sin(minusAngle + currentAngleOffset),
-                                finalX: newX + unitRadius * Math.cos(minusAngle + currentAngleOffset),
-                                finalZ: newZ - unitRadius * Math.sin(minusAngle + currentAngleOffset),
-                                isInner: true,
-                                intersection: {
-                                    currentCellsPathable: 0,
-                                    currentCell: null,
-                                    generator: null,
-                                    intersectionResult: null,
-                                    isObstructed: false
-                                }
-                            });
-                        }
-                    }
-                    pathingLines.add(lastPathingLine);
+                    let pathingLines = ComputePathTestingLines({
+                        startX: this.position.x,
+                        startZ: this.position.z,
+                        endX: newX,
+                        endZ: newZ,
+                        traversalAngle: Math.atan2(-fullZDistance, fullXDistance),
+                        unitRadius: this.gameModel.halfXZSize,
+                        numberOfExtraPathingLines: this.gameModel.numberOfExtraPathingLines
+                    });
                     //Check every cell that each of the lines intersects with, to see how many cells away from the unit are pathable.
                     let minPathable = {
                         cellCount: Infinity,
