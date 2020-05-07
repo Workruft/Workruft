@@ -82,6 +82,15 @@ function CeilToCell(alignMe) {
     return Math.ceil(alignMe / CellSize) * CellSize;
 }
 
+function CellClosestDistance({ cellX, cellZ, pointX, pointZ }) {
+    let diffX = cellX - pointX;
+    let diffZ = cellZ - pointZ;
+    return Math.hypot(
+        diffX + (diffX < -HalfCellSize ? CellSize : 0.0),
+        diffZ + (diffZ < -HalfCellSize ? CellSize : 0.0)
+    );
+}
+
 //1 means front of a horizontal line, -1 means back, and 0 means on the line.
 //1 means left of a vertical line, -1 means right, and 0 means on the line.
 function SideOfLine({ startX, startZ, endX, endZ, pointX, pointZ }) {
@@ -218,7 +227,7 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
         endZ: endZ + minusOffsetZ,
         innerDirections: [],
         intersection: {
-            currentCellsPathable: 0,
+            currentDistance: Infinity,
             currentCell: null,
             generator: null,
             intersectionResult: {}
@@ -231,7 +240,7 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
         endZ: endZ + plusOffsetZ,
         innerDirections: [],
         intersection: {
-            currentCellsPathable: 0,
+            currentDistance: Infinity,
             currentCell: null,
             generator: null,
             intersectionResult: {}
@@ -252,7 +261,7 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
                 endZ: endZ - unitRadius * Math.sin(currentAngleOffset),
                 innerDirections: [],
                 intersection: {
-                    currentCellsPathable: 0,
+                    currentDistance: Infinity,
                     currentCell: null,
                     generator: null,
                     intersectionResult: {}
@@ -319,20 +328,14 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
     });
     //Check every cell that each of the lines intersects with, to see how many cells away from the unit are pathable.
     let minPathable = {
-        cellCount: Infinity,
-        pathingLine: null,
-        obstructedCell: null
+        distance: Infinity,
+        pathingLine: null
     };
     let direction;
     let isCellTraversible;
-    let isObstructed = false;
     //Check one pathing line at a time, one cell at a time, in sync.
     do {
         for (let pathingLine of pathingLines) {
-            if (pathingLine.intersection.intersectionResult.done) {
-                continue;
-            }
-
             pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
             pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
 
@@ -361,7 +364,12 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
             if (isCellTraversible) {
                 //Still pathable.
                 pathingLine.intersection.currentCell = pathingLine.intersection.currentCell.neighbors[direction];
-                ++pathingLine.intersection.currentCellsPathable;
+                pathingLine.intersection.currentDistance = CellClosestDistance({
+                    cellX: pathingLine.intersection.currentCell.x,
+                    cellZ: pathingLine.intersection.currentCell.z,
+                    pointX: pathingLine.startX,
+                    pointZ: pathingLine.startZ
+                });
             } else {
                 //Obstruction found!
                 if (IsDefined(window.redz)) {
@@ -371,16 +379,15 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
                 window.redz = pathingLine.intersection.currentCell;
                 pathingLine.intersection.currentCell.faces.top[0].color = RedColor;
                 pathingLine.intersection.currentCell.faces.top[1].color = RedColor;
-                if (pathingLine.intersection.currentCellsPathable < minPathable.cellCount) {
-                    minPathable.cellCount = pathingLine.intersection.currentCellsPathable;
+                if (pathingLine.intersection.currentDistance < minPathable.distance) {
+                    minPathable.distance = pathingLine.intersection.currentDistance;
                     minPathable.pathingLine = pathingLine;
-                    minPathable.obstructedCell = pathingLine.intersection.currentCell.neighbors[direction];
                 }
-                isObstructed = true;
+                pathingLines.delete(pathingLine);
                 break;
             }
         }
-    } while (!isObstructed && pathingLines.size > 0);
+    } while (pathingLines.size > 0);
     worldMap.geometry.elementsNeedUpdate = true;
     return minPathable;
 }

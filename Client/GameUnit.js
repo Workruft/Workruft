@@ -75,7 +75,7 @@ class GameUnit {
                     });
 
                     //See if the unit's current movement step path is obstructed.
-                    if (minPathable.cellCount == Infinity) {
+                    if (minPathable.distance == Infinity) {
                         //Unobstructed; gogogo, full speed.
                         this.position.x = newX;
                         this.position.z = newZ;
@@ -87,10 +87,8 @@ class GameUnit {
                         }
                     } else {
                         //Obstructed; stop before the obstruction.
-                        let newLimitedDistance = Math.hypot(
-                            minPathable.obstructedCell.x - minPathable.pathingLine.startX,
-                            minPathable.obstructedCell.z - minPathable.pathingLine.startZ);
-                        newLimitedDistance = Math.max(0.0, newLimitedDistance - ThreeHalvesCellSize - this.gameModel.halfXZSize);
+                        let newLimitedDistance = Math.max(0.0, minPathable.distance - ThreeHalvesCellSize - this.gameModel.halfXZSize);
+                        alert(minPathable.distance + ' + ' + newLimitedDistance);
                         //See if the unit can even move at all.
                         if (newLimitedDistance > 0.0) {
                             //The unit can move some, just not all the way up to its speed potential.
