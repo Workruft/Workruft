@@ -207,52 +207,6 @@ function GetOrCreateTraversal({ unitRadius }) {
     return UnitTraversalOffsetsMap[unitRadius];
 }
 
-function* deleteLater(start, end) {
-    //Grid cells are 1.0 X 1.0.
-    let x = Math.floor(start.x);
-    let y = Math.floor(start.y);
-    let diffX = end.x - start.x;
-    let diffY = end.y - start.y;
-    let stepX = Math.sign(diffX);
-    let stepY = Math.sign(diffY);
-
-    //Ray/Slope related maths.
-    //Straight distance to the first vertical grid boundary.
-    let xOffset = end.x > start.x ?
-        (Math.ceil(start.x) - start.x) :
-        (start.x - Math.floor(start.x));
-    //Straight distance to the first horizontal grid boundary.
-    let yOffset = end.y > start.y ?
-        (Math.ceil(start.y) - start.y) :
-        (start.y - Math.floor(start.y));
-    //Angle of ray/slope.
-    let angle = Math.atan2(-diffY, diffX);
-    //NOTE: These can be divide by 0's, but JS just yields Infinity! :)
-    //How far to move along the ray to cross the first vertical grid cell boundary.
-    let tMaxX = xOffset / Math.cos(angle);
-    //How far to move along the ray to cross the first horizontal grid cell boundary.
-    let tMaxY = yOffset / Math.sin(angle);
-    //How far to move along the ray to move horizontally 1 grid cell.
-    let tDeltaX = 1.0 / Math.cos(angle);
-    //How far to move along the ray to move vertically 1 grid cell.
-    let tDeltaY = 1.0 / Math.sin(angle);
-
-    //Travel one grid cell at a time.
-    let manhattanDistance = Math.abs(Math.floor(end.x) - Math.floor(start.x)) +
-        Math.abs(Math.floor(end.y) - Math.floor(start.y));
-    for (let t = 0; t <= manhattanDistance; ++t) {
-        yield { x, y };
-        //Only move in either X or Y coordinates, not both.
-        if (Math.abs(tMaxX) < Math.abs(tMaxY)) {
-            tMaxX += tDeltaX;
-            x += stepX;
-        } else {
-            tMaxY += tDeltaY;
-            y += stepY;
-        }
-    }
-}
-
 //Create path-testing lines. The first two lines start and end at the outermost points of the circle
 //parallel to the slope of the unit's trajectory. The inner lines start at the front of the starting
 //circle and end at the back of the ending circle, evenly distributed according to the number of
@@ -370,27 +324,6 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             startX: pathingLine.startX, startZ: pathingLine.startZ,
             endX: pathingLine.endX, endZ: pathingLine.endZ
         });
-        // let cell = worldMap.getCell({
-        //     x: pathingLine.intersection.currentCell.x,
-        //     z: pathingLine.intersection.currentCell.z
-        // });
-        // cell.faces.top[0].color = BlueColor;
-        // cell.faces.top[1].color = BlueColor;
-        // let genned = pathingLine.intersection.generator.next();
-        // while (!genned.done) {
-        //     cell = cell.neighbors[genned.value];
-        //     cell.faces.top[0].color = BlueColor;
-        //     cell.faces.top[1].color = BlueColor;
-        //     genned = pathingLine.intersection.generator.next();
-        // }
-        let gen = deleteLater({ x: pathingLine.startX, y: pathingLine.startZ }, { x: pathingLine.endX, y: pathingLine.endZ });
-        let genned = gen.next();
-        while (!genned.done) {
-            let cell = worldMap.getCell({ x: genned.value.x, z: genned.value.y });
-            cell.faces.top[0].color = BlueColor;
-            cell.faces.top[1].color = BlueColor;
-            genned = gen.next();
-        }
     }
     return pathingLines;
 }
