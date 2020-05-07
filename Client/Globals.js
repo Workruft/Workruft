@@ -30,32 +30,11 @@ Enums.create({
 });
 
 let CardinalCellOffsetsDistance = CellSize;
-let DoubleCardinalCellOffsetsDistance = CardinalCellOffsetsDistance * 2.0;
 let CardinalCellOffsetsMap = {
-    [Enums.CardinalDirections.back]: [
-        { offsetX: 0.0, offsetZ: -CardinalCellOffsetsDistance },
-        { offsetX: CardinalCellOffsetsDistance, offsetZ: -CardinalCellOffsetsDistance },
-        { offsetX: CardinalCellOffsetsDistance, offsetZ: 0.0 },
-        { offsetX: 0.0, offsetZ: 0.0 }
-    ],
-    [Enums.CardinalDirections.right]: [
-        { offsetX: CardinalCellOffsetsDistance, offsetZ: 0.0 },
-        { offsetX: DoubleCardinalCellOffsetsDistance, offsetZ: 0.0 },
-        { offsetX: DoubleCardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance },
-        { offsetX: CardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance }
-    ],
-    [Enums.CardinalDirections.front]: [
-        { offsetX: 0.0, offsetZ: CardinalCellOffsetsDistance },
-        { offsetX: CardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance },
-        { offsetX: CardinalCellOffsetsDistance, offsetZ: DoubleCardinalCellOffsetsDistance },
-        { offsetX: 0.0, offsetZ: DoubleCardinalCellOffsetsDistance }
-    ],
-    [Enums.CardinalDirections.left]: [
-        { offsetX: -CardinalCellOffsetsDistance, offsetZ: 0.0 },
-        { offsetX: 0.0, offsetZ: 0.0 },
-        { offsetX: 0.0, offsetZ: CardinalCellOffsetsDistance },
-        { offsetX: -CardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance }
-    ]
+    [Enums.CardinalDirections.back]: [{ offsetX: 0.0, offsetZ: -CardinalCellOffsetsDistance }],
+    [Enums.CardinalDirections.right]: [{ offsetX: CardinalCellOffsetsDistance, offsetZ: 0.0 }],
+    [Enums.CardinalDirections.front]: [{ offsetX: 0.0, offsetZ: CardinalCellOffsetsDistance }],
+    [Enums.CardinalDirections.left]: [{ offsetX: -CardinalCellOffsetsDistance, offsetZ: 0.0 }]
 };
 
 // Store all of the HTML DOM elements in the body of the page as an HTMLCollection.
@@ -322,9 +301,6 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             if (allPointsFit) {
                 pathingLine.innerDirections.push(cardinalDirection);
             }
-        }
-        if (pathingLine != firstPathingLine && pathingLine != lastPathingLine) {
-            console.log(pathingLine.innerDirections);
         }
         game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
             new THREE.Vector3(pathingLine.startX, 0.1, pathingLine.startZ),

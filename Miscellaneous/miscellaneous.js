@@ -86,10 +86,31 @@ cubeGeometry.computeFaceNormals();
 
 
 
-let UnusedCardinalCellOffsetsDistance = DoubleCellSize;
-let UnusedCardinalCellOffsetsMap = {
-    [Enums.CardinalDirections.back]: { offsetX: 0.0, offsetZ: -CardinalCellOffsetsDistance },
-    [Enums.CardinalDirections.right]: { offsetX: CardinalCellOffsetsDistance, offsetZ: 0.0 },
-    [Enums.CardinalDirections.front]: { offsetX: 0.0, offsetZ: CardinalCellOffsetsDistance },
-    [Enums.CardinalDirections.left]: { offsetX: -CardinalCellOffsetsDistance, offsetZ: 0.0 }
+let CardinalCellOffsetsDistance = CellSize;
+let DoubleCardinalCellOffsetsDistance = CardinalCellOffsetsDistance * 2.0;
+let CardinalCellOffsetsMap = {
+    [Enums.CardinalDirections.back]: [
+        { offsetX: 0.0, offsetZ: -CardinalCellOffsetsDistance },
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: -CardinalCellOffsetsDistance },
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: 0.0 },
+        { offsetX: 0.0, offsetZ: 0.0 }
+    ],
+    [Enums.CardinalDirections.right]: [
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: 0.0 },
+        { offsetX: DoubleCardinalCellOffsetsDistance, offsetZ: 0.0 },
+        { offsetX: DoubleCardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance },
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance }
+    ],
+    [Enums.CardinalDirections.front]: [
+        { offsetX: 0.0, offsetZ: CardinalCellOffsetsDistance },
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance },
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: DoubleCardinalCellOffsetsDistance },
+        { offsetX: 0.0, offsetZ: DoubleCardinalCellOffsetsDistance }
+    ],
+    [Enums.CardinalDirections.left]: [
+        { offsetX: -CardinalCellOffsetsDistance, offsetZ: 0.0 },
+        { offsetX: 0.0, offsetZ: 0.0 },
+        { offsetX: 0.0, offsetZ: CardinalCellOffsetsDistance },
+        { offsetX: -CardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance }
+    ]
 };
