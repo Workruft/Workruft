@@ -3,7 +3,7 @@
 //-X  +X  ||
 //  +Z    \/-Y
 
-class Map {
+class GameMap {
     constructor(sizeX, sizeZ) {
         this.sizeX = sizeX;
         this.sizeZ = sizeZ;
