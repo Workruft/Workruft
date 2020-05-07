@@ -1,3 +1,5 @@
+let PathTestingLeniency = 0.2;
+
 let CellSize = 1.0;
 let HalfCellSize = CellSize * 0.5;
 let QuarterCellSize = HalfCellSize * 0.5;
@@ -215,10 +217,11 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
     numberOfExtraPathingLines, worldMap }) {
     let minusAngle = traversalAngle - HalfPI;
     let plusAngle = traversalAngle + HalfPI;
-    let minusOffsetX = unitRadius * Math.cos(minusAngle);
-    let minusOffsetZ = -unitRadius * Math.sin(minusAngle);
-    let plusOffsetX = unitRadius * Math.cos(plusAngle);
-    let plusOffsetZ = -unitRadius * Math.sin(plusAngle);
+    let lenientUnitRadius = unitRadius - PathTestingLeniency;
+    let minusOffsetX = lenientUnitRadius * Math.cos(minusAngle);
+    let minusOffsetZ = -lenientUnitRadius * Math.sin(minusAngle);
+    let plusOffsetX = lenientUnitRadius * Math.cos(plusAngle);
+    let plusOffsetZ = -lenientUnitRadius * Math.sin(plusAngle);
     //Outermost points.
     let firstPathingLine = {
         startX: startX + minusOffsetX,
@@ -253,12 +256,12 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
         let angleHelper = unitRadius * 2.0 / (numberOfExtraPathingLines + 1.0);
         let currentAngleOffset;
         for (let extraPathingLineNum = 1; extraPathingLineNum <= numberOfExtraPathingLines; ++extraPathingLineNum) {
-            currentAngleOffset = plusAngle - Math.acos(unitRadius - extraPathingLineNum * angleHelper);
+            currentAngleOffset = plusAngle - Math.acos((unitRadius - extraPathingLineNum * angleHelper) / unitRadius);
             pathingLines.add({
-                startX: startX + unitRadius * Math.cos(currentAngleOffset),
-                startZ: startZ - unitRadius * Math.sin(currentAngleOffset),
-                endX: endX + unitRadius * Math.cos(currentAngleOffset),
-                endZ: endZ - unitRadius * Math.sin(currentAngleOffset),
+                startX: startX + lenientUnitRadius * Math.cos(currentAngleOffset),
+                startZ: startZ - lenientUnitRadius * Math.sin(currentAngleOffset),
+                endX: endX + lenientUnitRadius * Math.cos(currentAngleOffset),
+                endZ: endZ - lenientUnitRadius * Math.sin(currentAngleOffset),
                 innerDirections: [],
                 intersection: {
                     currentDistance: Infinity,
@@ -306,15 +309,6 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
                 pathingLine.innerDirections.push(cardinalDirection);
             }
         }
-        // for (let ratio = 0.0; ratio <= 1.0; ratio += 0.01) {
-        //     let oneMinus = 1.0 - ratio;
-        //     let cell = worldMap.getCell({
-        //         x: Math.round(oneMinus * pathingLine.startX + ratio * pathingLine.endX),
-        //         z: Math.round(oneMinus * pathingLine.startZ + ratio * pathingLine.endZ)
-        //     });
-        //     cell.faces.top[0].color = BlueColor;
-        //     cell.faces.top[1].color = BlueColor;
-        // }
         game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
             new THREE.Vector3(pathingLine.startX, 0.1, pathingLine.startZ),
             new THREE.Vector3(pathingLine.endX, 0.1, pathingLine.endZ)
