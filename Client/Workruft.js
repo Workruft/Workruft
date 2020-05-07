@@ -41,7 +41,8 @@ class Workruft {
         //Game units etc.
         this.playerUnit = new GameUnit({
             workruft: this,
-            gameModel: this.world.wolfModel,
+            gameModel: this.world.sheepModel,
+            //gameModel: this.world.wolfModel,
             x: 0.0,
             z: 0.0
         });
@@ -139,11 +140,7 @@ class Workruft {
                     if (pickedGameObject.isSelected) {
                         pickedGameObject.deselect({ workruft: this });
                     } else {
-                        pickedGameObject.select({
-                            workruft: this,
-                            //selectionModel: this.world.tinySelectionCircleModel
-                            selectionModel: this.world.smallSelectionCircleModel
-                        });
+                        pickedGameObject.select({ workruft: this });
                     }
                 } else {
                     for (let selectedObject of this.selectedObjects) {

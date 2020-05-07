@@ -18,6 +18,7 @@ class World {
         });
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.selectionCircleModelsMap = new Map();
         this.onResize();
         window.addEventListener('resize', this.onResize.bind(this));
 
@@ -64,7 +65,7 @@ class World {
 
         //Action.
         //Map.
-        this.map = new Map(150, 150);
+        this.map = new GameMap(150, 150);
         let currentCell;
         //Border wall.
         let addBorder = function(currentCell) {
@@ -141,12 +142,10 @@ class World {
         this.isDeconstructing = true;
 
         //Geometries, materials, textures, render targets, scenes, and anything else with dispose().
-        if (this.tinySelectionCircleModel) {
-            this.tinySelectionCircleModel.deconstruct();
+        for (let selectionCircleModel of this.selectionCircleModelsMap.keys()) {
+            selectionCircleModel.deconstruct();
         }
-        if (this.smallSelectionCircleModel) {
-            this.smallSelectionCircleModel.deconstruct();
-        }
+        this.selectionCircleModelsMap.clear();
         this.sheepModel.deconstruct();
         this.wolfModel.deconstruct();
         this.buildingModel.deconstruct();
@@ -163,12 +162,11 @@ class World {
 
     //Make sure to update deconstruct!
     setupResizeGameModels() {
-        if (this.tinySelectionCircleModel) {
-            this.tinySelectionCircleModel.deconstruct();
+        //TODO: Really all selection circles will have to be recreated, and/or all objects deselected, here.
+        for (let selectionCircleModel of this.selectionCircleModelsMap.keys()) {
+            selectionCircleModel.deconstruct();
         }
-        if (this.smallSelectionCircleModel) {
-            this.smallSelectionCircleModel.deconstruct();
-        }
+        this.selectionCircleModelsMap.clear();
         this.selectionCircleMaterial = new MeshLineMaterial({
             color: 'blue',
             resolution: new THREE.Vector2(this.canvas.width, this.canvas.height),
@@ -178,29 +176,28 @@ class World {
             opacity: 0.5,
             transparent: true
         });
-        this.tinySelectionCircleModel = new GameModel({
-            geometry: TinyCircleGeometry,
-            material: this.selectionCircleMaterial,
-            xzSize: TinySize,
-            ySize: 0.0
-        });
-        this.smallSelectionCircleModel = new GameModel({
-            geometry: SmallCircleGeometry,
-            material: this.selectionCircleMaterial,
-            xzSize: SmallSize,
-            ySize: 0.0
-        });
+        for (let unitSizeXZ = HalfTinySize; unitSizeXZ <= BigSize; unitSizeXZ += HalfTinySize) {
+            this.selectionCircleModelsMap.set(unitSizeXZ, new GameModel({
+                world: this,
+                geometry: CircleGeometriesMap.get(unitSizeXZ),
+                material: this.selectionCircleMaterial,
+                xzSize: unitSizeXZ,
+                ySize: 0.0
+            }));
+        }
     }
 
     //Make sure to update deconstruct!
     setupGameModels() {
         this.sheepModel = new GameModel({
+            world: this,
             geometry: TinySphereGeometry,
             material: new THREE.MeshPhongMaterial({ color: '#777' }),
             xzSize: TinySize,
             ySize: TinySize
         });
         this.wolfModel = new GameModel({
+            world: this,
             geometry: SmallSphereGeometry,
             material: new THREE.MeshPhongMaterial({ color: '#555' }),
             xzSize: SmallSize,
@@ -208,6 +205,7 @@ class World {
         });
 
         this.buildingModel = new GameModel({
+            world: this,
             geometry: SmallCubeGeometry,
             material: new THREE.MeshPhongMaterial({ color: 'black' }),
             xzSize: SmallSize,

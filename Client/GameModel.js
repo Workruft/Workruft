@@ -1,6 +1,7 @@
 class GameModel {
     //Takes ownership of the geometry and material!
-    constructor({ geometry, material, xzSize, ySize }) {
+    constructor({ world, geometry, material, xzSize, ySize }) {
+        this.world = world;
         this.geometry = geometry;
         this.material = material;
 

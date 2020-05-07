@@ -18,14 +18,18 @@ function createCircleGeometry(radius) {
     //});
     return circleLine.geometry;
 }
-let TinyCircleGeometry = createCircleGeometry(SelectionExtraRadius + HalfTinySize);
-let SmallCircleGeometry = createCircleGeometry(SelectionExtraRadius + TinySize);
+let CircleGeometriesMap = new Map();
+for (let unitSizeXZ = HalfTinySize; unitSizeXZ <= BigSize; unitSizeXZ += HalfTinySize) {
+    CircleGeometriesMap.set(unitSizeXZ, createCircleGeometry(SelectionExtraRadius + unitSizeXZ));
+}
 
 function DeconstructPrimitives() {
     DisposeThreeObject(TinySphereGeometry);
     DisposeThreeObject(SmallSphereGeometry);
     DisposeThreeObject(TinyCubeGeometry);
     DisposeThreeObject(SmallCubeGeometry);
-    DisposeThreeObject(TinyCircleGeometry);
-    DisposeThreeObject(SmallCircleGeometry);
+    for (let circleGeometry of CircleGeometriesMap.keys()) {
+        DisposeThreeObject(circleGeometry);
+    }
+    CircleGeometriesMap.clear();
 }

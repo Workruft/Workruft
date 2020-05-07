@@ -135,9 +135,10 @@ class GameUnit {
         objectGroup.add(this.group);
     }
 
-    select({ workruft, selectionModel }) {
+    select({ workruft }) {
         if (!this.isSelected) {
-            this.private.selectionCircle = selectionModel.createNewMesh();
+            this.private.selectionCircle =
+                workruft.world.selectionCircleModelsMap.get(this.gameModel.halfXZSize).createNewMesh();
             this.private.selectionCircle.layers.set(1);
             this.private.selectionCircle.position.y = 0.5;
             this.private.selectionCircle.rotation.x = HalfPI;
