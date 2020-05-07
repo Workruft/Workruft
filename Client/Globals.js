@@ -221,8 +221,7 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             currentCellsPathable: 0,
             currentCell: null,
             generator: null,
-            intersectionResult: {},
-            isObstructed: false
+            intersectionResult: {}
         }
     };
     let lastPathingLine = {
@@ -235,8 +234,7 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             currentCellsPathable: 0,
             currentCell: null,
             generator: null,
-            intersectionResult: {},
-            isObstructed: false
+            intersectionResult: {}
         }
     };
     let pathingLines = new Set();
@@ -257,8 +255,7 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
                     currentCellsPathable: 0,
                     currentCell: null,
                     generator: null,
-                    intersectionResult: {},
-                    isObstructed: false
+                    intersectionResult: {}
                 }
             });
         }
@@ -328,11 +325,11 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
     };
     let direction;
     let isCellTraversible;
-    let pathingLinesToDelete = new Set();
+    let isObstructed = false;
     //Check one pathing line at a time, one cell at a time, in sync.
     do {
         for (let pathingLine of pathingLines) {
-            if (pathingLine.intersection.intersectionResult.done || pathingLine.intersection.isObstructed) {
+            if (pathingLine.intersection.intersectionResult.done) {
                 continue;
             }
 
@@ -341,7 +338,7 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
 
             pathingLine.intersection.intersectionResult = pathingLine.intersection.generator.next();
             if (pathingLine.intersection.intersectionResult.done) {
-                pathingLinesToDelete.add(pathingLine);
+                pathingLines.delete(pathingLine);
                 continue;
             }
 
@@ -379,16 +376,11 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
                     minPathable.pathingLine = pathingLine;
                     minPathable.obstructedCell = pathingLine.intersection.currentCell.neighbors[direction];
                 }
-                pathingLine.intersection.isObstructed = true;
-                pathingLinesToDelete.add(pathingLine);
+                isObstructed = true;
                 break;
             }
         }
-        for (let pathingLine of pathingLinesToDelete) {
-            pathingLines.delete(pathingLine);
-        }
-        pathingLinesToDelete.clear();
-    } while (pathingLines.size > 0);
+    } while (!isObstructed && pathingLines.size > 0);
     worldMap.geometry.elementsNeedUpdate = true;
     return minPathable;
 }
