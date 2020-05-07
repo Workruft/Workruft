@@ -88,7 +88,6 @@ class GameUnit {
                     } else {
                         //Obstructed; stop before the obstruction.
                         let newLimitedDistance = Math.max(0.0, minPathable.distance - ThreeHalvesCellSize - this.gameModel.halfXZSize);
-                        alert(minPathable.distance + ' + ' + newLimitedDistance);
                         //See if the unit can even move at all.
                         if (newLimitedDistance > 0.0) {
                             //The unit can move some, just not all the way up to its speed potential.

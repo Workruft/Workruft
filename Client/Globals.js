@@ -364,12 +364,6 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
             if (isCellTraversible) {
                 //Still pathable.
                 pathingLine.intersection.currentCell = pathingLine.intersection.currentCell.neighbors[direction];
-                pathingLine.intersection.currentDistance = CellClosestDistance({
-                    cellX: pathingLine.intersection.currentCell.x,
-                    cellZ: pathingLine.intersection.currentCell.z,
-                    pointX: pathingLine.startX,
-                    pointZ: pathingLine.startZ
-                });
             } else {
                 //Obstruction found!
                 if (IsDefined(window.redz)) {
@@ -379,6 +373,12 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
                 window.redz = pathingLine.intersection.currentCell;
                 pathingLine.intersection.currentCell.faces.top[0].color = RedColor;
                 pathingLine.intersection.currentCell.faces.top[1].color = RedColor;
+                pathingLine.intersection.currentDistance = CellClosestDistance({
+                    cellX: pathingLine.intersection.currentCell.x,
+                    cellZ: pathingLine.intersection.currentCell.z,
+                    pointX: pathingLine.startX,
+                    pointZ: pathingLine.startZ
+                });
                 if (pathingLine.intersection.currentDistance < minPathable.distance) {
                     minPathable.distance = pathingLine.intersection.currentDistance;
                     minPathable.pathingLine = pathingLine;
