@@ -53,10 +53,10 @@ class GameMap {
                         front: []
                     },
                     neighbors: {
-                        back: this.borderCell,
-                        right: this.borderCell,
-                        front: this.borderCell,
-                        left: this.borderCell
+                        [Enums.CardinalDirections.back]: this.borderCell,
+                        [Enums.CardinalDirections.right]: this.borderCell,
+                        [Enums.CardinalDirections.front]: this.borderCell,
+                        [Enums.CardinalDirections.left]: this.borderCell
                     },
                     //clusterTraversability: [],
                     rightTraversable: x != this.maxX,
@@ -71,10 +71,10 @@ class GameMap {
                 //    3-----2
                 //    Front
                 this.geometry.vertices.push(
-                    new THREE.Vector3(x - HalfCellSize, MapBottomY, z - HalfCellSize),
-                    new THREE.Vector3(x + HalfCellSize, MapBottomY, z - HalfCellSize),
-                    new THREE.Vector3(x + HalfCellSize, MapBottomY, z + HalfCellSize),
-                    new THREE.Vector3(x - HalfCellSize, MapBottomY, z + HalfCellSize)
+                    new THREE.Vector3(x, MapBottomY, z),
+                    new THREE.Vector3(x + CellSize, MapBottomY, z),
+                    new THREE.Vector3(x + CellSize, MapBottomY, z + CellSize),
+                    new THREE.Vector3(x, MapBottomY, z + CellSize)
                 );
                 this.geometry.faces.push(...column[z].faces.top);
             }
