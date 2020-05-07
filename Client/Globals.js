@@ -321,6 +321,13 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
                 pathingLine.innerDirections.push(cardinalDirection);
             }
         }
+        if (pathingLine != firstPathingLine && pathingLine != lastPathingLine) {
+            console.log(pathingLine.innerDirections);
+        }
+        game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(pathingLine.startX, 1, pathingLine.startZ),
+            new THREE.Vector3(pathingLine.endX, 1, pathingLine.endZ)
+        ]), new THREE.LineBasicMaterial({ color: 'orange' })));
 
         pathingLine.intersection.generator = IntersectLineWithGrid({
             startX: pathingLine.startX, startZ: pathingLine.startZ,
@@ -370,8 +377,8 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
             }
             if (isCellTraversible) {
                 //Still pathable.
-                // pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
-                // pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
+                pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
+                pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
                 pathingLine.intersection.currentCell = pathingLine.intersection.currentCell.neighbors[direction];
                 ++pathingLine.intersection.currentCellsPathable;
             } else {
