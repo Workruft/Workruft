@@ -253,10 +253,10 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
     pathingLines.add(firstPathingLine);
     //Add any inner points.
     if (numberOfExtraPathingLines > 0) {
-        let angleHelper = unitRadius * 2.0 / (numberOfExtraPathingLines + 1.0);
+        let angleHelper = 2.0 / (numberOfExtraPathingLines + 1.0);
         let currentAngleOffset;
         for (let extraPathingLineNum = 1; extraPathingLineNum <= numberOfExtraPathingLines; ++extraPathingLineNum) {
-            currentAngleOffset = plusAngle - Math.acos((unitRadius - extraPathingLineNum * angleHelper) / unitRadius);
+            currentAngleOffset = plusAngle - Math.acos(1.0 - extraPathingLineNum * angleHelper);
             pathingLines.add({
                 startX: startX + lenientUnitRadius * Math.cos(currentAngleOffset),
                 startZ: startZ - lenientUnitRadius * Math.sin(currentAngleOffset),
