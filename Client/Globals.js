@@ -99,8 +99,8 @@ function FloorToCell(alignMe) {
     return Math.floor(alignMe / CellSize) * CellSize;
 }
 
-function FloorToNextCell(alignMe) {
-    return Math.floor(alignMe / CellSize + 1.0) * CellSize;
+function CeilToCell(alignMe) {
+    return Math.ceil(alignMe / CellSize) * CellSize;
 }
 
 //1 means front of a horizontal line, -1 means back, and 0 means on the line.
@@ -146,11 +146,11 @@ function* IntersectLineWithGrid({ startX, startZ, endX, endZ }) {
 
     //Straight distance to the first vertical grid boundary.
     let xOffset = endX > startX ?
-        (FloorToNextCell(startX) - startX) :
+        (CeilToCell(startX) - startX) :
         (startX - cellX);
     //Straight distance to the first horizontal grid boundary.
     let yOffset = endZ > startZ ?
-        (FloorToNextCell(startZ) - startZ) :
+        (CeilToCell(startZ) - startZ) :
         (startZ - cellZ);
     //Angle of ray/slope.
     let angle = Math.atan2(-diffZ, diffX);
@@ -242,7 +242,7 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             currentCellsPathable: 0,
             currentCell: null,
             generator: null,
-            intersectionResult: null,
+            intersectionResult: {},
             isObstructed: false
         }
     };
@@ -256,7 +256,7 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             currentCellsPathable: 0,
             currentCell: null,
             generator: null,
-            intersectionResult: null,
+            intersectionResult: {},
             isObstructed: false
         }
     };
@@ -278,7 +278,7 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
                     currentCellsPathable: 0,
                     currentCell: null,
                     generator: null,
-                    intersectionResult: null,
+                    intersectionResult: {},
                     isObstructed: false
                 }
             });
@@ -290,6 +290,8 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             x: FloorToCell(pathingLine.startX),
             z: FloorToCell(pathingLine.startZ)
         });
+        pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
+        pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
 
         //If you can fit a cell on any cardinal side of the line and have it still
         //fit inside the outermost lines, then always path test in that direction.
@@ -325,8 +327,8 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             console.log(pathingLine.innerDirections);
         }
         game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-            new THREE.Vector3(pathingLine.startX, 1, pathingLine.startZ),
-            new THREE.Vector3(pathingLine.endX, 1, pathingLine.endZ)
+            new THREE.Vector3(pathingLine.startX, 0.1, pathingLine.startZ),
+            new THREE.Vector3(pathingLine.endX, 0.1, pathingLine.endZ)
         ]), new THREE.LineBasicMaterial({ color: 'orange' })));
 
         pathingLine.intersection.generator = IntersectLineWithGrid({
@@ -354,11 +356,19 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
     //Check one pathing line at a time, one cell at a time, in sync.
     do {
         for (let pathingLine of pathingLines) {
-            pathingLine.intersection.intersectionResult = pathingLine.intersection.generator.next();
             if (pathingLine.intersection.intersectionResult.done || pathingLine.intersection.isObstructed) {
+                continue;
+            }
+
+            pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
+            pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
+
+            pathingLine.intersection.intersectionResult = pathingLine.intersection.generator.next();
+            if (pathingLine.intersection.intersectionResult.done) {
                 pathingLinesToDelete.add(pathingLine);
                 continue;
             }
+
             direction = pathingLine.intersection.intersectionResult.value;
             isCellTraversible = worldMap.isTraversible({
                 cell: pathingLine.intersection.currentCell,
@@ -377,8 +387,6 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
             }
             if (isCellTraversible) {
                 //Still pathable.
-                pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
-                pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
                 pathingLine.intersection.currentCell = pathingLine.intersection.currentCell.neighbors[direction];
                 ++pathingLine.intersection.currentCellsPathable;
             } else {
@@ -396,6 +404,7 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
                     minPathable.obstructedCell = pathingLine.intersection.currentCell.neighbors[direction];
                 }
                 pathingLine.intersection.isObstructed = true;
+                pathingLinesToDelete.add(pathingLine);
                 break;
             }
         }
