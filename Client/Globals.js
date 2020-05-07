@@ -7,6 +7,7 @@ let DoubleCellSize = CellSize * 2.0;
 let HalfTinySize = CellSize;
 let TinySize = DoubleCellSize;
 let SmallSize = TinySize * 2.0;
+let BigSize = SmallSize * 2.0;
 
 let SelectionExtraRadius = QuarterCellSize;
 
@@ -27,6 +28,35 @@ Enums.create({
     name: 'CardinalDirections',
     items: [ 'back', 'right', 'front', 'left' ]
 });
+
+let CardinalCellOffsetsDistance = CellSize;
+let DoubleCardinalCellOffsetsDistance = CardinalCellOffsetsDistance * 2.0;
+let CardinalCellOffsetsMap = {
+    [Enums.CardinalDirections.back]: [
+        { offsetX: 0.0, offsetZ: -CardinalCellOffsetsDistance },
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: -CardinalCellOffsetsDistance },
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: 0.0 },
+        { offsetX: 0.0, offsetZ: 0.0 }
+    ],
+    [Enums.CardinalDirections.right]: [
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: 0.0 },
+        { offsetX: DoubleCardinalCellOffsetsDistance, offsetZ: 0.0 },
+        { offsetX: DoubleCardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance },
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance }
+    ],
+    [Enums.CardinalDirections.front]: [
+        { offsetX: 0.0, offsetZ: CardinalCellOffsetsDistance },
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance },
+        { offsetX: CardinalCellOffsetsDistance, offsetZ: DoubleCardinalCellOffsetsDistance },
+        { offsetX: 0.0, offsetZ: DoubleCardinalCellOffsetsDistance }
+    ],
+    [Enums.CardinalDirections.left]: [
+        { offsetX: -CardinalCellOffsetsDistance, offsetZ: 0.0 },
+        { offsetX: 0.0, offsetZ: 0.0 },
+        { offsetX: 0.0, offsetZ: CardinalCellOffsetsDistance },
+        { offsetX: -CardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance }
+    ]
+};
 
 // Store all of the HTML DOM elements in the body of the page as an HTMLCollection.
 // Any element with an ID can now simply be accessed by HTML.theID or HTML['theID'].
@@ -71,6 +101,14 @@ function FloorToCell(alignMe) {
 
 function FloorToNextCell(alignMe) {
     return Math.floor(alignMe / CellSize + 1.0) * CellSize;
+}
+
+//1 means front of a horizontal line, -1 means back, and 0 means on the line.
+//1 means left of a vertical line, -1 means right, and 0 means on the line.
+function SideOfLine({ startX, startZ, endX, endZ, pointX, pointZ }) {
+    //(Line X difference * point Z difference from start of line) -
+    //(line Z difference * point X difference from start of line)
+    return Math.sign((endX - startX) * (pointZ - startZ) - (endZ - startZ) * (pointX - startX));
 }
 
 function LimitDistance({ startX, startZ, endX, endZ, maxDistance }) {
@@ -197,9 +235,9 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
     let firstPathingLine = {
         startX: startX + minusOffsetX,
         startZ: startZ + minusOffsetZ,
-        finalX: endX + minusOffsetX,
-        finalZ: endZ + minusOffsetZ,
-        isInner: false,
+        endX: endX + minusOffsetX,
+        endZ: endZ + minusOffsetZ,
+        innerDirections: [],
         intersection: {
             currentCellsPathable: 0,
             currentCell: null,
@@ -211,9 +249,9 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
     let lastPathingLine = {
         startX: startX + plusOffsetX,
         startZ: startZ + plusOffsetZ,
-        finalX: endX + plusOffsetX,
-        finalZ: endZ + plusOffsetZ,
-        isInner: false,
+        endX: endX + plusOffsetX,
+        endZ: endZ + plusOffsetZ,
+        innerDirections: [],
         intersection: {
             currentCellsPathable: 0,
             currentCell: null,
@@ -233,9 +271,9 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             pathingLines.add({
                 startX: startX + unitRadius * Math.cos(minusAngle + currentAngleOffset),
                 startZ: startZ - unitRadius * Math.sin(minusAngle + currentAngleOffset),
-                finalX: endX + unitRadius * Math.cos(minusAngle + currentAngleOffset),
-                finalZ: endZ - unitRadius * Math.sin(minusAngle + currentAngleOffset),
-                isInner: true,
+                endX: endX + unitRadius * Math.cos(minusAngle + currentAngleOffset),
+                endZ: endZ - unitRadius * Math.sin(minusAngle + currentAngleOffset),
+                innerDirections: [],
                 intersection: {
                     currentCellsPathable: 0,
                     currentCell: null,
@@ -252,9 +290,41 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             x: FloorToCell(pathingLine.startX),
             z: FloorToCell(pathingLine.startZ)
         });
+
+        //If you can fit a cell on any cardinal side of the line and have it still
+        //fit inside the outermost lines, then always path test in that direction.
+        for (let cardinalDirection = 0; cardinalDirection < Enums.CardinalDirections.length; ++cardinalDirection) {
+            let allPointsFit = true;
+            for (let cellOffsetPoint of CardinalCellOffsetsMap[cardinalDirection]) {
+                let side1 = SideOfLine({
+                    startX: firstPathingLine.startX,
+                    startZ: firstPathingLine.startZ,
+                    endX: firstPathingLine.endX,
+                    endZ: firstPathingLine.endZ,
+                    pointX: pathingLine.startX + cellOffsetPoint.offsetX,
+                    pointZ: pathingLine.startZ + cellOffsetPoint.offsetZ
+                });
+                let side2 = SideOfLine({
+                    startX: lastPathingLine.startX,
+                    startZ: lastPathingLine.startZ,
+                    endX: lastPathingLine.endX,
+                    endZ: lastPathingLine.endZ,
+                    pointX: pathingLine.startX + cellOffsetPoint.offsetX,
+                    pointZ: pathingLine.startZ + cellOffsetPoint.offsetZ
+                });
+                if (side1 != 0 && side2 != 0 && side1 != side2 * -1) {
+                    allPointsFit = false;
+                    break;
+                }
+            }
+            if (allPointsFit) {
+                pathingLine.innerDirections.push(cardinalDirection);
+            }
+        }
+
         pathingLine.intersection.generator = IntersectLineWithGrid({
             startX: pathingLine.startX, startZ: pathingLine.startZ,
-            endX: pathingLine.finalX, endZ: pathingLine.finalZ
+            endX: pathingLine.endX, endZ: pathingLine.endZ
         });
     }
     return pathingLines;
@@ -283,33 +353,36 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
                 continue;
             }
             direction = pathingLine.intersection.intersectionResult.value;
-            if (pathingLine.isInner) {
-                isCellTraversible =
-                    worldMap.isTraversible({
+            isCellTraversible = worldMap.isTraversible({
+                cell: pathingLine.intersection.currentCell,
+                direction
+            });
+            if (isCellTraversible) {
+                for (let innerDirection of pathingLine.innerDirections) {
+                    isCellTraversible = worldMap.isTraversible({
                         cell: pathingLine.intersection.currentCell,
-                        direction: Enums.CardinalDirections.back
-                    }) &&
-                    worldMap.isTraversible({
-                        cell: pathingLine.intersection.currentCell,
-                        direction: Enums.CardinalDirections.right
-                    }) &&
-                    worldMap.isTraversible({
-                        cell: pathingLine.intersection.currentCell,
-                        direction: Enums.CardinalDirections.front
-                    }) &&
-                    worldMap.isTraversible({
-                        cell: pathingLine.intersection.currentCell,
-                        direction: Enums.CardinalDirections.left
+                        direction: innerDirection
                     });
-            } else {
-                isCellTraversible = worldMap.isTraversible({ cell: pathingLine.intersection.currentCell, direction });
+                    if (!isCellTraversible) {
+                        break;
+                    }
+                }
             }
             if (isCellTraversible) {
                 //Still pathable.
+                // pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
+                // pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
                 pathingLine.intersection.currentCell = pathingLine.intersection.currentCell.neighbors[direction];
                 ++pathingLine.intersection.currentCellsPathable;
             } else {
                 //Obstruction found!
+                if (IsDefined(window.redz)) {
+                    window.redz.faces.top[0].color = GrassColor;
+                    window.redz.faces.top[1].color = GrassColor;
+                }
+                window.redz = pathingLine.intersection.currentCell;
+                pathingLine.intersection.currentCell.faces.top[0].color = RedColor;
+                pathingLine.intersection.currentCell.faces.top[1].color = RedColor;
                 if (pathingLine.intersection.currentCellsPathable < minPathable.cellCount) {
                     minPathable.cellCount = pathingLine.intersection.currentCellsPathable;
                     minPathable.pathingLine = pathingLine;
@@ -324,5 +397,6 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
         }
         pathingLinesToDelete.clear();
     } while (pathingLines.size > 0);
+    worldMap.geometry.elementsNeedUpdate = true;
     return minPathable;
 }

@@ -83,3 +83,13 @@ cubeGeometry.faces.push(
 );
 //For lighting.
 cubeGeometry.computeFaceNormals();
+
+
+
+let UnusedCardinalCellOffsetsDistance = DoubleCellSize;
+let UnusedCardinalCellOffsetsMap = {
+    [Enums.CardinalDirections.back]: { offsetX: 0.0, offsetZ: -CardinalCellOffsetsDistance },
+    [Enums.CardinalDirections.right]: { offsetX: CardinalCellOffsetsDistance, offsetZ: 0.0 },
+    [Enums.CardinalDirections.front]: { offsetX: 0.0, offsetZ: CardinalCellOffsetsDistance },
+    [Enums.CardinalDirections.left]: { offsetX: -CardinalCellOffsetsDistance, offsetZ: 0.0 }
+};
