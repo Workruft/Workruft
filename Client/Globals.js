@@ -264,15 +264,15 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
     pathingLines.add(firstPathingLine);
     //Add any inner points.
     if (numberOfExtraPathingLines > 0) {
-        let angleInterval = Math.PI / (numberOfExtraPathingLines + 1.0);
+        let angleHelper = unitRadius * 2.0 / (numberOfExtraPathingLines + 1.0);
         let currentAngleOffset;
         for (let extraPathingLineNum = 1; extraPathingLineNum <= numberOfExtraPathingLines; ++extraPathingLineNum) {
-            currentAngleOffset = extraPathingLineNum * angleInterval;
+            currentAngleOffset = plusAngle - Math.acos(unitRadius - extraPathingLineNum * angleHelper);
             pathingLines.add({
-                startX: startX + unitRadius * Math.cos(minusAngle + currentAngleOffset),
-                startZ: startZ - unitRadius * Math.sin(minusAngle + currentAngleOffset),
-                endX: endX + unitRadius * Math.cos(minusAngle + currentAngleOffset),
-                endZ: endZ - unitRadius * Math.sin(minusAngle + currentAngleOffset),
+                startX: startX + unitRadius * Math.cos(currentAngleOffset),
+                startZ: startZ - unitRadius * Math.sin(currentAngleOffset),
+                endX: endX + unitRadius * Math.cos(currentAngleOffset),
+                endZ: endZ - unitRadius * Math.sin(currentAngleOffset),
                 innerDirections: [],
                 intersection: {
                     currentCellsPathable: 0,
