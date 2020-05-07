@@ -217,17 +217,34 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
     numberOfExtraPathingLines, worldMap }) {
     let minusAngle = traversalAngle - HalfPI;
     let plusAngle = traversalAngle + HalfPI;
+    let minusOffsetX = unitRadius * Math.cos(minusAngle);
+    let minusOffsetZ = -unitRadius * Math.sin(minusAngle);
+    let plusOffsetX = unitRadius * Math.cos(plusAngle);
+    let plusOffsetZ = -unitRadius * Math.sin(plusAngle);
     let lenientUnitRadius = unitRadius - PathTestingLeniency;
-    let minusOffsetX = lenientUnitRadius * Math.cos(minusAngle);
-    let minusOffsetZ = -lenientUnitRadius * Math.sin(minusAngle);
-    let plusOffsetX = lenientUnitRadius * Math.cos(plusAngle);
-    let plusOffsetZ = -lenientUnitRadius * Math.sin(plusAngle);
-    //Outermost points.
-    let firstPathingLine = {
+    let lenientMinusOffsetX = lenientUnitRadius * Math.cos(minusAngle);
+    let lenientMinusOffsetZ = -lenientUnitRadius * Math.sin(minusAngle);
+    let lenientPlusOffsetX = lenientUnitRadius * Math.cos(plusAngle);
+    let lenientPlusOffsetZ = -lenientUnitRadius * Math.sin(plusAngle);
+    //Outermost bounds, without any leniency.
+    let firstBoundingLine = {
         startX: startX + minusOffsetX,
         startZ: startZ + minusOffsetZ,
         endX: endX + minusOffsetX,
-        endZ: endZ + minusOffsetZ,
+        endZ: endZ + minusOffsetZ
+    };
+    let lastBoundingLine = {
+        startX: startX + plusOffsetX,
+        startZ: startZ + plusOffsetZ,
+        endX: endX + plusOffsetX,
+        endZ: endZ + plusOffsetZ
+    };
+    //Outermost points.
+    let firstPathingLine = {
+        startX: startX + lenientMinusOffsetX,
+        startZ: startZ + lenientMinusOffsetZ,
+        endX: endX + lenientMinusOffsetX,
+        endZ: endZ + lenientMinusOffsetZ,
         innerDirections: [],
         intersection: {
             currentDistance: Infinity,
@@ -237,10 +254,10 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
         }
     };
     let lastPathingLine = {
-        startX: startX + plusOffsetX,
-        startZ: startZ + plusOffsetZ,
-        endX: endX + plusOffsetX,
-        endZ: endZ + plusOffsetZ,
+        startX: startX + lenientPlusOffsetX,
+        startZ: startZ + lenientPlusOffsetZ,
+        endX: endX + lenientPlusOffsetX,
+        endZ: endZ + lenientPlusOffsetZ,
         innerDirections: [],
         intersection: {
             currentDistance: Infinity,
@@ -285,18 +302,18 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             let allPointsFit = true;
             for (let cellOffsetPoint of CardinalCellOffsetsMap[cardinalDirection]) {
                 let side1 = SideOfLine({
-                    startX: firstPathingLine.startX,
-                    startZ: firstPathingLine.startZ,
-                    endX: firstPathingLine.endX,
-                    endZ: firstPathingLine.endZ,
+                    startX: firstBoundingLine.startX,
+                    startZ: firstBoundingLine.startZ,
+                    endX: firstBoundingLine.endX,
+                    endZ: firstBoundingLine.endZ,
                     pointX: pathingLine.startX + cellOffsetPoint.offsetX,
                     pointZ: pathingLine.startZ + cellOffsetPoint.offsetZ
                 });
                 let side2 = SideOfLine({
-                    startX: lastPathingLine.startX,
-                    startZ: lastPathingLine.startZ,
-                    endX: lastPathingLine.endX,
-                    endZ: lastPathingLine.endZ,
+                    startX: lastBoundingLine.startX,
+                    startZ: lastBoundingLine.startZ,
+                    endX: lastBoundingLine.endX,
+                    endZ: lastBoundingLine.endZ,
                     pointX: pathingLine.startX + cellOffsetPoint.offsetX,
                     pointZ: pathingLine.startZ + cellOffsetPoint.offsetZ
                 });

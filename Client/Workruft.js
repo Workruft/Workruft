@@ -41,8 +41,8 @@ class Workruft {
         //Game units etc.
         this.playerUnit = new GameUnit({
             workruft: this,
-            // gameModel: this.world.sheepModel,
-            gameModel: this.world.wolfModel,
+            gameModel: this.world.sheepModel,
+            // gameModel: this.world.wolfModel,
             x: 0.0,
             z: 0.0
         });
