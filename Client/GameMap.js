@@ -14,8 +14,6 @@ class GameMap {
         this.maxX = Math.ceil(halfSizeX);
         this.maxZ = Math.ceil(halfSizeZ);
 
-        //this.cellClusterSizes = new Set([ 2 * CellSize, 3 * CellSize, 4 * CellSize ]);
-
         this.generate();
     }
 
@@ -25,13 +23,9 @@ class GameMap {
 
         //Create border cell placeholder.
         this.borderCell = {
-            //clusterTraversability: [],
             rightTraversable: false,
             frontTraversable: false
         };
-        // for (let cellClusterSize of this.cellClusterSizes) {
-        //     this.borderCell.clusterTraversability.push(false);
-        // }
 
         //Vertex Index Offset.
         let vio;
@@ -58,7 +52,6 @@ class GameMap {
                         [Enums.CardinalDirections.front]: this.borderCell,
                         [Enums.CardinalDirections.left]: this.borderCell
                     },
-                    //clusterTraversability: [],
                     rightTraversable: x != this.maxX,
                     frontTraversable: z != this.maxZ
                 };
@@ -79,7 +72,7 @@ class GameMap {
                 this.geometry.faces.push(...column[z].faces.top);
             }
         }
-        //Assign non-border neighbors and cluster traversability.
+        //Assign non-border neighbors.
         for (let x = this.minX; x <= this.maxX; x += CellSize) {
             let column = this.grid[x];
             for (let z = this.minZ; z <= this.maxZ; z += CellSize) {
@@ -95,9 +88,6 @@ class GameMap {
                 if (x != this.minX) {
                     column[z].neighbors[Enums.CardinalDirections.left] = this.grid[x - CellSize][z];
                 }
-                // for (let cellClusterSize of this.cellClusterSizes) {
-                //     column[z].clusterTraversability.push(x - CellSize + cellClusterSize <= this.maxX && z - CellSize + cellClusterSize <= this.maxZ);
-                // }
             }
         }
 
@@ -191,7 +181,6 @@ class GameMap {
     //    Front
     updateCells({ lowX, lowZ, highX, highZ }) {
         let currentCell;
-        let isClusterTraversable;
         //Go through each side within the bounds.
         for (let x = lowX; x < highX; x += CellSize) {
             for (let z = lowZ; z < highZ; z += CellSize) {
@@ -226,25 +215,6 @@ class GameMap {
                         });
                     }
                 }
-                //Cluster traversability.
-                // for (let cellClusterSize of this.cellClusterSizes) {
-                //     if (x - cellClusterSize >= this.minX && z - cellClusterSize >= this.minZ) {
-                //         isClusterTraversable = true;
-                //         checkingCluster: {
-                //             for (let clusterX = x + CellSize - cellClusterSize; clusterX <= x; clusterX += CellSize) {
-                //                 for (let clusterZ = z + CellSize - cellClusterSize; clusterZ <= z; clusterX += CellSize) {
-                //                     if ((clusterX < x && !this.grid[clusterX][clusterZ].rightTraversable) ||
-                //                         (clusterZ < z && !this.grid[clusterX][clusterZ].frontTraversable)) {
-                //                         isClusterTraversable = false;
-                //                         //This actually sends it to *after* the checkingCluster label...
-                //                         break checkingCluster;
-                //                     }
-                //                 }
-                //             }
-                //         }
-                //         this.grid[x][z].clusterTraversability[cellClusterSize] = isClusterTraversable;
-                //     }
-                // }
             }
         }
 
