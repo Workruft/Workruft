@@ -43,10 +43,23 @@ class Workruft {
             workruft: this,
             gameModel: this.world.sheepModel,
             // gameModel: this.world.wolfModel,
-            x: 0.0,
-            z: 0.0
+            x: HalfCellSize,
+            z: HalfCellSize
         });
         this.playerUnit.addToGroup({ objectGroup: this.world.playerObjects });
+
+        for (let traversalObject of Object.values(this.playerUnit.gameModel.traversalOffsets)) {
+            for (let cellOffset of traversalObject.cellOffsets) {
+                // let cell = this.world.map.getCell({ x: RoundToCell(cellOffset.offsetX), z: RoundToCell(cellOffset.offsetZ) });
+                let cell = this.world.map.getCell({ x: AlignToCell(cellOffset.offsetX), z: AlignToCell(cellOffset.offsetZ) });
+                cell.faces.top[0].color = BlueColor;
+                cell.faces.top[1].color = BlueColor;
+            }
+        }
+        let cell = this.world.map.getCell({ x: 0, z: 0 });
+        cell.faces.top[0].color = RedColor;
+        cell.faces.top[1].color = RedColor;
+        this.world.map.geometry.elementsNeedUpdate = true;
 
         //this.network.connect();
     }

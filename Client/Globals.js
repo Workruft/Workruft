@@ -189,7 +189,7 @@ function ComputeTraversalOffsets({ unitRadius, traversalAngle }) {
     }
     return traversalOffsets;
 }
-function GetOrCreateTraversal({ unitRadius }) {
+function GetOrCreateTraversalOffsets({ unitRadius }) {
     if (IsUndefined(UnitTraversalOffsetsMap[unitRadius])) {
         UnitTraversalOffsetsMap[unitRadius] = {
             [Enums.CardinalDirections.back]: ComputeTraversalOffsets({
@@ -326,10 +326,10 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
                 pathingLine.innerDirections.push(cardinalDirection);
             }
         }
-        game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-            new THREE.Vector3(pathingLine.startX, 0.1, pathingLine.startZ),
-            new THREE.Vector3(pathingLine.endX, 0.1, pathingLine.endZ)
-        ]), new THREE.LineBasicMaterial({ color: 'orange' })));
+        // game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+        //     new THREE.Vector3(pathingLine.startX, 0.1, pathingLine.startZ),
+        //     new THREE.Vector3(pathingLine.endX, 0.1, pathingLine.endZ)
+        // ]), new THREE.LineBasicMaterial({ color: 'orange' })));
 
         pathingLine.intersection.generator = IntersectLineWithGrid({
             startX: pathingLine.startX, startZ: pathingLine.startZ,
@@ -381,12 +381,12 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
                 }
             }
             pathingLine.intersection.currentCell = pathingLine.intersection.currentCell.neighbors[direction];
-            pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
-            pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
+            // pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
+            // pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
             if (!isCellTraversible) {
                 //Obstruction found!
-                pathingLine.intersection.currentCell.faces.top[0].color = RedColor;
-                pathingLine.intersection.currentCell.faces.top[1].color = RedColor;
+                // pathingLine.intersection.currentCell.faces.top[0].color = RedColor;
+                // pathingLine.intersection.currentCell.faces.top[1].color = RedColor;
                 pathingLine.intersection.currentDistance = CellClosestDistance({
                     cellX: pathingLine.intersection.currentCell.x,
                     cellZ: pathingLine.intersection.currentCell.z,
@@ -402,6 +402,6 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
             }
         }
     } while (pathingLines.size > 0);
-    worldMap.geometry.elementsNeedUpdate = true;
+    // worldMap.geometry.elementsNeedUpdate = true;
     return minPathable;
 }
