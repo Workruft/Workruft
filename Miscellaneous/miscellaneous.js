@@ -37,6 +37,11 @@ function createLines() {
 let lines = createLines();
 scene.add(lines);
 
+game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0.0, 0.01, 0.0),
+    new THREE.Vector3(CellSize, 0.01, CellSize)
+]), new THREE.LineBasicMaterial({ color: 'orange' })));
+
 let cubeGeometry = new THREE.Geometry();
 //Corners:
 //    Top

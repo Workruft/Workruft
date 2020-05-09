@@ -102,6 +102,31 @@ function SideOfLine({ startX, startZ, endX, endZ, pointX, pointZ }) {
     return Math.sign((endX - startX) * (pointZ - startZ) - (endZ - startZ) * (pointX - startX));
 }
 
+function CalculatePathingStartPoints({ numberOfExtraPoints, traversalAngle, offsetX, offsetZ, radius }) {
+    let pathingStartPoints = [];
+
+    let minusAngle = traversalAngle - HalfPI;
+    let plusAngle = traversalAngle + HalfPI;
+    let minusOffsetX = radius * Math.cos(minusAngle);
+    let minusOffsetZ = -radius * Math.sin(minusAngle);
+    let plusOffsetX = radius * Math.cos(plusAngle);
+    let plusOffsetZ = -radius * Math.sin(plusAngle);
+    pathingStartPoints.push({ offsetX: offsetX + minusOffsetX, offsetZ: offsetZ - minusOffsetZ });
+    pathingStartPoints.push({ offsetX: offsetX + plusOffsetX, offsetZ: offsetZ - plusOffsetZ });
+
+    let angleHelper = 2.0 / (numberOfExtraPoints + 1.0);
+    let currentAngleOffset;
+    for (let innerPointNum = 1; innerPointNum <= numberOfExtraPoints; ++innerPointNum) {
+        currentAngleOffset = plusAngle - Math.acos(1.0 - innerPointNum * angleHelper);
+        pathingStartPoints.push({
+            offsetX: offsetX + radius * Math.cos(currentAngleOffset),
+            offsetZ: offsetZ - radius * Math.sin(currentAngleOffset)
+        });
+    }
+
+    return pathingStartPoints;
+}
+
 function LimitDistance({ startX, startZ, endX, endZ, maxDistance }) {
     let limitedX;
     let limitedZ;
@@ -176,18 +201,15 @@ function ComputeTraversalOffsets({ unitRadius, traversalAngle }) {
     let traversalOffsets = {
         offsetX: GenericRound(unitRadius * Math.cos(traversalAngle)),
         offsetZ: GenericRound(-unitRadius * Math.sin(traversalAngle)),
-        cellOffsets: []
+        cellOffsets: null
     };
-    let numberOfCells = Math.max(2, Math.round(unitRadius * 2.0 / CellSize));
-    let angleInterval = Math.PI / (numberOfCells - 1.0);
-    let currentAngleOffset;
-    for (let cellIndex = 0; cellIndex < numberOfCells; ++cellIndex) {
-        currentAngleOffset = cellIndex * angleInterval;
-        traversalOffsets.cellOffsets.push({
-            offsetX: GenericRound(unitRadius * Math.cos(traversalAngle - HalfPI + currentAngleOffset)),
-            offsetZ: GenericRound(-unitRadius * Math.sin(traversalAngle - HalfPI + currentAngleOffset))
-        });
-    }
+    traversalOffsets.cellOffsets = CalculatePathingStartPoints({
+        numberOfExtraPoints: Math.ceil(unitRadius * 2.0 / CellSize) + 2,
+        traversalAngle,
+        offsetX: traversalOffsets.offsetX,
+        offsetZ: traversalOffsets.offsetZ,
+        radius: unitRadius
+    });
     return traversalOffsets;
 }
 function GetOrCreateTraversalOffsets({ unitRadius }) {
@@ -382,12 +404,8 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
                 }
             }
             pathingLine.intersection.currentCell = pathingLine.intersection.currentCell.neighbors[direction];
-            // pathingLine.intersection.currentCell.faces.top[0].color = BlueColor;
-            // pathingLine.intersection.currentCell.faces.top[1].color = BlueColor;
             if (!isCellTraversible) {
                 //Obstruction found!
-                // pathingLine.intersection.currentCell.faces.top[0].color = RedColor;
-                // pathingLine.intersection.currentCell.faces.top[1].color = RedColor;
                 pathingLine.intersection.currentDistance = CellClosestDistance({
                     cellX: pathingLine.intersection.currentCell.x,
                     cellZ: pathingLine.intersection.currentCell.z,
@@ -403,6 +421,5 @@ function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRa
             }
         }
     } while (pathingLines.size > 0);
-    // worldMap.geometry.elementsNeedUpdate = true;
     return minPathable;
 }

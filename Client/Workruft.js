@@ -48,14 +48,36 @@ class Workruft {
         });
         this.playerUnit.addToGroup({ objectGroup: this.world.playerObjects });
 
+        game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0.0, 0.01, 0.0),
+            new THREE.Vector3(CellSize, 0.01, CellSize)
+        ]), new THREE.LineBasicMaterial({ color: 'orange' })));
+
         this.coloredSquares = [];
         setInterval(function() {
             for (let coloredSquare of this.coloredSquares) {
                 coloredSquare.deconstruct();
             }
             this.coloredSquares = [];
+
+            // if (Math.floor(performance.now() * 0.002) % Enums.CardinalDirections.length == 0) {
+            //     if (Math.random() - 0.5 >= 0.0) {
+            //         this.playerUnit.position.x += Math.random() - 0.5 >= 0.0 ? 1.0 : -1.0;
+            //     } else {
+            //         this.playerUnit.position.z += Math.random() - 0.5 >= 0.0 ? 1.0 : -1.0;
+            //     }
+            //     this.playerUnit.autoSetHeight();
+            // }
+
             let traversalObject = this.playerUnit.gameModel.traversalOffsets[
-                Math.floor(performance.now() * 0.001) % Enums.CardinalDirections.length];
+                Math.floor(performance.now() * 0.002) % Enums.CardinalDirections.length];
+            this.coloredSquares.push(
+                new ColoredSquare({
+                    workruft: this,
+                    x: FloorToCell(this.playerUnit.position.x + traversalObject.offsetX),
+                    z: FloorToCell(this.playerUnit.position.z + traversalObject.offsetZ),
+                    color: DirtColor
+            }));
             for (let cellOffset of traversalObject.cellOffsets) {
                 this.coloredSquares.push(
                     new ColoredSquare({
@@ -72,7 +94,7 @@ class Workruft {
                     z: FloorToCell(this.playerUnit.position.z),
                     color: RedColor
             }));
-        }.bind(this), 1000);
+        }.bind(this), 500);
 
         //this.network.connect();
     }
@@ -179,15 +201,14 @@ class Workruft {
             case 1:
             {
                 //Middle click.
-                // let pickedMapObjectArray = this.world.pickMap(this.getNormalizedCanvasMouse(event));
-                // if (pickedMapObjectArray.length > 0) {
-                //     let clickCoordinates = pickedMapObjectArray[0].point;
-                //     let cellX = AlignToCell(clickCoordinates.x);
-                //     let cellZ = AlignToCell(clickCoordinates.z);
-                //     let clickedCell = this.world.map.getCell({ x: cellX, z: cellZ });
-                //     alert(JSON.stringify(clickedCell.rightTraversable) + " + " + JSON.stringify(clickedCell.frontTraversable));
-                // }
-                // break;
+                let pickedMapObjectArray = this.world.pickMap(this.getNormalizedCanvasMouse(event));
+                if (pickedMapObjectArray.length > 0) {
+                    let clickCoordinates = pickedMapObjectArray[0].point;
+                    let cellX = AlignToCell(clickCoordinates.x);
+                    let cellZ = AlignToCell(clickCoordinates.z);
+                    alert(clickCoordinates.x + ', ' + clickCoordinates.z + '\n' + cellX + ', ' + cellZ);
+                }
+                break;
             }
             case 2:
             {
