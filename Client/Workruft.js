@@ -69,23 +69,23 @@ class Workruft {
             //     this.playerUnit.autoSetHeight();
             // }
 
-            let traversalObject = this.playerUnit.gameModel.traversalOffsets[
-                Math.floor(performance.now() * 0.002) % Enums.CardinalDirections.length];
-            this.coloredSquares.push(
-                new ColoredSquare({
-                    workruft: this,
-                    x: FloorToCell(this.playerUnit.position.x + traversalObject.offsetX),
-                    z: FloorToCell(this.playerUnit.position.z + traversalObject.offsetZ),
-                    color: DirtColor
-            }));
-            for (let cellOffset of traversalObject.cellOffsets) {
+            for (let traversalObject of Object.values(this.playerUnit.gameModel.traversalOffsets)) {
                 this.coloredSquares.push(
                     new ColoredSquare({
                         workruft: this,
-                        x: FloorToCell(this.playerUnit.position.x + cellOffset.offsetX),
-                        z: FloorToCell(this.playerUnit.position.z + cellOffset.offsetZ),
-                        color: BlueColor
+                        x: FloorToCell(this.playerUnit.position.x + traversalObject.offsetX),
+                        z: FloorToCell(this.playerUnit.position.z + traversalObject.offsetZ),
+                        color: DirtColor
                 }));
+                for (let cellOffset of traversalObject.cellOffsets) {
+                    this.coloredSquares.push(
+                        new ColoredSquare({
+                            workruft: this,
+                            x: FloorToCell(this.playerUnit.position.x + cellOffset.offsetX),
+                            z: FloorToCell(this.playerUnit.position.z + cellOffset.offsetZ),
+                            color: BlueColor
+                    }));
+                }
             }
             this.coloredSquares.push(
                 new ColoredSquare({
