@@ -48,12 +48,31 @@ class Workruft {
         });
         this.playerUnit.addToGroup({ objectGroup: this.world.playerObjects });
 
-        for (let traversalObject of Object.values(this.playerUnit.gameModel.traversalOffsets)) {
-            for (let cellOffset of traversalObject.cellOffsets) {
-                new ColoredSquare({ workruft: this, x: AlignToCell(cellOffset.offsetX), z: AlignToCell(cellOffset.offsetZ), color: BlueColor });
+        this.coloredSquares = [];
+        setInterval(function() {
+            for (let coloredSquare of this.coloredSquares) {
+                coloredSquare.deconstruct();
             }
-        }
-        new ColoredSquare({ workruft: this, x: 0.0, z: 0.0, color: RedColor });
+            this.coloredSquares = [];
+            let traversalObject = this.playerUnit.gameModel.traversalOffsets[
+                Math.floor(performance.now() * 0.001) % Enums.CardinalDirections.length];
+            for (let cellOffset of traversalObject.cellOffsets) {
+                this.coloredSquares.push(
+                    new ColoredSquare({
+                        workruft: this,
+                        x: FloorToCell(this.playerUnit.position.x + cellOffset.offsetX),
+                        z: FloorToCell(this.playerUnit.position.z + cellOffset.offsetZ),
+                        color: BlueColor
+                }));
+            }
+            this.coloredSquares.push(
+                new ColoredSquare({
+                    workruft: this,
+                    x: FloorToCell(this.playerUnit.position.x),
+                    z: FloorToCell(this.playerUnit.position.z),
+                    color: RedColor
+            }));
+        }.bind(this), 1000);
 
         //this.network.connect();
     }
