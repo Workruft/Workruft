@@ -84,6 +84,13 @@ cubeGeometry.faces.push(
 //For lighting.
 cubeGeometry.computeFaceNormals();
 
+let SquareGeometry = new THREE.ShapeBufferGeometry(new THREE.Shape([
+    new THREE.Vector2(0.0, 0.0),
+    new THREE.Vector2(CellSize, 0.0),
+    new THREE.Vector2(CellSize, CellSize),
+    new THREE.Vector2(0.0, CellSize)
+]));
+
 
 
 let CardinalCellOffsetsDistance = CellSize;

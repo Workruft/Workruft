@@ -1,5 +1,6 @@
 class GameUnit {
     constructor({ workruft, gameModel, x, z }) {
+        this.workruft = workruft;
         this.gameModel = gameModel;
         this.group = new THREE.Group();
         this.position.set(x, 0.0, z);
@@ -8,10 +9,9 @@ class GameUnit {
             orders: [],
             speed: 50.0
         };
-        this.private.mesh.geometry.computeBoundingBox();
         this.private.mesh.position.y = this.gameModel.halfYSize;
         this.private.mesh.userData = this;
-        this.autoSetHeight({ workruft });
+        this.autoSetHeight();
         this.group.add(this.private.mesh);
 
         this.isSelected = false;
@@ -20,22 +20,21 @@ class GameUnit {
     destroy() {
         this.deselect();
         if (this.mesh != null) {
-            DisposeThreeObject(this.mesh);
             delete this.mesh;
         }
     }
 
-    issueReplacementOrder({ workruft, order }) {
+    issueReplacementOrder({ order }) {
         this.private.orders = [];
-        this.issueAdditionalOrder({ workruft, order });
+        this.issueAdditionalOrder({ order });
     }
 
-    issueAdditionalOrder({ workruft, order }) {
+    issueAdditionalOrder({ order }) {
         this.private.orders.push(order);
-        workruft.objectsToUpdate.add(this);
+        this.workruft.objectsToUpdate.add(this);
     }
 
-    update({ workruft, deltaTimeMS }) {
+    update({ deltaTimeMS }) {
         let lastPositionX = this.position.x;
         let lastPositionZ = this.position.z;
         let updateComplete = false;
@@ -60,7 +59,7 @@ class GameUnit {
                         endZ: currentOrder.data.z,
                         maxDistance
                     });
-                    let worldMap = workruft.world.map;
+                    let worldMap = this.workruft.world.map;
                     //Determine the minimum distance the unit can go towards the current movement step before reaching an
                     //obstruction in the path.
                     let minPathable = ComputeMinPathable({
@@ -121,10 +120,10 @@ class GameUnit {
         }
         //If the unit has moved any, update its height.
         if (this.position.x != lastPositionX || this.position.z != lastPositionZ) {
-            this.autoSetHeight({ workruft });
+            this.autoSetHeight();
         }
         if (this.private.orders.length == 0) {
-            workruft.objectsToUpdate.delete(this);
+            this.workruft.objectsToUpdate.delete(this);
         }
     }
 
@@ -132,22 +131,22 @@ class GameUnit {
         objectGroup.add(this.group);
     }
 
-    select({ workruft }) {
+    select() {
         if (!this.isSelected) {
             this.private.selectionCircle =
-                workruft.world.selectionCircleModelsMap.get(this.gameModel.halfXZSize).createNewMesh();
+                this.workruft.world.selectionCircleModelsMap.get(this.gameModel.halfXZSize).createNewMesh();
             this.private.selectionCircle.layers.set(1);
-            this.private.selectionCircle.position.y = 0.5;
-            this.private.selectionCircle.rotation.x = HalfPI;
+            this.private.selectionCircle.position.y = HalfCellSize;
+            this.private.selectionCircle.rotation.x = -HalfPI;
             this.group.add(this.private.selectionCircle);
-            workruft.selectedObjects.add(this);
+            this.workruft.selectedObjects.add(this);
             this.isSelected = true;
         }
     }
 
-    deselect({ workruft }) {
+    deselect() {
         if (this.isSelected) {
-            workruft.selectedObjects.delete(this);
+            this.workruft.selectedObjects.delete(this);
             DisposeThreeObject(this.private.selectionCircle);
             delete this.private.selectionCircle;
             this.isSelected = false;
@@ -159,11 +158,11 @@ class GameUnit {
         return this.group.position;
     }
 
-    autoSetHeight({ workruft }) {
+    autoSetHeight() {
         let cellX = AlignToCell(this.position.x);
         let cellZ = AlignToCell(this.position.z);
-        this.position.y = workruft.world.map.getAverageHeight({
-            cell: workruft.world.map.getCell({ x: cellX, z: cellZ })
+        this.position.y = this.workruft.world.map.getAverageHeight({
+            cell: this.workruft.world.map.getCell({ x: cellX, z: cellZ })
         });
     }
 }

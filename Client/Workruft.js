@@ -50,16 +50,10 @@ class Workruft {
 
         for (let traversalObject of Object.values(this.playerUnit.gameModel.traversalOffsets)) {
             for (let cellOffset of traversalObject.cellOffsets) {
-                // let cell = this.world.map.getCell({ x: RoundToCell(cellOffset.offsetX), z: RoundToCell(cellOffset.offsetZ) });
-                let cell = this.world.map.getCell({ x: AlignToCell(cellOffset.offsetX), z: AlignToCell(cellOffset.offsetZ) });
-                cell.faces.top[0].color = BlueColor;
-                cell.faces.top[1].color = BlueColor;
+                new ColoredSquare({ workruft: this, x: AlignToCell(cellOffset.offsetX), z: AlignToCell(cellOffset.offsetZ), color: BlueColor });
             }
         }
-        let cell = this.world.map.getCell({ x: 0, z: 0 });
-        cell.faces.top[0].color = RedColor;
-        cell.faces.top[1].color = RedColor;
-        this.world.map.geometry.elementsNeedUpdate = true;
+        new ColoredSquare({ workruft: this, x: 0.0, z: 0.0, color: RedColor });
 
         //this.network.connect();
     }
@@ -67,7 +61,7 @@ class Workruft {
     onUpdate() {
         let deltaTimeMS = this.world.clock.getDelta();
         for (let objectToUpdate of this.objectsToUpdate) {
-            objectToUpdate.update({ workruft: this, deltaTimeMS });
+            objectToUpdate.update({ deltaTimeMS });
         }
 
         if (!this.chat.isChatEntryBoxOpen()) {
@@ -151,13 +145,13 @@ class Workruft {
                 if (pickedObjectArray.length > 0) {
                     let pickedGameObject = pickedObjectArray[0].object.userData;
                     if (pickedGameObject.isSelected) {
-                        pickedGameObject.deselect({ workruft: this });
+                        pickedGameObject.deselect();
                     } else {
-                        pickedGameObject.select({ workruft: this });
+                        pickedGameObject.select();
                     }
                 } else {
                     for (let selectedObject of this.selectedObjects) {
-                        selectedObject.deselect({ workruft: this });
+                        selectedObject.deselect();
                     }
                     this.selectedObjects.clear();
                 }
@@ -188,7 +182,6 @@ class Workruft {
                     if (clickedCell) {
                         for (let selectedObject of this.selectedObjects) {
                             let newOrderObject = {
-                                workruft: this,
                                 order: new Order({
                                     type: Enums.OrderTypes.Move,
                                     data: { x: clickCoordinates.x, z: clickCoordinates.z }

@@ -1,3 +1,10 @@
+//Directions:
+//  -Z    /\+Y
+//-X  +X  ||
+//  +Z    \/-Y
+
+let SquareGeometry = new THREE.PlaneBufferGeometry(CellSize, CellSize);
+
 let TinySphereGeometry = new THREE.SphereBufferGeometry(HalfTinySize, 15, 15);
 let SmallSphereGeometry = new THREE.SphereBufferGeometry(TinySize, 15, 15);
 let TinyCubeGeometry = new THREE.BoxGeometry(TinySize, TinySize, TinySize);

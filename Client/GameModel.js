@@ -24,4 +24,10 @@ class GameModel {
         newMesh.castShadow = true;
         return newMesh;
     }
+
+    createNewMeshWithMaterial({ material }) {
+        let newMesh = new THREE.Mesh(this.geometry, material);
+        newMesh.castShadow = true;
+        return newMesh;
+    }
 }

@@ -23,6 +23,7 @@ let GrassColor = new THREE.Color('#0c4013');
 let DirtColor = new THREE.Color('#2b3c1f');
 let RedColor = new THREE.Color('red');
 let BlueColor = new THREE.Color('blue');
+let ColoredMeshPhongMaterialsMap = new Map();
 
 let HalfPI = Math.PI * 0.5;
 
@@ -327,8 +328,8 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
             }
         }
         // game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-        //     new THREE.Vector3(pathingLine.startX, 0.1, pathingLine.startZ),
-        //     new THREE.Vector3(pathingLine.endX, 0.1, pathingLine.endZ)
+        //     new THREE.Vector3(pathingLine.startX, 0.01, pathingLine.startZ),
+        //     new THREE.Vector3(pathingLine.endX, 0.01, pathingLine.endZ)
         // ]), new THREE.LineBasicMaterial({ color: 'orange' })));
 
         pathingLine.intersection.generator = IntersectLineWithGrid({

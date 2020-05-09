@@ -61,7 +61,7 @@ class World {
         this.objectsRaycaster.far = far;
         this.objectsRaycaster.layers.set(0);
         //TODO: Why does this not work?
-        this.objectsRaycaster.params.Mesh.threshold = 30000;
+        //this.objectsRaycaster.params.Mesh.threshold = 5;
 
         //Action.
         //Map.
@@ -126,6 +126,7 @@ class World {
         this.gameObjects = new THREE.Group();
         //Unclickables.
         this.unclickableObjects = new THREE.Group();
+        this.indicatorObjects = new THREE.Group();
         this.doodadObjects = new THREE.Group();
         //Clickables.
         this.clickableObjects = new THREE.Group();
@@ -134,6 +135,7 @@ class World {
         this.scene.add(this.gameObjects);
         this.gameObjects.add(this.unclickableObjects);
         this.gameObjects.add(this.clickableObjects);
+        this.unclickableObjects.add(this.indicatorObjects);
         this.unclickableObjects.add(this.doodadObjects);
         this.clickableObjects.add(this.playerObjects);
     }
@@ -142,13 +144,17 @@ class World {
         this.isDeconstructing = true;
 
         //Geometries, materials, textures, render targets, scenes, and anything else with dispose().
+
         for (let selectionCircleModel of this.selectionCircleModelsMap.keys()) {
             selectionCircleModel.deconstruct();
         }
         this.selectionCircleModelsMap.clear();
+
+        this.squareModel.deconstruct();
         this.sheepModel.deconstruct();
         this.wolfModel.deconstruct();
         this.buildingModel.deconstruct();
+
         DisposeThreeObject(this.scene);
         DisposeThreeObject(this.renderer);
     }
@@ -172,7 +178,6 @@ class World {
             resolution: new THREE.Vector2(this.canvas.width, this.canvas.height),
             sizeAttenuation: 0,
             lineWidth: 5.0,
-            side: THREE.DoubleSide,
             opacity: 0.5,
             transparent: true
         });
@@ -189,6 +194,13 @@ class World {
 
     //Make sure to update deconstruct!
     setupGameModels() {
+        this.squareModel = new GameModel({
+            world: this,
+            geometry: SquareGeometry,
+            xzSize: CellSize,
+            ySize: 0.0
+        });
+
         this.sheepModel = new GameModel({
             world: this,
             geometry: TinySphereGeometry,
