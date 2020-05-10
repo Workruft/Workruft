@@ -33,6 +33,13 @@ function CellClosestDistance({ cellX, cellZ, pointX, pointZ }) {
     }
 }
 
+//===========================================================================
+//===========================================================================
+//All of the above code is safe. Any of the below code might be refactored.
+//===========================================================================
+//===========================================================================
+
+//TODO: Refactor into part of a line class?
 //1 means front of a horizontal line, -1 means back, and 0 means on the line.
 //1 means left of a vertical line, -1 means right, and 0 means on the line.
 function SideOfLine({ startX, startZ, endX, endZ, pointX, pointZ }) {
@@ -40,12 +47,6 @@ function SideOfLine({ startX, startZ, endX, endZ, pointX, pointZ }) {
     //(line Z difference * point X difference from start of line)
     return Math.sign((endX - startX) * (pointZ - startZ) - (endZ - startZ) * (pointX - startX));
 }
-
-//===========================================================================
-//===========================================================================
-//All of the above code is safe. Any of the below code might be refactored.
-//===========================================================================
-//===========================================================================
 
 let CardinalCellOffsetsDistance = CellSize;
 let CardinalCellOffsetsMap = {
@@ -80,6 +81,7 @@ function CalculatePathingStartPoints({ numberOfExtraPoints, traversalAngle, offs
     return pathingStartPoints;
 }
 
+//TODO: Delete!
 function LimitDistance({ startX, startZ, endX, endZ, maxDistance }) {
     let limitedX;
     let limitedZ;
