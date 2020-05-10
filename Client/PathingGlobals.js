@@ -316,9 +316,7 @@ function ComputePathTestingLines({ startX, startZ, endX, endZ, traversalAngle, u
     }
     return pathingLines;
 }
-// function InitPathingLines
-//     break the codes up into smaller pieces and then reuse and shiz
-//     make like a class for passing stuff around so it's fast and ez
+
 //Test linear pathing for a unit and return the findings.
 function ComputeMinPathable({ startX, startZ, endX, endZ, traversalAngle, unitRadius,
     numberOfExtraPathingLines, worldMap }) {
