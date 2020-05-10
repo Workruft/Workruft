@@ -1,10 +1,15 @@
 class PathingTester {
-    constructor({ map, startX, startZ, endX, endZ, gameModel }) {
+    constructor({ map, gameModel }) {
         this.map = map;
-        this.startX = startX;
-        this.startZ = startZ;
-        this.endX = endX;
-        this.endZ = endZ;
         this.gameModel = gameModel;
+        this.start = new XZPair({ x: 0.0, z: 0.0 });
+        this.end = new XZPair({ x: 0.0, z: 0.0 });
+    }
+
+    setEnds({ startX, startZ, endX, endZ }) {
+        this.start.x = startX;
+        this.start.z = startZ;
+        this.end.x = endX;
+        this.end.z = endZ;
     }
 }

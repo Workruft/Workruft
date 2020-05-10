@@ -2,6 +2,7 @@ class GameUnit {
     constructor({ workruft, gameModel, x, z }) {
         this.workruft = workruft;
         this.gameModel = gameModel;
+
         this.group = new THREE.Group();
         this.position.set(x, 0.0, z);
         this.private = {
@@ -15,6 +16,11 @@ class GameUnit {
         this.group.add(this.private.mesh);
 
         this.isSelected = false;
+
+        this.pathingTester = new PathingTester({
+            map: this.workruft.world.map,
+            gameModel: this.gameModel
+        });
     }
 
     destroy() {
@@ -46,6 +52,13 @@ class GameUnit {
                     if (this.private.speed <= 0.0) {
                         this.private.orders.splice(0, 1);
                     }
+
+                    this.pathingTester.setEnds({
+                        startX: this.position.x,
+                        startZ: this.position.z,
+                        endX: currentOrder.data.x,
+                        endZ: currentOrder.data.z
+                    });
 
                     //Determine current movement step endpoints and related calculations.
                     let maxDistance = this.private.speed * deltaTimeMS;
