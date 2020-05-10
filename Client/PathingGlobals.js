@@ -3,14 +3,6 @@ Enums.create({
     items: [ 'back', 'right', 'front', 'left' ]
 });
 
-let CardinalCellOffsetsDistance = CellSize;
-let CardinalCellOffsetsMap = {
-    [Enums.CardinalDirections.back]: [{ offsetX: 0.0, offsetZ: -CardinalCellOffsetsDistance }],
-    [Enums.CardinalDirections.right]: [{ offsetX: CardinalCellOffsetsDistance, offsetZ: 0.0 }],
-    [Enums.CardinalDirections.front]: [{ offsetX: 0.0, offsetZ: CardinalCellOffsetsDistance }],
-    [Enums.CardinalDirections.left]: [{ offsetX: -CardinalCellOffsetsDistance, offsetZ: 0.0 }]
-};
-
 function AlignToCell(alignMe) {
     return Math.round(alignMe / CellSize) * CellSize;
 }
@@ -23,13 +15,22 @@ function CeilToCell(alignMe) {
     return Math.ceil(alignMe / CellSize) * CellSize;
 }
 
+//Get the closest distance to the cell from a given point.
 function CellClosestDistance({ cellX, cellZ, pointX, pointZ }) {
-    let diffX = cellX - pointX;
-    let diffZ = cellZ - pointZ;
-    return Math.hypot(
-        Math.min(diffX, diffX + CellSize),
-        Math.min(diffZ, diffZ + CellSize)
-    );
+    //Check to see if the point is inside the cell.
+    if (pointX >= cellX && pointX <= cellX + CellSize &&
+        pointZ >= cellZ && pointZ <= cellZ + CellSize) {
+        //Point inside the cell.
+        return 0.0;
+    } else {
+        //Point outside the cell.
+        let diffX = cellX - pointX;
+        let diffZ = cellZ - pointZ;
+        return Math.hypot(
+            Math.min(diffX, diffX + CellSize),
+            Math.min(diffZ, diffZ + CellSize)
+        );
+    }
 }
 
 //1 means front of a horizontal line, -1 means back, and 0 means on the line.
@@ -39,6 +40,20 @@ function SideOfLine({ startX, startZ, endX, endZ, pointX, pointZ }) {
     //(line Z difference * point X difference from start of line)
     return Math.sign((endX - startX) * (pointZ - startZ) - (endZ - startZ) * (pointX - startX));
 }
+
+//===========================================================================
+//===========================================================================
+//All of the above code is safe. Any of the below code might be refactored.
+//===========================================================================
+//===========================================================================
+
+let CardinalCellOffsetsDistance = CellSize;
+let CardinalCellOffsetsMap = {
+    [Enums.CardinalDirections.back]: [{ offsetX: 0.0, offsetZ: -CardinalCellOffsetsDistance }],
+    [Enums.CardinalDirections.right]: [{ offsetX: CardinalCellOffsetsDistance, offsetZ: 0.0 }],
+    [Enums.CardinalDirections.front]: [{ offsetX: 0.0, offsetZ: CardinalCellOffsetsDistance }],
+    [Enums.CardinalDirections.left]: [{ offsetX: -CardinalCellOffsetsDistance, offsetZ: 0.0 }]
+};
 
 function CalculatePathingStartPoints({ numberOfExtraPoints, traversalAngle, offsetX, offsetZ, radius }) {
     let pathingStartPoints = [];

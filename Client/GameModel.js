@@ -11,7 +11,7 @@ class GameModel {
         this.ySize = ySize;
         this.halfYSize = ySize * 0.5;
 
-        this.traversalOffsets = GetOrCreateTraversalOffsets({ unitRadius: this.halfXZSize });
+        // this.traversalOffsets = GetOrCreateTraversalOffsets({ unitRadius: this.halfXZSize });
     }
 
     deconstruct() {
