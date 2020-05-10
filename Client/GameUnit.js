@@ -59,6 +59,8 @@ class GameUnit {
                         endX: currentOrder.data.x,
                         endZ: currentOrder.data.z
                     });
+                    this.pathingTester.limitDistance({ maxDistance: this.private.speed * deltaTimeMS });
+
 
                     //Determine current movement step endpoints and related calculations.
                     let maxDistance = this.private.speed * deltaTimeMS;
