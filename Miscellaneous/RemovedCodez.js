@@ -126,3 +126,65 @@ let CardinalCellOffsetsMap = {
         { offsetX: -CardinalCellOffsetsDistance, offsetZ: CardinalCellOffsetsDistance }
     ]
 };
+
+function CalculatePathingStartPoints({ numberOfExtraPoints, traversalAngle, offsetX, offsetZ, radius }) {
+    let pathingStartPoints = [];
+
+    let minusAngle = traversalAngle - HalfPI;
+    let plusAngle = traversalAngle + HalfPI;
+    let minusOffsetX = radius * Math.cos(minusAngle);
+    let minusOffsetZ = -radius * Math.sin(minusAngle);
+    let plusOffsetX = radius * Math.cos(plusAngle);
+    let plusOffsetZ = -radius * Math.sin(plusAngle);
+    pathingStartPoints.push({ offsetX: offsetX + minusOffsetX, offsetZ: offsetZ - minusOffsetZ });
+    pathingStartPoints.push({ offsetX: offsetX + plusOffsetX, offsetZ: offsetZ - plusOffsetZ });
+
+    let angleHelper = 2.0 / (numberOfExtraPoints + 1.0);
+    let currentAngleOffset;
+    for (let innerPointNum = 1; innerPointNum <= numberOfExtraPoints; ++innerPointNum) {
+        currentAngleOffset = plusAngle - Math.acos(1.0 - innerPointNum * angleHelper);
+        pathingStartPoints.push({
+            offsetX: offsetX + radius * Math.cos(currentAngleOffset),
+            offsetZ: offsetZ - radius * Math.sin(currentAngleOffset)
+        });
+    }
+
+    return pathingStartPoints;
+}
+
+//Calculate unit traversal offsets for each unit size for cardinal path finding navigation.
+let UnitTraversalOffsetsMap = {};
+function ComputeTraversalOffsets({ unitRadius, traversalAngle }) {
+    let traversalOffsets = {
+        offsetX: GenericRound(unitRadius * Math.cos(traversalAngle)),
+        offsetZ: GenericRound(-unitRadius * Math.sin(traversalAngle)),
+        cellOffsets: null
+    };
+    traversalOffsets.cellOffsets = CalculatePathingStartPoints({
+        numberOfExtraPoints: Math.ceil(unitRadius * 2.0 / CellSize) + 2,
+        traversalAngle,
+        offsetX: traversalOffsets.offsetX,
+        offsetZ: traversalOffsets.offsetZ,
+        radius: unitRadius
+    });
+    return traversalOffsets;
+}
+function GetOrCreateTraversalOffsets({ unitRadius }) {
+    if (IsUndefined(UnitTraversalOffsetsMap[unitRadius])) {
+        UnitTraversalOffsetsMap[unitRadius] = {
+            [Enums.CardinalDirections.back]: ComputeTraversalOffsets({
+                unitRadius, traversalAngle: Math.PI * 0.5
+            }),
+            [Enums.CardinalDirections.right]: ComputeTraversalOffsets({
+                unitRadius, traversalAngle: 0.0
+            }),
+            [Enums.CardinalDirections.front]: ComputeTraversalOffsets({
+                unitRadius, traversalAngle: Math.PI * 1.5
+            }),
+            [Enums.CardinalDirections.left]: ComputeTraversalOffsets({
+                unitRadius, traversalAngle: Math.PI
+            })
+        };
+    }
+    return UnitTraversalOffsetsMap[unitRadius];
+}

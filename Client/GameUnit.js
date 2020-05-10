@@ -60,40 +60,16 @@ class GameUnit {
                         endZ: currentOrder.data.z
                     });
                     this.pathingTester.limitDistance({ maxDistance: this.private.speed * deltaTimeMS });
+                    this.pathingTester.computePathingLines();
+                    this.pathingTester.computeMinPathable();
 
-
-                    //Determine current movement step endpoints and related calculations.
-                    let maxDistance = this.private.speed * deltaTimeMS;
-                    let {
-                        limitedX: newX, limitedZ: newZ, limitedDistance,
-                        fullXDistance, fullZDistance, fullManhattanDistance
-                    } = LimitDistance({
-                        startX: this.position.x,
-                        startZ: this.position.z,
-                        endX: currentOrder.data.x,
-                        endZ: currentOrder.data.z,
-                        maxDistance
-                    });
-                    let worldMap = this.workruft.world.map;
-                    //Determine the minimum distance the unit can go towards the current movement step before reaching an
-                    //obstruction in the path.
-                    let minPathable = ComputeMinPathable({
-                        startX: this.position.x,
-                        startZ: this.position.z,
-                        endX: newX,
-                        endZ: newZ,
-                        traversalAngle: Math.atan2(-fullZDistance, fullXDistance),
-                        unitRadius: this.gameModel.halfXZSize,
-                        numberOfExtraPathingLines: this.gameModel.numberOfExtraPathingLines,
-                        worldMap
-                    });
 
                     //See if the unit's current movement step path is obstructed.
-                    if (minPathable.distance == Infinity) {
+                    if (this.pathingTester.minPathable.distance == Infinity) {
                         //Unobstructed; gogogo, full speed.
-                        this.position.x = newX;
-                        this.position.z = newZ;
-                        deltaTimeMS -= limitedDistance / this.private.speed;
+                        this.position.x = this.pathingTester.endX;
+                        this.position.z = this.pathingTester.endZ;
+                        deltaTimeMS -= this.pathingTester.limitedDistance / this.private.speed;
                         //See if unit reached destination.
                         if (this.position.x == currentOrder.data.x && this.position.z == currentOrder.data.z) {
                             //Order complete.
@@ -101,22 +77,15 @@ class GameUnit {
                         }
                     } else {
                         //Obstructed; stop before the obstruction.
-                        let newLimitedDistance = Math.max(0.0, minPathable.distance - ThreeHalvesCellSize - this.gameModel.halfXZSize);
+                        let newLimitedDistance = Math.max(0.0, this.pathingTester.minPathable.distance -
+                            ThreeHalvesCellSize - this.gameModel.halfXZSize);
                         //See if the unit can even move at all.
                         if (newLimitedDistance > 0.0) {
                             //The unit can move some, just not all the way up to its speed potential.
                             //Figure out where that is and move.
-                            let {
-                                limitedX: newLimitedX, limitedZ: newLimitedZ
-                            } = LimitDistance({
-                                startX: this.position.x,
-                                startZ: this.position.z,
-                                endX: currentOrder.data.x,
-                                endZ: currentOrder.data.z,
-                                maxDistance: newLimitedDistance
-                            });
-                            this.position.x = newLimitedX;
-                            this.position.z = newLimitedZ;
+                            this.pathingTester.limitDistance({ maxDistance: newLimitedDistance });
+                            this.position.x = this.pathingTester.endX;
+                            this.position.z = this.pathingTester.endZ;
                         }
                         //Order cannot be completed, so cancel all orders (stop unit).
                         deltaTimeMS = -Infinity;
