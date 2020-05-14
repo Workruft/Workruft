@@ -1,14 +1,31 @@
 # TODO
 
-- Implement A* with immediate linear optimization.
+- Precompute cardinal offsets for cardinal path finding.
 
-  - Buildings and other units need to be factored in.
+- Create a PathFinder class that will be allotted so many "attempts"/calculations per X time period.
 
-    - Add in buildings and other units...
+- Align the starting position to the *nearest* floor/ceil combo that's open; if none, stop path finding immediately.
 
-- Send and check for pings server<->client both, to ensure livelihood of connection in silent disconnection cases. (Check on both ends, but only send a ping on receiving a ping - except for the very first, of course.)
+- Align the end position to the *nearest* target cells that can contain the unit, using a gridded-Archimedian spiral;
+  consider having a maximum check distance.
 
-- Establish some kind of protocol for the messages. Put the common parts in /Common/ and the rest in /Client/ and /Server/ individually.
+- Implement A* with cardinal direction path testing, aligned to the grid (AlignToCell) the whole way.
+
+- Once the path is finally found, cleanup and begin execution of the path immediately.
+
+  - Ensure that PathFinder cleans up every time an order is executed, finished, and/or replaced.
+
+  - Ensure that path finding and traveling are perfectly synchronized for all clients.
+
+- Buildings and other units need to be factored in.
+
+  - Add in buildings and other units...
+
+- Send and check for pings server<->client both, to ensure livelihood of connection in silent disconnection cases.
+  (Check on both ends, but only send a ping on receiving a ping - except for the very first, of course.)
+
+- Establish some kind of protocol for the messages. Put the common parts in /Common/ and the rest in /Client/ and
+  /Server/ individually.
 
 - "A client WebSocket broadcasting to every other connected WebSocket clients, excluding itself":
 ```js
