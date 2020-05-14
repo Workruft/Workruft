@@ -1,4 +1,4 @@
-//A helper class to test pathing with.
+//A helper class to test pathing with, using multiple PathingLines, in one direction at a time.
 //This class is designed to promote reusability.
 class PathingTester {
     constructor({ map, gameModel }) {
@@ -41,46 +41,42 @@ class PathingTester {
     //circle and end at the back of the ending circle, evenly distributed according to the number of
     //extra pathing lines.
     computePathingLines() {
-        this.traversalAngle = Math.atan2(-this.zDistance, this.xDistance);
-
-        //TODO: Precompute cardinal offsets. Pass in an offsets object/class instance.
-        //TODO: Only compute offsets when traversalAngle changes (can have different ends same traversalAngle).
-        let minusAngle = this.traversalAngle - HalfPI;
-        let plusAngle = this.traversalAngle + HalfPI;
-        let cosMinusAngle = Math.cos(minusAngle);
-        let sinMinusAngle = Math.sin(minusAngle);
-        let cosPlusAngle = Math.cos(plusAngle);
-        let sinPlusAngle = Math.sin(plusAngle);
-        let minusOffsetX = this.gameModel.halfXZSize * cosMinusAngle;
-        let minusOffsetZ = -this.gameModel.halfXZSize * sinMinusAngle;
-        let plusOffsetX = this.gameModel.halfXZSize * cosPlusAngle;
-        let plusOffsetZ = -this.gameModel.halfXZSize * sinPlusAngle;
-        let lenientUnitRadius = this.gameModel.halfXZSize - PathTestingLeniency;
-        let lenientMinusOffsetX = lenientUnitRadius * cosMinusAngle;
-        let lenientMinusOffsetZ = -lenientUnitRadius * sinMinusAngle;
-        let lenientPlusOffsetX = lenientUnitRadius * cosPlusAngle;
-        let lenientPlusOffsetZ = -lenientUnitRadius * sinPlusAngle;
+        let lastTraversalAngle = this.traversalAngle;
+        this.traversalAngle = GenericRound(Math.atan2(-this.zDistance, this.xDistance));
+        //Only compute offsets when traversalAngle changes (can have different ends but the same traversalAngle).
+        if (this.traversalAngle != lastTraversalAngle) {
+            //Only compute offsets when traversalAngle is not a cardinal angle.
+            if (IsDefined(CardinalPathingLineOffsetsMap[this.gameModel.halfXZSize]) &&
+                IsDefined(CardinalPathingLineOffsetsMap[this.gameModel.halfXZSize][this.traversalAngle])) {
+                this.pathingLineOffsets = CardinalPathingLineOffsetsMap[this.gameModel.halfXZSize][this.traversalAngle];
+            } else {
+                this.pathingLineOffsets = computePathingLineOffsets({
+                    traversalAngle: this.traversalAngle,
+                    halfXZSize: this.gameModel.halfXZSize
+                });
+            }
+        }
 
         //Outermost bounds, without any leniency.
         let firstBoundingLine = {
-            startX: this.startX + minusOffsetX,
-            startZ: this.startZ + minusOffsetZ,
-            endX: this.endX + minusOffsetX,
-            endZ: this.endZ + minusOffsetZ
+            startX: this.startX + this.pathingLineOffsets.minusOffsetX,
+            startZ: this.startZ + this.pathingLineOffsets.minusOffsetZ,
+            endX: this.endX + this.pathingLineOffsets.minusOffsetX,
+            endZ: this.endZ + this.pathingLineOffsets.minusOffsetZ
         };
         let lastBoundingLine = {
-            startX: this.startX + plusOffsetX,
-            startZ: this.startZ + plusOffsetZ,
-            endX: this.endX + plusOffsetX,
-            endZ: this.endZ + plusOffsetZ
+            startX: this.startX + this.pathingLineOffsets.plusOffsetX,
+            startZ: this.startZ + this.pathingLineOffsets.plusOffsetZ,
+            endX: this.endX + this.pathingLineOffsets.plusOffsetX,
+            endZ: this.endZ + this.pathingLineOffsets.plusOffsetZ
         };
 
         this.pathingLines = new Set();
         this.pathingLines.add(new PathingLine({
-            startX: this.startX + lenientMinusOffsetX,
-            startZ: this.startZ + lenientMinusOffsetZ,
-            endX: this.endX + lenientMinusOffsetX,
-            endZ: this.endZ + lenientMinusOffsetZ
+            startX: this.startX + this.pathingLineOffsets.lenientMinusOffsetX,
+            startZ: this.startZ + this.pathingLineOffsets.lenientMinusOffsetZ,
+            endX: this.endX + this.pathingLineOffsets.lenientMinusOffsetX,
+            endZ: this.endZ + this.pathingLineOffsets.lenientMinusOffsetZ
         }));
         //Add any inner points.
         if (this.gameModel.numberOfExtraPathingLines > 0) {
@@ -90,9 +86,10 @@ class PathingTester {
             let currentZOffset;
             for (let extraPathingLineNum = 1; extraPathingLineNum <= this.gameModel.numberOfExtraPathingLines;
                 ++extraPathingLineNum) {
-                currentAngleOffset = plusAngle - Math.acos(1.0 - extraPathingLineNum * angleHelper);
-                currentXOffset = lenientUnitRadius * Math.cos(currentAngleOffset);
-                currentZOffset = -lenientUnitRadius * Math.sin(currentAngleOffset);
+                currentAngleOffset = this.pathingLineOffsets.plusAngle -
+                    Math.acos(1.0 - extraPathingLineNum * angleHelper);
+                currentXOffset = this.pathingLineOffsets.lenientUnitRadius * Math.cos(currentAngleOffset);
+                currentZOffset = -this.pathingLineOffsets.lenientUnitRadius * Math.sin(currentAngleOffset);
                 this.pathingLines.add(new PathingLine({
                     startX: this.startX + currentXOffset,
                     startZ: this.startZ + currentZOffset,
@@ -102,10 +99,10 @@ class PathingTester {
             }
         }
         this.pathingLines.add(new PathingLine({
-            startX: this.startX + lenientPlusOffsetX,
-            startZ: this.startZ + lenientPlusOffsetZ,
-            endX: this.endX + lenientPlusOffsetX,
-            endZ: this.endZ + lenientPlusOffsetZ
+            startX: this.startX + this.pathingLineOffsets.lenientPlusOffsetX,
+            startZ: this.startZ + this.pathingLineOffsets.lenientPlusOffsetZ,
+            endX: this.endX + this.pathingLineOffsets.lenientPlusOffsetX,
+            endZ: this.endZ + this.pathingLineOffsets.lenientPlusOffsetZ
         }));
         let side1;
         let side2;

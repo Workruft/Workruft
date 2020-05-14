@@ -181,12 +181,12 @@ class World {
             opacity: 0.5,
             transparent: true
         });
-        for (let unitSizeXZ = HalfTinySize; unitSizeXZ <= BigSize; unitSizeXZ += HalfTinySize) {
-            this.selectionCircleModelsMap.set(unitSizeXZ, new GameModel({
+        for (let halfXZSize of CommonUnitHalfSizes) {
+            this.selectionCircleModelsMap.set(halfXZSize, new GameModel({
                 world: this,
-                geometry: CircleGeometriesMap.get(unitSizeXZ),
+                geometry: CircleGeometriesMap.get(halfXZSize),
                 material: this.selectionCircleMaterial,
-                xzSize: unitSizeXZ,
+                xzSize: halfXZSize * 2.0,
                 ySize: 0.0
             }));
         }

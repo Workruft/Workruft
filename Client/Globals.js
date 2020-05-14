@@ -13,6 +13,11 @@ let BigSize = SmallSize * 2.0;
 
 let SelectionExtraRadius = QuarterCellSize;
 
+let CommonUnitHalfSizes = [];
+for (let halfXZSize = HalfTinySize; halfXZSize <= SmallSize; halfXZSize += HalfTinySize) {
+    CommonUnitHalfSizes.push(halfXZSize);
+}
+
 let MapBottomY = 0.0;
 let MapMinimumHeight = 0.0;
 
@@ -57,5 +62,5 @@ function IsDefined(checkMe) {
 }
 
 function GenericRound(roundMe) {
-    return Math.round(roundMe / 0.001) * 0.001;
+    return Math.round(roundMe * 100000000.0) / 100000000.0;
 }

@@ -48,52 +48,6 @@ class Workruft {
         });
         this.playerUnit.addToGroup({ objectGroup: this.world.playerObjects });
 
-        // this.coloredSquares = [];
-        // setInterval(function() {
-        //     for (let coloredSquare of this.coloredSquares) {
-        //         coloredSquare.deconstruct();
-        //     }
-        //     this.coloredSquares = [];
-
-        //     // if (Math.floor(performance.now() * 0.002) % Enums.CardinalDirections.length == 0) {
-        //     //     if (Math.random() - 0.5 >= 0.0) {
-        //     //         this.playerUnit.position.x += Math.random() - 0.5 >= 0.0 ? 1.0 : -1.0;
-        //     //     } else {
-        //     //         this.playerUnit.position.z += Math.random() - 0.5 >= 0.0 ? 1.0 : -1.0;
-        //     //     }
-        //     //     this.playerUnit.autoSetHeight();
-        //     // }
-
-        //     // let pathingLines = ComputePathTestingLines({
-        //     //     startX, startZ, endX, endZ, traversalAngle, unitRadius, numberOfExtraPathingLines, worldMap
-        //     // });
-        //     for (let traversalObject of Object.values(this.playerUnit.gameModel.traversalOffsets)) {
-        //         this.coloredSquares.push(
-        //             new ColoredSquare({
-        //                 workruft: this,
-        //                 x: FloorToCell(this.playerUnit.position.x + traversalObject.offsetX),
-        //                 z: FloorToCell(this.playerUnit.position.z + traversalObject.offsetZ),
-        //                 color: DirtColor
-        //         }));
-        //         for (let cellOffset of traversalObject.cellOffsets) {
-        //             this.coloredSquares.push(
-        //                 new ColoredSquare({
-        //                     workruft: this,
-        //                     x: FloorToCell(this.playerUnit.position.x + cellOffset.offsetX),
-        //                     z: FloorToCell(this.playerUnit.position.z + cellOffset.offsetZ),
-        //                     color: BlueColor
-        //             }));
-        //         }
-        //     }
-        //     this.coloredSquares.push(
-        //         new ColoredSquare({
-        //             workruft: this,
-        //             x: FloorToCell(this.playerUnit.position.x),
-        //             z: FloorToCell(this.playerUnit.position.z),
-        //             color: RedColor
-        //     }));
-        // }.bind(this), 500);
-
         //this.network.connect();
     }
 

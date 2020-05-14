@@ -26,8 +26,8 @@ function createCircleGeometry(radius) {
     return circleLine.geometry;
 }
 let CircleGeometriesMap = new Map();
-for (let unitSizeXZ = HalfTinySize; unitSizeXZ <= BigSize; unitSizeXZ += HalfTinySize) {
-    CircleGeometriesMap.set(unitSizeXZ, createCircleGeometry(SelectionExtraRadius + unitSizeXZ));
+for (let halfXZSize of CommonUnitHalfSizes) {
+    CircleGeometriesMap.set(halfXZSize, createCircleGeometry(SelectionExtraRadius + halfXZSize));
 }
 
 function DeconstructPrimitives() {
