@@ -60,9 +60,9 @@ class GameUnit {
                         endZ: currentOrder.data.z
                     });
                     this.pathingTester.limitDistance({ maxDistance: this.private.speed * deltaTimeMS });
+                    this.pathingTester.updateTraversalAngle();
                     this.pathingTester.computePathingLines();
                     this.pathingTester.computeMinPathable();
-
 
                     //See if the unit's current movement step path is obstructed.
                     if (this.pathingTester.minPathable.distance == Infinity) {

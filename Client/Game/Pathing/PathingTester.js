@@ -1,4 +1,4 @@
-//A helper class to test pathing with, using multiple PathingLines, in one direction at a time.
+//A path tester, using multiple PathingLines, one direction at a time.
 //This class is designed to promote reusability.
 class PathingTester {
     constructor({ map, gameModel }) {
@@ -36,11 +36,8 @@ class PathingTester {
         }
     }
 
-    //Create path-testing lines. The first two lines start and end at the outermost points of the circle
-    //parallel to the slope of the unit's trajectory. The inner lines start at the front of the starting
-    //circle and end at the back of the ending circle, evenly distributed according to the number of
-    //extra pathing lines.
-    computePathingLines() {
+    //Call once this.xDistance and this.zDistance are what they should be.
+    updateTraversalAngle() {
         let lastTraversalAngle = this.traversalAngle;
         this.traversalAngle = GenericRound(Math.atan2(-this.zDistance, this.xDistance));
         //Only compute offsets when traversalAngle changes (can have different ends but the same traversalAngle).
@@ -56,7 +53,14 @@ class PathingTester {
                 });
             }
         }
+    }
 
+    //Create path-testing lines. The first two lines start and end at the outermost points of the circle
+    //parallel to the slope of the unit's trajectory. The inner lines start at the front of the starting
+    //circle and end at the back of the ending circle, evenly distributed according to the number of
+    //extra pathing lines.
+    //Call once this.traversalAngle is what it should be.
+    computePathingLines() {
         //Outermost bounds, without any leniency.
         let firstBoundingLine = {
             startX: this.startX + this.pathingLineOffsets.minusOffsetX,

@@ -42,8 +42,4 @@
 
 - More mouse and keyboard controls.
 
-- Update THREE.MeshLine.js to fork.
-
-- Properly cleanup the game on close and consider replacing F5 or Ctrl+F5.
-
 - TODO's in code.
