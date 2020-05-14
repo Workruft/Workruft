@@ -10,8 +10,6 @@ class GameModel {
         this.numberOfExtraPathingLines = Math.max(0, Math.round(this.xzSize / CellSize));
         this.ySize = ySize;
         this.halfYSize = ySize * 0.5;
-
-        // this.traversalOffsets = GetOrCreateTraversalOffsets({ unitRadius: this.halfXZSize });
     }
 
     deconstruct() {

@@ -1,7 +1,5 @@
 # TODO
 
-- Precompute cardinal offsets for cardinal path finding.
-
 - Create a PathFinder class that will be allotted so many "attempts"/calculations per X time period.
 
 - Align the starting position to the *nearest* floor/ceil combo that's open; if none, stop path finding immediately.
