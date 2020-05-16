@@ -125,18 +125,18 @@ function ComputePathingLineOffsets({
         []
     ]);
     //Add any inner line offsets.
-    //TODO: Don't use lenient for inner lines!
     if (numberOfExtraPathingLines > 0) {
         let angleHelper = 2.0 / (numberOfExtraPathingLines + 1.0);
         let currentAngleOffset;
         for (let extraPathingLineNum = 1; extraPathingLineNum <= numberOfExtraPathingLines;
             ++extraPathingLineNum) {
             currentAngleOffset = pathingLineOffsets.plusAngle - Math.acos(1.0 - extraPathingLineNum * angleHelper);
+            //Don't use leniency for the inner lines!
             pathingLineOffsets.lines.push([
                 //X offset.
-                pathingLineOffsets.lenientUnitRadius * Math.cos(currentAngleOffset),
+                pathingLineOffsets.halfXZSize * Math.cos(currentAngleOffset),
                 //Z offset.
-                -pathingLineOffsets.lenientUnitRadius * Math.sin(currentAngleOffset),
+                -pathingLineOffsets.halfXZSize * Math.sin(currentAngleOffset),
                 []
                 //Inner directions.
             ]);
