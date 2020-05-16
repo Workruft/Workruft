@@ -49,9 +49,15 @@ function SideOfLine({ line, pointX, pointZ }) {
         (line.endZ - line.startZ) * (pointX - line.startX));
 }
 
+function CalculateNumberOfExtraPathingLines({ xzSize }) {
+    return Math.max(0, Math.round(xzSize / CellSize));
+}
+
 //Mapped by halfXZSize's then by (cardinal) traversalAngle's.
 let CardinalPathingLineOffsetsMap = {};
-function computePathingLineOffsets({ traversalAngle, halfXZSize }) {
+function ComputePathingLineOffsets({
+    traversalAngle, xDistance, zDistance, halfXZSize, numberOfExtraPathingLines
+}) {
     //Keep the same structure for efficiency.
     const pathingLineOffsets = {
         traversalAngle,
@@ -70,8 +76,12 @@ function computePathingLineOffsets({ traversalAngle, halfXZSize }) {
         lenientMinusOffsetX: null,
         lenientMinusOffsetZ: null,
         lenientPlusOffsetX: null,
-        lenientPlusOffsetZ: null
+        lenientPlusOffsetZ: null,
+        firstBoundingLine: null,
+        lastBoundingLine: null,
+        lines: []
     };
+
     pathingLineOffsets.minusAngle = traversalAngle - HalfPI;
     pathingLineOffsets.plusAngle = traversalAngle + HalfPI;
     pathingLineOffsets.cosMinusAngle = Math.cos(pathingLineOffsets.minusAngle);
@@ -91,6 +101,86 @@ function computePathingLineOffsets({ traversalAngle, halfXZSize }) {
         pathingLineOffsets.cosPlusAngle;
     pathingLineOffsets.lenientPlusOffsetZ = -pathingLineOffsets.lenientUnitRadius *
         pathingLineOffsets.sinPlusAngle;
+
+    //Outermost bounds, without any leniency.
+    pathingLineOffsets.firstBoundingLine = {
+        startX: pathingLineOffsets.minusOffsetX,
+        startZ: pathingLineOffsets.minusOffsetZ,
+        endX: pathingLineOffsets.minusOffsetX + xDistance,
+        endZ: pathingLineOffsets.minusOffsetZ + zDistance
+    };
+    pathingLineOffsets.lastBoundingLine = {
+        startX: pathingLineOffsets.plusOffsetX,
+        startZ: pathingLineOffsets.plusOffsetZ,
+        endX: pathingLineOffsets.plusOffsetX + xDistance,
+        endZ: pathingLineOffsets.plusOffsetZ + zDistance
+    };
+
+    pathingLineOffsets.lines.push([
+        //X offset.
+        pathingLineOffsets.lenientMinusOffsetX,
+        //Z offset.
+        pathingLineOffsets.lenientMinusOffsetZ,
+        //Inner directions.
+        []
+    ]);
+    //Add any inner line offsets.
+    //TODO: Don't use lenient for inner lines!
+    if (numberOfExtraPathingLines > 0) {
+        let angleHelper = 2.0 / (numberOfExtraPathingLines + 1.0);
+        let currentAngleOffset;
+        for (let extraPathingLineNum = 1; extraPathingLineNum <= numberOfExtraPathingLines;
+            ++extraPathingLineNum) {
+            currentAngleOffset = pathingLineOffsets.plusAngle - Math.acos(1.0 - extraPathingLineNum * angleHelper);
+            pathingLineOffsets.lines.push([
+                //X offset.
+                pathingLineOffsets.lenientUnitRadius * Math.cos(currentAngleOffset),
+                //Z offset.
+                -pathingLineOffsets.lenientUnitRadius * Math.sin(currentAngleOffset),
+                []
+                //Inner directions.
+            ]);
+        }
+    }
+    pathingLineOffsets.lines.push([
+        //X offset.
+        pathingLineOffsets.lenientPlusOffsetX,
+        //Z offset.
+        pathingLineOffsets.lenientPlusOffsetZ,
+        //Inner directions.
+        []
+    ]);
+
+    let side1;
+    let side2;
+    let allPointsFit;
+    for (let line of pathingLineOffsets.lines) {
+        //If you can fit a cell on any cardinal side of the line and have it still
+        //fit inside the outermost lines, then always path test in that currentDirection.
+        for (let cardinalDirection = 0; cardinalDirection < Enums.CardinalDirections.length; ++cardinalDirection) {
+            allPointsFit = true;
+            for (let cellOffsetPoint of CardinalCellOffsetsMap[cardinalDirection]) {
+                side1 = SideOfLine({
+                    line: pathingLineOffsets.firstBoundingLine,
+                    pointX: line[0] + cellOffsetPoint.offsetX,
+                    pointZ: line[1] + cellOffsetPoint.offsetZ
+                });
+                side2 = SideOfLine({
+                    line: pathingLineOffsets.lastBoundingLine,
+                    pointX: line[0] + cellOffsetPoint.offsetX,
+                    pointZ: line[1] + cellOffsetPoint.offsetZ
+                });
+                if (side1 != 0 && side2 != 0 && side1 != side2 * -1) {
+                    allPointsFit = false;
+                    break;
+                }
+            }
+            if (allPointsFit) {
+                line[2].push(cardinalDirection);
+            }
+        }
+    }
+
     return pathingLineOffsets;
 }
 for (let halfXZSize of CommonUnitHalfSizes) {
@@ -98,6 +188,12 @@ for (let halfXZSize of CommonUnitHalfSizes) {
     CardinalPathingLineOffsetsMap[halfXZSize] = innerMap;
     for (let piRatio = 0.5; piRatio >= -1.0; piRatio -= 0.5) {
         let traversalAngle = GenericRound(Math.PI * piRatio);
-        innerMap[traversalAngle] = computePathingLineOffsets({ traversalAngle, halfXZSize });
+        innerMap[traversalAngle] = ComputePathingLineOffsets({
+            traversalAngle,
+            xDistance: Math.cos(traversalAngle),
+            zDistance: -Math.sin(traversalAngle),
+            halfXZSize,
+            numberOfExtraPathingLines: CalculateNumberOfExtraPathingLines({ xzSize: halfXZSize * 2.0 })
+        });
     }
 }

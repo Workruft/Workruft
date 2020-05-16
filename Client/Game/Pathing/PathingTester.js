@@ -47,9 +47,12 @@ class PathingTester {
                 IsDefined(CardinalPathingLineOffsetsMap[this.gameModel.halfXZSize][this.traversalAngle])) {
                 this.pathingLineOffsets = CardinalPathingLineOffsetsMap[this.gameModel.halfXZSize][this.traversalAngle];
             } else {
-                this.pathingLineOffsets = computePathingLineOffsets({
+                this.pathingLineOffsets = ComputePathingLineOffsets({
                     traversalAngle: this.traversalAngle,
-                    halfXZSize: this.gameModel.halfXZSize
+                    xDistance: this.xDistance,
+                    zDistance: this.zDistance,
+                    halfXZSize: this.gameModel.halfXZSize,
+                    numberOfExtraPathingLines: this.gameModel.numberOfExtraPathingLines
                 });
             }
         }
@@ -61,86 +64,18 @@ class PathingTester {
     //extra pathing lines.
     //Call once this.traversalAngle is what it should be.
     computePathingLines() {
-        //Outermost bounds, without any leniency.
-        let firstBoundingLine = {
-            startX: this.startX + this.pathingLineOffsets.minusOffsetX,
-            startZ: this.startZ + this.pathingLineOffsets.minusOffsetZ,
-            endX: this.endX + this.pathingLineOffsets.minusOffsetX,
-            endZ: this.endZ + this.pathingLineOffsets.minusOffsetZ
-        };
-        let lastBoundingLine = {
-            startX: this.startX + this.pathingLineOffsets.plusOffsetX,
-            startZ: this.startZ + this.pathingLineOffsets.plusOffsetZ,
-            endX: this.endX + this.pathingLineOffsets.plusOffsetX,
-            endZ: this.endZ + this.pathingLineOffsets.plusOffsetZ
-        };
-
         this.pathingLines = new Set();
-        this.pathingLines.add(new PathingLine({
-            workruft: this.workruft,
-            startX: this.startX + this.pathingLineOffsets.lenientMinusOffsetX,
-            startZ: this.startZ + this.pathingLineOffsets.lenientMinusOffsetZ,
-            endX: this.endX + this.pathingLineOffsets.lenientMinusOffsetX,
-            endZ: this.endZ + this.pathingLineOffsets.lenientMinusOffsetZ
-        }));
-        //Add any inner points.
-        if (this.gameModel.numberOfExtraPathingLines > 0) {
-            let angleHelper = 2.0 / (this.gameModel.numberOfExtraPathingLines + 1.0);
-            let currentAngleOffset;
-            let currentXOffset;
-            let currentZOffset;
-            for (let extraPathingLineNum = 1; extraPathingLineNum <= this.gameModel.numberOfExtraPathingLines;
-                ++extraPathingLineNum) {
-                currentAngleOffset = this.pathingLineOffsets.plusAngle -
-                    Math.acos(1.0 - extraPathingLineNum * angleHelper);
-                currentXOffset = this.pathingLineOffsets.lenientUnitRadius * Math.cos(currentAngleOffset);
-                currentZOffset = -this.pathingLineOffsets.lenientUnitRadius * Math.sin(currentAngleOffset);
-                this.pathingLines.add(new PathingLine({
-                    workruft: this.workruft,
-                    startX: this.startX + currentXOffset,
-                    startZ: this.startZ + currentZOffset,
-                    endX: this.endX + currentXOffset,
-                    endZ: this.endZ + currentZOffset
-                }));
-            }
-        }
-        this.pathingLines.add(new PathingLine({
-            workruft: this.workruft,
-            startX: this.startX + this.pathingLineOffsets.lenientPlusOffsetX,
-            startZ: this.startZ + this.pathingLineOffsets.lenientPlusOffsetZ,
-            endX: this.endX + this.pathingLineOffsets.lenientPlusOffsetX,
-            endZ: this.endZ + this.pathingLineOffsets.lenientPlusOffsetZ
-        }));
-        let side1;
-        let side2;
-        let allPointsFit;
-        for (let pathingLine of this.pathingLines) {
-            //If you can fit a cell on any cardinal side of the line and have it still
-            //fit inside the outermost lines, then always path test in that currentDirection.
-            for (let cardinalDirection = 0; cardinalDirection < Enums.CardinalDirections.length; ++cardinalDirection) {
-                allPointsFit = true;
-                for (let cellOffsetPoint of CardinalCellOffsetsMap[cardinalDirection]) {
-                    side1 = SideOfLine({
-                        line: firstBoundingLine,
-                        pointX: pathingLine.startX + cellOffsetPoint.offsetX,
-                        pointZ: pathingLine.startZ + cellOffsetPoint.offsetZ
-                    });
-                    side2 = SideOfLine({
-                        line: lastBoundingLine,
-                        pointX: pathingLine.startX + cellOffsetPoint.offsetX,
-                        pointZ: pathingLine.startZ + cellOffsetPoint.offsetZ
-                    });
-                    if (side1 != 0 && side2 != 0 && side1 != side2 * -1) {
-                        allPointsFit = false;
-                        break;
-                    }
-                }
-                if (allPointsFit) {
-                    pathingLine.innerDirections.push(cardinalDirection);
-                }
-            }
-
-            pathingLine.setupTesting();
+        for (let line of this.pathingLineOffsets.lines) {
+            let newPathingLine = new PathingLine({
+                workruft: this.workruft,
+                startX: this.startX + line[0],
+                startZ: this.startZ + line[1],
+                endX: this.endX + line[0],
+                endZ: this.endZ + line[1],
+                innerDirections: line[2]
+            });
+            this.pathingLines.add(newPathingLine);
+            newPathingLine.setupTesting();
         }
     }
 

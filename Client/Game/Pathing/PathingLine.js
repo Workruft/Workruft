@@ -1,13 +1,13 @@
 //A single pathing line for path testing.
 //This class is designed to promote reusability.
 class PathingLine {
-    constructor({ workruft, startX, startZ, endX, endZ }) {
+    constructor({ workruft, startX, startZ, endX, endZ, innerDirections }) {
         this.workruft = workruft;
         this.startX = startX;
         this.startZ = startZ;
         this.endX = endX;
         this.endZ = endZ;
-        this.innerDirections = [];
+        this.innerDirections = innerDirections;
 
         // game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
         //     new THREE.Vector3(this.startX, 0.01, this.startZ),
