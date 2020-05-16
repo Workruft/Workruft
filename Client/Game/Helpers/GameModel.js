@@ -8,6 +8,9 @@ class GameModel {
         this.xzSize = xzSize;
         this.halfXZSize = xzSize * 0.5;
         this.numberOfExtraPathingLines = Math.max(0, Math.round(this.xzSize / CellSize));
+        //Offset places unit in center of smallest cells alignment that can still fit the entire unit.
+        //E.g. if unit is 1.5 cells big, it should start at cell position + 0.25.
+        this.cellAlignmentOffset = (this.xzSize % CellSize) * 0.5;
         this.ySize = ySize;
         this.halfYSize = ySize * 0.5;
     }

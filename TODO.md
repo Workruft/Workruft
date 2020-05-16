@@ -1,13 +1,6 @@
 # TODO
 
-- Create a PathFinder class that will be allotted so many "attempts"/calculations per X time period.
-
-- Align the starting position to the *nearest* floor/ceil combo that's open; if none, stop path finding immediately.
-
-- Align the end position to the *nearest* target cells that can contain the unit, using a gridded-Archimedian spiral;
-  consider having a maximum check distance.
-
-- Implement A* with cardinal direction path testing, aligned to the grid (AlignToCell) the whole way.
+- Implement A* with cardinal direction path testing.
 
 - Once the path is finally found, cleanup and begin execution of the path immediately.
 
@@ -18,6 +11,8 @@
 - Buildings and other units need to be factored in.
 
   - Add in buildings and other units...
+
+- Give PathFinder class so many "attempts"/calculations per X time period.
 
 - Send and check for pings server<->client both, to ensure livelihood of connection in silent disconnection cases.
   (Check on both ends, but only send a ping on receiving a ping - except for the very first, of course.)

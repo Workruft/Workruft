@@ -17,6 +17,10 @@ class GameUnit {
 
         this.isSelected = false;
 
+        this.pathFinder = new PathFinder({
+            map: this.workruft.world.map,
+            gameUnit: this
+        });
         this.pathingTester = new PathingTester({
             map: this.workruft.world.map,
             gameModel: this.gameModel
@@ -51,6 +55,12 @@ class GameUnit {
                 {
                     if (this.private.speed <= 0.0) {
                         this.private.orders.splice(0, 1);
+                    }
+
+                    if (IsUndefined(currentOrder.data.path)) {
+                        this.pathFinder.setStart({ unitX: this.position.x, unitZ: this.position.z });
+                        this.pathFinder.setTargetPoint({ pointX: currentOrder.data.x, pointZ: currentOrder.data.z });
+
                     }
 
                     this.pathingTester.setEnds({
