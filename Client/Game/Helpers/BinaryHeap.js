@@ -2,7 +2,7 @@
 //Guarantees first element is lowest-scored.
 //It doesn't maintain sorting of the entire array; rather, it keeps it hierarchically sorted (if thought of as a tree).
 class BinaryHeap extends Array {
-    constructor(scoringFunction) {
+    constructor({ scoringFunction }) {
         super();
         this.scoringFunction = scoringFunction;
     }
@@ -11,6 +11,7 @@ class BinaryHeap extends Array {
         this.bubbleUp(super.push(element) - 1);
     }
 
+    //Pops off and returns the lowest-scored element.
     pop() {
         const top = this[0];
         const bottom = super.pop();
