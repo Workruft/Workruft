@@ -1,8 +1,12 @@
+function calculateScore({ point }) {
+    point.score = point.manhattanTraveled + point.distance * 1.5;
+}
+
 //A path finder, one for each unit, which utilizes PathingTesters in all 4 cardinal directions, 1 cell at a time, to
 //find the best path for a unit from A to B, using a variation of the A* path finding algorithm.
 class PathFinder {
-    constructor({ map, gameUnit }) {
-        this.map = map;
+    constructor({ workruft, gameUnit }) {
+        this.workruft = workruft;
         this.gameUnit = gameUnit;
 
         this.bestPath = null;
@@ -44,13 +48,25 @@ class PathFinder {
             manhattanTraveled: 0,
             fromPoint: null
         };
-        currentPoint.score = currentPoint.manhattanTraveled + currentPoint.distance;
+        calculateScore({ point: currentPoint });
         this.mappedPoints[currentPoint.x] = {
             [currentPoint.z]: currentPoint
         };
 
+        if (IsDefined(this.coloredSquares)) {
+            for (let coloredSquare of this.coloredSquares) {
+                coloredSquare.deconstruct();
+            }
+        }
+        this.coloredSquares = [];
         //Pathfinding loop.
         do {
+            this.coloredSquares.push(new ColoredSquare({
+                workruft: this.workruft,
+                x: currentPoint.x,
+                z: currentPoint.z,
+                color: BlueColor
+            }));
             //See if point is within specified range.
             if (currentPoint.distance <= range) {
                 //Solution found!
@@ -117,7 +133,7 @@ class PathFinder {
             manhattanTraveled: fromPoint.manhattanTraveled + 1,
             fromPoint
         };
-        newPoint.score = newPoint.manhattanTraveled + newPoint.distance;
+        calculateScore({ point: newPoint });
         this.mappedPoints[newX][newZ] = newPoint;
         this.heapedPoints.push(newPoint);
     }

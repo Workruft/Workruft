@@ -40,6 +40,6 @@ class ColoredSquare {
         let cellZ = AlignToCell(this.mesh.position.z);
         this.mesh.position.y = this.workruft.world.map.getAverageHeight({
             cell: this.workruft.world.map.getCell({ x: cellX, z: cellZ })
-        }) + 0.001;
+        }) + 0.01;
     }
 }

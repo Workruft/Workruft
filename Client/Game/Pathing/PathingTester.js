@@ -1,8 +1,8 @@
 //A path tester, using multiple PathingLines, one direction at a time.
 //This class is designed to promote reusability.
 class PathingTester {
-    constructor({ map, gameModel }) {
-        this.map = map;
+    constructor({ workruft, gameModel }) {
+        this.workruft = workruft;
         this.gameModel = gameModel;
     }
 
@@ -77,6 +77,7 @@ class PathingTester {
 
         this.pathingLines = new Set();
         this.pathingLines.add(new PathingLine({
+            workruft: this.workruft,
             startX: this.startX + this.pathingLineOffsets.lenientMinusOffsetX,
             startZ: this.startZ + this.pathingLineOffsets.lenientMinusOffsetZ,
             endX: this.endX + this.pathingLineOffsets.lenientMinusOffsetX,
@@ -95,6 +96,7 @@ class PathingTester {
                 currentXOffset = this.pathingLineOffsets.lenientUnitRadius * Math.cos(currentAngleOffset);
                 currentZOffset = -this.pathingLineOffsets.lenientUnitRadius * Math.sin(currentAngleOffset);
                 this.pathingLines.add(new PathingLine({
+                    workruft: this.workruft,
                     startX: this.startX + currentXOffset,
                     startZ: this.startZ + currentZOffset,
                     endX: this.endX + currentXOffset,
@@ -103,6 +105,7 @@ class PathingTester {
             }
         }
         this.pathingLines.add(new PathingLine({
+            workruft: this.workruft,
             startX: this.startX + this.pathingLineOffsets.lenientPlusOffsetX,
             startZ: this.startZ + this.pathingLineOffsets.lenientPlusOffsetZ,
             endX: this.endX + this.pathingLineOffsets.lenientPlusOffsetX,
@@ -137,7 +140,7 @@ class PathingTester {
                 }
             }
 
-            pathingLine.setupTesting({ map: this.map });
+            pathingLine.setupTesting();
         }
     }
 
@@ -162,14 +165,14 @@ class PathingTester {
                 }
 
                 //Test the traversal direction.
-                isCellTraversible = this.map.isTraversible({
+                isCellTraversible = this.workruft.world.map.isTraversible({
                     cell: pathingLine.currentCell,
                     direction: currentDirection
                 });
                 if (isCellTraversible) {
                     //Also test any inner directions.
                     for (let innerDirection of pathingLine.innerDirections) {
-                        isCellTraversible = this.map.isTraversible({
+                        isCellTraversible = this.workruft.world.map.isTraversible({
                             cell: pathingLine.currentCell,
                             direction: innerDirection
                         });

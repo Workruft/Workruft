@@ -1,7 +1,8 @@
 //A single pathing line for path testing.
 //This class is designed to promote reusability.
 class PathingLine {
-    constructor({ startX, startZ, endX, endZ }) {
+    constructor({ workruft, startX, startZ, endX, endZ }) {
+        this.workruft = workruft;
         this.startX = startX;
         this.startZ = startZ;
         this.endX = endX;
@@ -17,7 +18,7 @@ class PathingLine {
     //Starts at the first cell past the starting cell towards the end position if any.
     //Every cell traveled is guaranteed to be in one of the 4 cardinal directions from
     //the previous cell (or null after already reached last cell).
-    setupTesting({ map }) {
+    setupTesting() {
         let cellX = FloorToCell(this.startX);
         let cellZ = FloorToCell(this.startZ);
         let diffX = this.endX - this.startX;
@@ -51,7 +52,7 @@ class PathingLine {
         this.manhattanDistance = Math.abs(FloorToCell(this.endX) - cellX) +
             Math.abs(FloorToCell(this.endZ) - cellZ);
 
-        this.currentCell = map.getCell({ x: cellX, z: cellZ });
+        this.currentCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
         this.currentDistance = Infinity;
         this.traveledCells = 0;
     }

@@ -18,11 +18,11 @@ class GameUnit {
         this.isSelected = false;
 
         this.pathFinder = new PathFinder({
-            map: this.workruft.world.map,
+            workruft: this.workruft,
             gameUnit: this
         });
         this.pathingTester = new PathingTester({
-            map: this.workruft.world.map,
+            workruft: this.workruft,
             gameModel: this.gameModel
         });
     }
@@ -61,20 +61,20 @@ class GameUnit {
                         this.pathFinder.setStartPoint({ pointX: this.position.x, pointZ: this.position.z });
                         this.pathFinder.setEndPoint({ pointX: currentOrder.data.x, pointZ: currentOrder.data.z });
                         currentOrder.data.path = this.pathFinder.findBestPath({ range: 0.1 });
-                        if (IsDefined(this.coloredSquares)) {
-                            for (let coloredSquare of this.coloredSquares) {
-                                coloredSquare.deconstruct();
-                            }
-                        }
-                        this.coloredSquares = [];
-                        for (let point of currentOrder.data.path) {
-                            this.coloredSquares.push(new ColoredSquare({
-                                workruft: this.workruft,
-                                x: point.x,
-                                z: point.z,
-                                color: BlueColor
-                            }));
-                        }
+                        // if (IsDefined(this.coloredSquares)) {
+                        //     for (let coloredSquare of this.coloredSquares) {
+                        //         coloredSquare.deconstruct();
+                        //     }
+                        // }
+                        // this.coloredSquares = [];
+                        // for (let point of currentOrder.data.path) {
+                        //     this.coloredSquares.push(new ColoredSquare({
+                        //         workruft: this.workruft,
+                        //         x: point.x,
+                        //         z: point.z,
+                        //         color: BlueColor
+                        //     }));
+                        // }
                     }
 
                     this.pathingTester.setEnds({
