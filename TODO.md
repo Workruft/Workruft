@@ -1,8 +1,12 @@
 # TODO
 
-- Fix any and all PathFinder bugs.
+- Improve heuristic?
 
-- Optimize cardinal paths to be linear wherever possible.
+  - Wall-hugging factor.
+
+  - Keep track of shortest path towards each point.
+
+- End-to-start path-finding as well?
 
 - Ensure that PathFinder cleans up every time an order is executed, finished, and/or replaced. See deconstruct() in
   pathing classes.
