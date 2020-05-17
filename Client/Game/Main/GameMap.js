@@ -193,12 +193,6 @@ class GameMap {
                         currentCell.rightTraversable =
                             this.getBackRightVertex({ cell: currentCell }).y == this.getBackLeftVertex({ cell: otherCell }).y &&
                             this.getFrontRightVertex({ cell: currentCell }).y == this.getFrontLeftVertex({ cell: otherCell }).y;
-                        if (!currentCell.rightTraversable) {
-                            currentCell.faces.top[0].color = RedColor;
-                            currentCell.faces.top[1].color = RedColor;
-                            currentCell.neighbors[Enums.CardinalDirections.right].faces.top[0].color = RedColor;
-                            currentCell.neighbors[Enums.CardinalDirections.right].faces.top[1].color = RedColor;
-                        }
                         this.updateFaces({
                             currentCell, otherCell,
                             direction: 'right',
@@ -214,12 +208,6 @@ class GameMap {
                         currentCell.frontTraversable =
                             this.getFrontRightVertex({ cell: currentCell }).y == this.getBackRightVertex({ cell: otherCell }).y &&
                             this.getFrontLeftVertex({ cell: currentCell }).y == this.getBackLeftVertex({ cell: otherCell }).y;
-                        if (!currentCell.frontTraversable) {
-                            currentCell.faces.top[0].color = RedColor;
-                            currentCell.faces.top[1].color = RedColor;
-                            currentCell.neighbors[Enums.CardinalDirections.front].faces.top[0].color = RedColor;
-                            currentCell.neighbors[Enums.CardinalDirections.front].faces.top[1].color = RedColor;
-                        }
                         this.updateFaces({
                             currentCell, otherCell,
                             direction: 'front',
