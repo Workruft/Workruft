@@ -1,15 +1,9 @@
 # TODO
 
-- Improve heuristic?
-
-  - Wall-hugging factor.
-
-  - Keep track of shortest path towards each point.
-
-- End-to-start path-finding as well?
-
 - Ensure that PathFinder cleans up every time an order is executed, finished, and/or replaced. See deconstruct() in
   pathing classes.
+
+- Level editor?
 
 - Buildings and other units need to be factored in.
 
@@ -41,5 +35,11 @@
 ```
 
 - More mouse and keyboard controls.
+
+- Improve path-finding
+
+  - Improve heuristic with wall-hugging factor. Relatively penalize path finding in open space.
+
+  - End-to-start path-finding as well?
 
 - TODO's in code.
