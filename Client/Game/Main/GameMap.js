@@ -181,6 +181,8 @@ class GameMap {
     //    3-----2
     //    Front
     updateCells({ lowX, lowZ, highX, highZ }) {
+        this.geometry.verticesNeedUpdate = true;
+
         let currentCell;
         //Go through each side within the bounds.
         for (let x = lowX; x < highX; x += CellSize) {

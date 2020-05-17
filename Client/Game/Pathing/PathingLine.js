@@ -8,11 +8,6 @@ class PathingLine {
         this.endX = endX;
         this.endZ = endZ;
         this.innerDirections = innerDirections;
-
-        // game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-        //     new THREE.Vector3(this.startX, 0.01, this.startZ),
-        //     new THREE.Vector3(this.endX, 0.01, this.endZ)
-        // ]), new THREE.LineBasicMaterial({ color: 'orange' })));
     }
 
     //TODO.

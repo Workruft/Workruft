@@ -1,5 +1,5 @@
 class ColoredSquare {
-    constructor({ workruft, x, z, color }) {
+    constructor({ workruft, x, z, color, opacity = 1.0 }) {
         this.workruft = workruft;
         let material;
         if (ColoredMeshPhongMaterialsMap.has(color)) {
@@ -7,6 +7,11 @@ class ColoredSquare {
         } else {
             material = new THREE.MeshPhongMaterial({ color });
             ColoredMeshPhongMaterialsMap.set(color, material);
+        }
+        if (opacity != 1.0) {
+            material = material.clone();
+            material.opacity = opacity;
+            material.transparent = true;
         }
         this.mesh = this.workruft.world.squareModel.createNewMeshWithMaterial({
             material
@@ -18,6 +23,9 @@ class ColoredSquare {
     }
 
     deconstruct() {
+        if (!ColoredMeshPhongMaterialsMap.has(this.mesh.material)) {
+            DisposeThreeObject(this.mesh.material);
+        }
         this.workruft.world.indicatorObjects.remove(this.mesh);
     }
 
@@ -26,8 +34,8 @@ class ColoredSquare {
     }
 
     set position({ x, z }) {
-        this.mesh.position.x = x + HalfCellSize;
-        this.mesh.position.z = z + HalfCellSize;
+        this.mesh.position.x = x;
+        this.mesh.position.z = z;
         this.autoSetHeight();
     }
 

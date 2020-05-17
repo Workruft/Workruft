@@ -23,13 +23,17 @@ class PathFinder {
             }));
         };
         //Back.
-        this.cardinalPathingTesters[0].setEnds({ startX: 0.0, startZ: 0.0, endX: 0.0, endZ: -1.0 });
+        this.cardinalPathingTesters[Enums.CardinalDirections.back].setEnds({
+            startX: 0.0, startZ: 0.0, endX: 0.0, endZ: -1.0 });
         //Right.
-        this.cardinalPathingTesters[1].setEnds({ startX: 0.0, startZ: 0.0, endX: 1.0, endZ: 0.0 });
+        this.cardinalPathingTesters[Enums.CardinalDirections.right].setEnds({
+            startX: 0.0, startZ: 0.0, endX: 1.0, endZ: 0.0 });
         //Front.
-        this.cardinalPathingTesters[2].setEnds({ startX: 0.0, startZ: 0.0, endX: 0.0, endZ: 1.0 });
+        this.cardinalPathingTesters[Enums.CardinalDirections.front].setEnds({
+            startX: 0.0, startZ: 0.0, endX: 0.0, endZ: 1.0 });
         //Left.
-        this.cardinalPathingTesters[3].setEnds({ startX: 0.0, startZ: 0.0, endX: -1.0, endZ: 0.0 });
+        this.cardinalPathingTesters[Enums.CardinalDirections.left].setEnds({
+            startX: 0.0, startZ: 0.0, endX: -1.0, endZ: 0.0 });
         for (let cardinalPathFinder of this.cardinalPathingTesters) {
             cardinalPathFinder.updateTraversalAngleAndOffsets();
         }
@@ -41,17 +45,21 @@ class PathFinder {
     }
 
     setStartPoint({ pointX, pointZ }) {
-        this.startX = AlignToCell(pointX - this.gameUnit.gameModel.cellAlignmentOffset) +
-            this.gameUnit.gameModel.cellAlignmentOffset;
-        this.startZ = AlignToCell(pointZ - this.gameUnit.gameModel.cellAlignmentOffset) +
-            this.gameUnit.gameModel.cellAlignmentOffset;
+        this.startX = FloorToCell(pointX);
+        this.startZ = FloorToCell(pointZ);
+        // this.startX = AlignToCell(pointX - this.gameUnit.gameModel.cellAlignmentOffset) +
+        //     this.gameUnit.gameModel.cellAlignmentOffset;
+        // this.startZ = AlignToCell(pointZ - this.gameUnit.gameModel.cellAlignmentOffset) +
+        //     this.gameUnit.gameModel.cellAlignmentOffset;
     }
 
     setEndPoint({ pointX, pointZ }) {
-        this.endX = AlignToCell(pointX - this.gameUnit.gameModel.cellAlignmentOffset) +
-            this.gameUnit.gameModel.cellAlignmentOffset;
-        this.endZ = AlignToCell(pointZ - this.gameUnit.gameModel.cellAlignmentOffset) +
-            this.gameUnit.gameModel.cellAlignmentOffset;
+        this.endX = FloorToCell(pointX);
+        this.endZ = FloorToCell(pointZ);
+        // this.endX = AlignToCell(pointX - this.gameUnit.gameModel.cellAlignmentOffset) +
+        //     this.gameUnit.gameModel.cellAlignmentOffset;
+        // this.endZ = AlignToCell(pointZ - this.gameUnit.gameModel.cellAlignmentOffset) +
+        //     this.gameUnit.gameModel.cellAlignmentOffset;
     }
 
     findBestPath({ range }) {
@@ -182,17 +190,21 @@ class PathFinder {
             CalculateScore({ point: newPoint });
             this.mappedPoints[newX][newZ] = newPoint;
             this.heapedPoints.push(newPoint);
+            this.gameUnit.coloredSquares.push(new ColoredSquare({
+                workruft: this.workruft,
+                x: newX - HalfCellSize,
+                z: newZ - HalfCellSize,
+                color: BlackColor,
+                opacity: 0.1
+            }));
         } else {
-            //Unpathable; map a dead point to prevent testing for it again.
-            let deadPoint = {
-                x: newX,
-                z: newZ,
-                score: Infinity,
-                distance: Infinity,
-                manhattanTraveled: fromPoint.manhattanTraveled + 1,
-                fromPoint
-            };
-            this.mappedPoints[newX][newZ] = deadPoint;
+            this.gameUnit.coloredSquares.push(new ColoredSquare({
+                workruft: this.workruft,
+                x: newX - HalfCellSize,
+                z: newZ - HalfCellSize,
+                color: RedColor,
+                opacity: 0.5
+            }));
         }
     }
 }

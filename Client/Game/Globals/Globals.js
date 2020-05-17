@@ -1,5 +1,6 @@
+
 let PathTestingLeniency = 0.2;
-let PathFindingGreediness = 1.5;
+let PathFindingGreediness = 2.0;
 let PathFindingMaxPoints = 5000;
 let PathFindingMaxPointsWithoutImprovement = 500;
 
@@ -29,8 +30,10 @@ let MaxCameraHeight = 500.0;
 
 let GrassColor = new THREE.Color('#0c4013');
 let DirtColor = new THREE.Color('#2b3c1f');
-let RedColor = new THREE.Color('red');
-let BlueColor = new THREE.Color('blue');
+let RedColor = new THREE.Color('#A02000');
+let BlueColor = new THREE.Color('#001080');
+let YellowColor = new THREE.Color('#FFFF00');
+let BlackColor = new THREE.Color('#000000');
 let ColoredMeshPhongMaterialsMap = new Map();
 
 let HalfPI = Math.PI * 0.5;

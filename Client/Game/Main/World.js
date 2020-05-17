@@ -116,7 +116,6 @@ class World {
             this.map.getFrontLeftVertex({ cell: this.map.getCell({ x: wholeRampXOffset, z: -15 }) }).y = rampIncline;
             this.map.getFrontRightVertex({ cell: this.map.getCell({ x: wholeRampXOffset, z: -15 }) }).y = rampIncline;
         }
-        this.map.geometry.verticesNeedUpdate = true;
         this.map.updateCells({ lowX: this.map.minX, lowZ: this.map.minZ, highX: this.map.maxX, highZ: this.map.maxZ });
         this.scene.add(this.map.mesh);
         //Game models.

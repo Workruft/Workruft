@@ -59,23 +59,24 @@ class GameUnit {
                     if (IsUndefined(currentOrder.data.path)) {
                         this.pathFinder.setStartPoint({ pointX: this.position.x, pointZ: this.position.z });
                         this.pathFinder.setEndPoint({ pointX: currentOrder.data.x, pointZ: currentOrder.data.z });
-                        currentOrder.data.path = this.pathFinder.findBestPath({ range: 0.1 });
                         if (IsDefined(this.coloredSquares)) {
                             for (let coloredSquare of this.coloredSquares) {
                                 coloredSquare.deconstruct();
                             }
                         }
                         this.coloredSquares = [];
+                        currentOrder.data.path = this.pathFinder.findBestPath({ range: 0.1 });
                         for (let point of currentOrder.data.path) {
-                            for (let xOffset = -this.gameModel.xzSize;
+                            for (let xOffset = -this.gameModel.halfXZSize;
                                 xOffset <= 0.0; xOffset += CellSize) {
-                                for (let zOffset = -this.gameModel.xzSize;
+                                for (let zOffset = -this.gameModel.halfXZSize;
                                     zOffset <= 0.0; zOffset += CellSize) {
                                     this.coloredSquares.push(new ColoredSquare({
                                         workruft: this.workruft,
-                                        x: point.x + xOffset,
-                                        z: point.z + zOffset,
-                                        color: BlueColor
+                                        x: point.x + xOffset + HalfCellSize,
+                                        z: point.z + zOffset + HalfCellSize,
+                                        color: BlueColor,
+                                        opacity: 0.5
                                     }));
                                 }
                             }
@@ -113,7 +114,7 @@ class GameUnit {
                     } else {
                         //Obstructed; stop before the obstruction.
                         let newLimitedDistance = Math.max(0.0, this.pathingTester.minPathable.distance -
-                            ThreeHalvesCellSize - this.gameModel.halfXZSize);
+                            CellSize - this.gameModel.halfXZSize);
                         //See if the unit can even move at all.
                         if (newLimitedDistance > 0.0) {
                             //The unit can move some, just not all the way up to its speed potential.
@@ -148,6 +149,10 @@ class GameUnit {
 
     addToGroup({ objectGroup }) {
         objectGroup.add(this.group);
+    }
+
+    removeFromGroup({ objectGroup }) {
+        objectGroup.remove(this.group);
     }
 
     select() {
