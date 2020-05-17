@@ -29,6 +29,7 @@ class Workruft {
     deconstruct() {
         this.world.deconstruct();
         this.network.deconstruct();
+        //TODO: Units! Here or in World.
     }
 
     onSetup() {

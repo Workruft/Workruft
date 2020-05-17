@@ -27,11 +27,10 @@ class GameUnit {
         });
     }
 
-    destroy() {
+    deconstruct() {
         this.deselect();
-        if (this.mesh != null) {
-            delete this.mesh;
-        }
+        delete this.pathFinder;
+        delete this.pathingTester;
     }
 
     issueReplacementOrder({ order }) {
@@ -61,30 +60,37 @@ class GameUnit {
                         this.pathFinder.setStartPoint({ pointX: this.position.x, pointZ: this.position.z });
                         this.pathFinder.setEndPoint({ pointX: currentOrder.data.x, pointZ: currentOrder.data.z });
                         currentOrder.data.path = this.pathFinder.findBestPath({ range: 0.1 });
-                        // if (IsDefined(this.coloredSquares)) {
-                        //     for (let coloredSquare of this.coloredSquares) {
-                        //         coloredSquare.deconstruct();
-                        //     }
-                        // }
-                        // this.coloredSquares = [];
-                        // for (let point of currentOrder.data.path) {
-                        //     this.coloredSquares.push(new ColoredSquare({
-                        //         workruft: this.workruft,
-                        //         x: point.x,
-                        //         z: point.z,
-                        //         color: BlueColor
-                        //     }));
-                        // }
+                        if (IsDefined(this.coloredSquares)) {
+                            for (let coloredSquare of this.coloredSquares) {
+                                coloredSquare.deconstruct();
+                            }
+                        }
+                        this.coloredSquares = [];
+                        for (let point of currentOrder.data.path) {
+                            for (let xOffset = -this.gameModel.xzSize;
+                                xOffset <= 0.0; xOffset += CellSize) {
+                                for (let zOffset = -this.gameModel.xzSize;
+                                    zOffset <= 0.0; zOffset += CellSize) {
+                                    this.coloredSquares.push(new ColoredSquare({
+                                        workruft: this.workruft,
+                                        x: point.x + xOffset,
+                                        z: point.z + zOffset,
+                                        color: BlueColor
+                                    }));
+                                }
+                            }
+                        }
                     }
 
+                    let currentPathPoint = currentOrder.data.path[currentOrder.data.path.length - 1];
                     this.pathingTester.setEnds({
                         startX: this.position.x,
                         startZ: this.position.z,
-                        endX: currentOrder.data.x,
-                        endZ: currentOrder.data.z
+                        endX: currentPathPoint.x,
+                        endZ: currentPathPoint.z
                     });
                     this.pathingTester.limitDistance({ maxDistance: this.private.speed * deltaTimeMS });
-                    this.pathingTester.updateTraversalAngle();
+                    this.pathingTester.updateTraversalAngleAndOffsets();
                     this.pathingTester.computePathingLines();
                     this.pathingTester.computeMinPathable();
 
@@ -95,9 +101,14 @@ class GameUnit {
                         this.position.z = this.pathingTester.endZ;
                         deltaTimeMS -= this.pathingTester.limitedDistance / this.private.speed;
                         //See if unit reached destination.
-                        if (this.position.x == currentOrder.data.x && this.position.z == currentOrder.data.z) {
-                            //Order complete.
-                            this.private.orders.splice(0, 1);
+                        if (this.position.x == currentPathPoint.x && this.position.z == currentPathPoint.z) {
+                            if (currentOrder.data.path.length > 1) {
+                                //Path point complete.
+                                currentOrder.data.path.splice(-1);
+                            } else {
+                                //Order complete.
+                                this.private.orders.splice(0, 1);
+                            }
                         }
                     } else {
                         //Obstructed; stop before the obstruction.

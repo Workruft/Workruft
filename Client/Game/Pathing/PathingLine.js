@@ -9,10 +9,15 @@ class PathingLine {
         this.endZ = endZ;
         this.innerDirections = innerDirections;
 
-        game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-            new THREE.Vector3(this.startX, 0.01, this.startZ),
-            new THREE.Vector3(this.endX, 0.01, this.endZ)
-        ]), new THREE.LineBasicMaterial({ color: 'orange' })));
+        // game.world.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+        //     new THREE.Vector3(this.startX, 0.01, this.startZ),
+        //     new THREE.Vector3(this.endX, 0.01, this.endZ)
+        // ]), new THREE.LineBasicMaterial({ color: 'orange' })));
+    }
+
+    //TODO.
+    deconstruct() {
+
     }
 
     //Starts at the first cell past the starting cell towards the end position if any.

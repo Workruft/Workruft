@@ -6,13 +6,16 @@ class PathingTester {
         this.gameModel = gameModel;
     }
 
+    //TODO.
+    deconstruct() {
+
+    }
+
     setEnds({ startX, startZ, endX, endZ }) {
         this.startX = startX;
         this.startZ = startZ;
         this.endX = endX;
         this.endZ = endZ;
-        this.unlimitedEndX = endX;
-        this.unlimitedEndZ = endZ;
         this.xDistance = this.endX - this.startX;
         this.zDistance = this.endZ - this.startZ;
     }
@@ -23,8 +26,6 @@ class PathingTester {
         this.manhattanDistance = Math.abs(this.xDistance) + Math.abs(this.zDistance);
         if (this.euclidianDistance < this.maxDistance) {
             //Closer to the destination than the maximum distance.
-            this.endX = this.unlimitedEndX;
-            this.endZ = this.unlimitedEndZ;
             this.limitedDistance = this.euclidianDistance;
         } else {
             //Travel at the maximum distance.
@@ -37,7 +38,7 @@ class PathingTester {
     }
 
     //Call once this.xDistance and this.zDistance are what they should be.
-    updateTraversalAngle() {
+    updateTraversalAngleAndOffsets() {
         let lastTraversalAngle = this.traversalAngle;
         this.traversalAngle = GenericRound(Math.atan2(-this.zDistance, this.xDistance));
         //Only compute offsets when traversalAngle changes (can have different ends but the same traversalAngle).
@@ -62,7 +63,7 @@ class PathingTester {
     //parallel to the slope of the unit's trajectory. The inner lines start at the front of the starting
     //circle and end at the back of the ending circle, evenly distributed according to the number of
     //extra pathing lines.
-    //Call once this.traversalAngle is what it should be.
+    //Call once the ends and this.traversalAngle are what they should be.
     computePathingLines() {
         this.pathingLines = new Set();
         for (let line of this.pathingLineOffsets.lines) {
@@ -95,6 +96,7 @@ class PathingTester {
             for (let pathingLine of this.pathingLines) {
                 currentDirection = pathingLine.testNextCell();
                 if (currentDirection == null) {
+                    //End of pathing line.
                     this.pathingLines.delete(pathingLine);
                     continue;
                 }
@@ -117,12 +119,6 @@ class PathingTester {
                     }
                 }
                 pathingLine.currentCell = pathingLine.currentCell.neighbors[currentDirection];
-                // new ColoredSquare({
-                //     workruft: game,
-                //     x: FloorToCell(pathingLine.currentCell.x),
-                //     z: FloorToCell(pathingLine.currentCell.z),
-                //     color: BlueColor
-                // });
                 if (!isCellTraversible) {
                     //Obstruction found!
                     pathingLine.currentDistance = CellClosestDistance({
@@ -140,5 +136,49 @@ class PathingTester {
                 }
             }
         } while (this.pathingLines.size > 0);
+    }
+
+    //Determine whether the unit can reach the destination at all.
+    computePathability() {
+        //Check every cell that each of the lines intersects with, to see whether all of the cells are pathable.
+        this.isPathable = true;
+        let currentDirection;
+        let isCellTraversible;
+        //Check one pathing line at a time, one cell at a time, in sync.
+        do {
+            for (let pathingLine of this.pathingLines) {
+                currentDirection = pathingLine.testNextCell();
+                if (currentDirection == null) {
+                    //End of pathing line.
+                    this.pathingLines.delete(pathingLine);
+                    continue;
+                }
+
+                //Test the traversal direction.
+                isCellTraversible = this.workruft.world.map.isTraversible({
+                    cell: pathingLine.currentCell,
+                    direction: currentDirection
+                });
+                if (isCellTraversible) {
+                    //Also test any inner directions.
+                    for (let innerDirection of pathingLine.innerDirections) {
+                        isCellTraversible = this.workruft.world.map.isTraversible({
+                            cell: pathingLine.currentCell,
+                            direction: innerDirection
+                        });
+                        if (!isCellTraversible) {
+                            break;
+                        }
+                    }
+                }
+                if (!isCellTraversible) {
+                    //Obstruction found!
+                    this.isPathable = false;
+                    break;
+                }
+                pathingLine.currentCell = pathingLine.currentCell.neighbors[currentDirection];
+            }
+        } while (this.isPathable && this.pathingLines.size > 0);
+        this.isPathable;
     }
 }

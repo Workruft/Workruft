@@ -1,4 +1,7 @@
 let PathTestingLeniency = 0.2;
+let PathFindingGreediness = 1.5;
+let PathFindingMaxPoints = 5000;
+let PathFindingMaxPointsWithoutImprovement = 500;
 
 let CellSize = 1.0;
 let HalfCellSize = CellSize * 0.5;

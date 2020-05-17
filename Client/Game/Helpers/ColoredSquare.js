@@ -36,10 +36,16 @@ class ColoredSquare {
     }
 
     autoSetHeight() {
-        let cellX = AlignToCell(this.mesh.position.x);
-        let cellZ = AlignToCell(this.mesh.position.z);
-        this.mesh.position.y = this.workruft.world.map.getAverageHeight({
-            cell: this.workruft.world.map.getCell({ x: cellX, z: cellZ })
-        }) + 0.01;
+        let maxHeight = 0.0;
+        for (let xOffset = -HalfCellSize; xOffset <= HalfCellSize; xOffset += CellSize) {
+            for (let zOffset = -HalfCellSize; zOffset <= HalfCellSize; zOffset += CellSize) {
+                let cellX = AlignToCell(this.mesh.position.x + xOffset);
+                let cellZ = AlignToCell(this.mesh.position.z + zOffset);
+                maxHeight = Math.max(maxHeight, this.workruft.world.map.getAverageHeight({
+                    cell: this.workruft.world.map.getCell({ x: cellX, z: cellZ })
+                }) + 0.01);
+            }
+        }
+        this.mesh.position.y = maxHeight;
     }
 }
