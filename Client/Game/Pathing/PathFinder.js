@@ -45,21 +45,21 @@ class PathFinder {
     }
 
     setStartPoint({ pointX, pointZ }) {
-        this.startX = FloorToCell(pointX);
-        this.startZ = FloorToCell(pointZ);
-        // this.startX = AlignToCell(pointX - this.gameUnit.gameModel.cellAlignmentOffset) +
-        //     this.gameUnit.gameModel.cellAlignmentOffset;
-        // this.startZ = AlignToCell(pointZ - this.gameUnit.gameModel.cellAlignmentOffset) +
-        //     this.gameUnit.gameModel.cellAlignmentOffset;
+        // this.startX = FloorToCell(pointX);
+        // this.startZ = FloorToCell(pointZ);
+        this.startX = AlignToCell(pointX - this.gameUnit.gameModel.cellAlignmentOffset) +
+            this.gameUnit.gameModel.cellAlignmentOffset;
+        this.startZ = AlignToCell(pointZ - this.gameUnit.gameModel.cellAlignmentOffset) +
+            this.gameUnit.gameModel.cellAlignmentOffset;
     }
 
     setEndPoint({ pointX, pointZ }) {
-        this.endX = FloorToCell(pointX);
-        this.endZ = FloorToCell(pointZ);
-        // this.endX = AlignToCell(pointX - this.gameUnit.gameModel.cellAlignmentOffset) +
-        //     this.gameUnit.gameModel.cellAlignmentOffset;
-        // this.endZ = AlignToCell(pointZ - this.gameUnit.gameModel.cellAlignmentOffset) +
-        //     this.gameUnit.gameModel.cellAlignmentOffset;
+        // this.endX = FloorToCell(pointX);
+        // this.endZ = FloorToCell(pointZ);
+        this.endX = AlignToCell(pointX - this.gameUnit.gameModel.cellAlignmentOffset) +
+            this.gameUnit.gameModel.cellAlignmentOffset;
+        this.endZ = AlignToCell(pointZ - this.gameUnit.gameModel.cellAlignmentOffset) +
+            this.gameUnit.gameModel.cellAlignmentOffset;
     }
 
     findBestPath({ range }) {
@@ -151,10 +151,13 @@ class PathFinder {
             currentPoint = closestPoint;
         }
         do {
-            solutionPath.push(currentPoint);
             if (currentPoint.fromPoint == null) {
+                if (solutionPath.length == 0) {
+                    solutionPath.push(currentPoint);
+                }
                 break;
             }
+            solutionPath.push(currentPoint);
             currentPoint = currentPoint.fromPoint;
         } while (true);
         return solutionPath;
