@@ -27,10 +27,9 @@ class GameUnit {
         });
     }
 
+    //Make sure to remove from any groups!
     deconstruct() {
         this.deselect();
-        delete this.pathFinder;
-        delete this.pathingTester;
     }
 
     issueReplacementOrder({ order }) {

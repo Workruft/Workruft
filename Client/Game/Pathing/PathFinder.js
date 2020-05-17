@@ -34,18 +34,13 @@ class PathFinder {
         //Left.
         this.cardinalPathingTesters[Enums.CardinalDirections.left].setEnds({
             startX: 0.0, startZ: 0.0, endX: -1.0, endZ: 0.0 });
-        for (let cardinalPathFinder of this.cardinalPathingTesters) {
-            cardinalPathFinder.updateTraversalAngleAndOffsets();
+        for (let cardinalPathingTester of this.cardinalPathingTesters) {
+            cardinalPathingTester.updateTraversalAngleAndOffsets();
         }
         this.linearOptimizationTester = new PathingTester({
             workruft: this.workruft,
             gameModel: this.gameUnit.gameModel
         });
-    }
-
-    //TODO.
-    deconstruct() {
-
     }
 
     setStartPoint({ pointX, pointZ }) {

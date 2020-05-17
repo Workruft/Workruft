@@ -6,11 +6,6 @@ class PathingTester {
         this.gameModel = gameModel;
     }
 
-    //TODO.
-    deconstruct() {
-
-    }
-
     setEnds({ startX, startZ, endX, endZ }) {
         this.startX = startX;
         this.startZ = startZ;

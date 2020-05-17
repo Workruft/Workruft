@@ -10,11 +10,6 @@ class PathingLine {
         this.innerDirections = innerDirections;
     }
 
-    //TODO.
-    deconstruct() {
-
-    }
-
     //Starts at the first cell past the starting cell towards the end position if any.
     //Every cell traveled is guaranteed to be in one of the 4 cardinal directions from
     //the previous cell (or null after already reached last cell).
