@@ -110,7 +110,7 @@ class PathingTester {
                     //Also test any inner directions.
                     for (let innerDirection of pathingLine.innerDirections) {
                         isCellTraversible = this.workruft.world.map.isTraversible({
-                            cell: pathingLine.currentCell,
+                            cell: pathingLine.currentCell.neighbors[currentDirection],
                             direction: innerDirection
                         });
                         if (!isCellTraversible) {
@@ -163,7 +163,7 @@ class PathingTester {
                     //Also test any inner directions.
                     for (let innerDirection of pathingLine.innerDirections) {
                         isCellTraversible = this.workruft.world.map.isTraversible({
-                            cell: pathingLine.currentCell,
+                            cell: pathingLine.currentCell.neighbors[currentDirection],
                             direction: innerDirection
                         });
                         if (!isCellTraversible) {
