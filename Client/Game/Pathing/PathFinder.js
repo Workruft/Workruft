@@ -196,7 +196,12 @@ class PathFinder {
             //X hasn't even been mapped yet.
             this.mappedPoints[newX] = {};
         } else if (IsDefined(this.mappedPoints[newX][newZ])) {
-            //X and Z have both already been mapped.
+            //X and Z have both already been mapped. Check for a lower travel distance coming from the current fromPoint
+            //than the already mapped point's fromPoint.
+            if (this.mappedPoints[newX][newZ].fromPoint != null &&
+                fromPoint.manhattanTraveled < this.mappedPoints[newX][newZ].fromPoint.manhattanTraveled) {
+                this.mappedPoints[newX][newZ].fromPoint = fromPoint;
+            }
             return;
         }
         //Either way now, X has been mapped, and Z has not.
