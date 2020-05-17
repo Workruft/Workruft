@@ -37,6 +37,10 @@ class PathFinder {
         for (let cardinalPathFinder of this.cardinalPathingTesters) {
             cardinalPathFinder.updateTraversalAngleAndOffsets();
         }
+        this.linearOptimizationTester = new PathingTester({
+            workruft: this.workruft,
+            gameModel: this.gameUnit.gameModel
+        });
     }
 
     //TODO.
@@ -80,7 +84,8 @@ class PathFinder {
             score: null,
             distance: Math.hypot(this.endX - this.startX, this.endZ - this.startZ),
             manhattanTraveled: 0,
-            fromPoint: null
+            fromPoint: null,
+            travelDirection: null
         };
         CalculateScore({ point: currentPoint });
         this.mappedPoints[currentPoint.x] = {
@@ -160,6 +165,27 @@ class PathFinder {
             solutionPath.push(currentPoint);
             currentPoint = currentPoint.fromPoint;
         } while (true);
+        for (let pointIndex = solutionPath.length - 2; pointIndex > 0; --pointIndex) {
+            //Same-direction optimization.
+            if (solutionPath[pointIndex - 1].travelDirection == solutionPath[pointIndex].travelDirection) {
+                solutionPath.splice(pointIndex, 1);
+            }
+        }
+        for (let pointIndex = solutionPath.length - 1; pointIndex > 1; --pointIndex) {
+            //Linear optimization.
+            this.linearOptimizationTester.setEnds({
+                startX: solutionPath[pointIndex].x,
+                startZ: solutionPath[pointIndex].z,
+                endX: solutionPath[pointIndex - 2].x,
+                endZ: solutionPath[pointIndex - 2].z
+            });
+            this.linearOptimizationTester.updateTraversalAngleAndOffsets();
+            this.linearOptimizationTester.computePathingLines();
+            this.linearOptimizationTester.computePathability();
+            if (this.linearOptimizationTester.isPathable) {
+                solutionPath.splice(pointIndex - 1, 1);
+            }
+        }
         return solutionPath;
     }
 
@@ -188,7 +214,8 @@ class PathFinder {
                 score: null,
                 distance: Math.hypot(this.endX - newX, this.endZ - newZ),
                 manhattanTraveled: fromPoint.manhattanTraveled + 1,
-                fromPoint
+                fromPoint,
+                travelDirection
             };
             CalculateScore({ point: newPoint });
             this.mappedPoints[newX][newZ] = newPoint;

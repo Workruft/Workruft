@@ -1,4 +1,3 @@
-
 let PathTestingLeniency = 0.2;
 let PathFindingGreediness = 2.0;
 let PathFindingMaxPoints = 5000;
