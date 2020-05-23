@@ -1,9 +1,10 @@
-// Have a Set that keeps track of keys currently down; then just iterate through that here
 class InputHandler {
-    constructor({ workruft }) {
+    constructor({ workruft, inputBindings }) {
         this.workruft = workruft;
+        this.inputBindings = inputBindings;
 
         this.keysDown = new Set();
+        this.mouseButtonsDown = new Set();
 
         //Disable right click.
         document.addEventListener('contextmenu', function(event) {
@@ -24,17 +25,15 @@ class InputHandler {
         this.keysDown.add(event.key);
         if (!event.repeat) {
             switch (event.key) {
-                case 'Enter':
-                    if (this.workruft.chat.toggleChatEntryBox()) {
-
-                    } else {
-
-                    }
+                case this.inputBindings.ToggleChat: {
+                    this.workruft.chat.toggleChatEntry();
                     break;
-                case 'Escape':
+                }
+                case this.inputBindings.CancelChat: {
                     this.workruft.chat.cancelChatEntry();
                     break;
-                case 'F5':
+                }
+                case 'F5': {
                     if (event.ctrlKey) {
                         //For Ctrl+F5, force a full page reload.
                         DestroyAll();
@@ -44,6 +43,22 @@ class InputHandler {
                         event.preventDefault();
                     }
                     break;
+                }
+            }
+
+            if (!this.workruft.chat.isChatting) {
+                switch (event.key) {
+                    case this.inputBindings.RotateCameraClockwise: {
+                        //TODO: Screws with camera movement; also, repositioning will need to handle zoom.
+                        // this.workruft.world.camera.rotation.z -= HalfPI;
+                        break;
+                    }
+                    case this.inputBindings.RotateCameraCounterclockwise: {
+                        //TODO: Screws with camera movement; also, repositioning will need to handle zoom.
+                        // this.workruft.world.camera.rotation.z += HalfPI;
+                        break;
+                    }
+                }
             }
         }
     }
@@ -55,9 +70,9 @@ class InputHandler {
     }
 
     onMouseDown(event) {
+        this.mouseButtonsDown.add(event.button);
         switch (event.button) {
-            case 0:
-            {
+            case this.inputBindings.SelectUnitButton: {
                 //Left click.
                 let pickedObjectArray = this.workruft.world.pickObjects([ this.workruft.world.playerObjects ],
                     this.workruft.world.getNormalizedCanvasMouse(event));
@@ -76,8 +91,7 @@ class InputHandler {
                 }
                 break;
             }
-            case 1:
-            {
+            case this.inputBindings.MiscellaneousButton: {
                 //Middle click.
                 let pickedMapObjectArray = this.workruft.world.pickMap(
                     this.workruft.world.getNormalizedCanvasMouse(event));
@@ -89,8 +103,7 @@ class InputHandler {
                 }
                 break;
             }
-            case 2:
-            {
+            case this.inputBindings.OrderUnitButton: {
                 //Right click.
                 let pickedMapObjectArray = this.workruft.world.pickMap(
                     this.workruft.world.getNormalizedCanvasMouse(event));
@@ -125,18 +138,17 @@ class InputHandler {
     }
 
     onMouseUp(event) {
-
+        this.mouseButtonsDown.delete(event.button);
     }
 
     onWheel(event) {
-        //Negative is up/forward/in.
         let scrollDirection = Math.sign(event.deltaY);
         if (scrollDirection < 0) {
-            //Up/forward/in.
+            //Negative scroll: up/forward/in.
             this.workruft.world.camera.position.y = Math.max(MinCameraHeight,
                 this.workruft.world.camera.position.y * (10.0 / 11.0));
         } else if (scrollDirection > 0) {
-            //Down/backward/out.
+            //Positive scroll: down/backward/out.
             this.workruft.world.camera.position.y = Math.min(MaxCameraHeight,
                 this.workruft.world.camera.position.y * 1.1);
         }

@@ -27,7 +27,7 @@ class Chat {
         this.chatBox.prepend(chatPre);
     }
 
-    toggleChatEntryBox() {
+    toggleChatEntry() {
         if (this.isChatting) {
             //Stop chatting.
             if (this.chatEntryBox.value.length > 0) {

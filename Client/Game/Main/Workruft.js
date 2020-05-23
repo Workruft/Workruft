@@ -2,7 +2,8 @@ class Workruft {
     constructor() {
         this.gameState = Enums.GameStates.Playing;
 
-        this.inputHandler = new InputHandler({ workruft: this });
+        this.inputBindings = new InputBindings();
+        this.inputHandler = new InputHandler({ workruft: this, inputBindings: this.inputBindings });
 
         this.chat = new Chat(this.onChatEntry.bind(this));
         this.network = new Network(this.chat);
@@ -50,23 +51,17 @@ class Workruft {
 
         if (!this.chat.isChatting) {
             let cameraMoveAmount = Math.tan(Math.PI * 0.01) * this.world.camera.position.y;
-            if (this.inputHandler.keysDown.has('w')) {
+            if (this.inputHandler.keysDown.has(this.inputBindings.MoveCameraUp)) {
                 this.world.camera.position.z -= cameraMoveAmount;
             }
-            if (this.inputHandler.keysDown.has('s')) {
+            if (this.inputHandler.keysDown.has(this.inputBindings.MoveCameraDown)) {
                 this.world.camera.position.z += cameraMoveAmount;
             }
-            if (this.inputHandler.keysDown.has('a')) {
+            if (this.inputHandler.keysDown.has(this.inputBindings.MoveCameraLeft)) {
                 this.world.camera.position.x -= cameraMoveAmount;
             }
-            if (this.inputHandler.keysDown.has('d')) {
+            if (this.inputHandler.keysDown.has(this.inputBindings.MoveCameraRight)) {
                 this.world.camera.position.x += cameraMoveAmount;
-            }
-            if (this.inputHandler.keysDown.has('q')) {
-                //this.world.camera.rotation.z += 0.01;
-            }
-            if (this.inputHandler.keysDown.has('e')) {
-                //this.world.camera.rotation.z -= 0.01;
             }
         }
     }
