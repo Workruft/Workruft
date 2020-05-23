@@ -6,29 +6,15 @@ class Workruft {
         this.inputHandler = new InputHandler({ workruft: this, inputBindings: this.inputBindings });
 
         this.chat = new Chat(this.onChatEntry.bind(this));
-        this.network = new Network(this.chat);
+        this.chat.print({ message: 'Workruft!' });
+        this.chat.print({ message: 'Press \'m\' to toggle map editing mode.' });
         this.world = new World(this.chat, this.onUpdate.bind(this));
-    }
-
-    deconstruct() {
-        this.world.deconstruct();
-        this.network.deconstruct();
-        //TODO: Units! Here or in World.
-    }
-
-    start() {
-        this.onSetup();
-
-        //Hand over control.
-        this.world.graphicsLoop();
-    }
-
-    onSetup() {
-        this.selectedObjects = new Set();
-        this.objectsToUpdate = new Set();
-
         this.world.camera.position.set(0, 75, 10);
         this.world.camera.lookAt(0, 0, this.world.camera.position.z - 10);
+        this.world.graphicsLoop();
+        this.network = new Network(this.chat);
+
+        this.objectsToUpdate = new Set();
 
         //Game units etc.
         this.playerUnit = new GameUnit({
@@ -41,6 +27,14 @@ class Workruft {
         this.playerUnit.addToGroup({ objectGroup: this.world.playerObjects });
 
         //this.network.connect();
+
+        setInterval(this.onUpdate.bind(this), 30);
+    }
+
+    deconstruct() {
+        this.world.deconstruct();
+        this.network.deconstruct();
+        //TODO: Units! Here or in World.
     }
 
     onUpdate() {

@@ -162,14 +162,14 @@ class GameUnit {
             this.private.selectionCircle.position.y = HalfCellSize;
             this.private.selectionCircle.rotation.x = -HalfPI;
             this.group.add(this.private.selectionCircle);
-            this.workruft.selectedObjects.add(this);
+            this.workruft.world.selectedObjects.add(this);
             this.isSelected = true;
         }
     }
 
     deselect() {
         if (this.isSelected) {
-            this.workruft.selectedObjects.delete(this);
+            this.workruft.world.selectedObjects.delete(this);
             DisposeThreeObject(this.private.selectionCircle);
             delete this.private.selectionCircle;
             this.isSelected = false;

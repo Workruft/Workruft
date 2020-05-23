@@ -39,7 +39,7 @@ let HalfPI = Math.PI * 0.5;
 
 Enums.create({
     name: 'GameStates',
-    items: [ 'Playing', 'LevelEditing' ]
+    items: [ 'Playing', 'MapEditing' ]
 });
 
 // Store all of the HTML DOM elements in the body of the page as an HTMLCollection.

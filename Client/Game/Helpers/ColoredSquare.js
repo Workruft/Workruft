@@ -44,9 +44,9 @@ class ColoredSquare {
     }
 
     autoSetHeight() {
-        let maxHeight = 0.0;
-        for (let xOffset = -HalfCellSize; xOffset <= HalfCellSize; xOffset += CellSize) {
-            for (let zOffset = -HalfCellSize; zOffset <= HalfCellSize; zOffset += CellSize) {
+        let maxHeight = -Infinity;
+        for (let xOffset = -HalfCellSize; xOffset < HalfCellSize; xOffset += CellSize) {
+            for (let zOffset = -HalfCellSize; zOffset < HalfCellSize; zOffset += CellSize) {
                 let cellX = AlignToCell(this.mesh.position.x + xOffset);
                 let cellZ = AlignToCell(this.mesh.position.z + zOffset);
                 maxHeight = Math.max(maxHeight, this.workruft.world.map.getAverageHeight({

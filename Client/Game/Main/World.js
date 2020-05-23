@@ -4,9 +4,8 @@
 //  +Z    \/-Y
 
 class World {
-    constructor(chat, onUpdate) {
+    constructor(chat) {
         this.chat = chat;
-        this.onUpdate = onUpdate;
         this.boundGraphicsLoop = this.graphicsLoop.bind(this);
 
         //WebGL.
@@ -19,6 +18,7 @@ class World {
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.selectionCircleModelsMap = new Map();
+        this.selectedObjects = new Set();
         this.onResize();
         window.addEventListener('resize', this.onResize.bind(this));
 
@@ -65,24 +65,8 @@ class World {
 
         //Action.
         //Map.
-        this.map = new GameMap(150, 150);
+        this.map = new GameMap(250, 250);
         let currentCell;
-        //Border wall.
-        let addBorder = function(currentCell) {
-            this.map.setCellFlatHeight({ cell: currentCell, height: 1.0 });
-        }.bind(this);
-        for (let x = this.map.minX; x <= this.map.maxX; x += CellSize) {
-            addBorder(this.map.getCell({ x, z: this.map.minZ }));
-            addBorder(this.map.getCell({ x, z: this.map.minZ + 1 }));
-            addBorder(this.map.getCell({ x, z: this.map.maxZ - 1 }));
-            addBorder(this.map.getCell({ x, z: this.map.maxZ }));
-        }
-        for (let z = this.map.minZ; z <= this.map.maxZ; z += CellSize) {
-            addBorder(this.map.getCell({ x: this.map.minX, z }));
-            addBorder(this.map.getCell({ x: this.map.minX + 1, z }));
-            addBorder(this.map.getCell({ x: this.map.maxX - 1, z }));
-            addBorder(this.map.getCell({ x: this.map.maxX, z }));
-        }
         //Rampsnstuff.
         let rampIncline = 0.5;
         for (let wholeRampXOffset = -8; wholeRampXOffset <= 8; wholeRampXOffset += 4) {
@@ -141,7 +125,8 @@ class World {
 
         //Geometries, materials, textures, render targets, scenes, and anything else with dispose().
 
-        for (let selectionCircleModel of this.selectionCircleModelsMap.keys()) {
+        this.deselectAll();
+        for (let selectionCircleModel of this.selectionCircleModelsMap.values()) {
             selectionCircleModel.deconstruct();
         }
         this.selectionCircleModelsMap.clear();
@@ -164,8 +149,8 @@ class World {
 
     //Make sure to update deconstruct!
     setupResizeGameModels() {
-        //TODO: Really all selection circles will have to be recreated, and/or all objects deselected, here.
-        for (let selectionCircleModel of this.selectionCircleModelsMap.keys()) {
+        this.deselectAll();
+        for (let selectionCircleModel of this.selectionCircleModelsMap.values()) {
             selectionCircleModel.deconstruct();
         }
         this.selectionCircleModelsMap.clear();
@@ -226,8 +211,14 @@ class World {
             return;
         }
         this.renderer.render(this.scene, this.camera);
-        this.onUpdate();
         requestAnimationFrame(this.boundGraphicsLoop);
+    }
+
+    deselectAll() {
+        for (let selectedObject of this.selectedObjects) {
+            selectedObject.deselect();
+        }
+        this.selectedObjects.clear();
     }
 
     //Object groups must be an array.
@@ -239,6 +230,7 @@ class World {
     }
     pickMap(mousePositionVector) {
         this.mapRaycaster.setFromCamera(mousePositionVector, this.camera);
+        //TODO: If this yields nothing, use this.mapRaycaster.ray.intersectPlane() and bound the point to the map.
         return this.mapRaycaster.intersectObjects([ this.map.mesh ], true);
     }
     //From the docs: {

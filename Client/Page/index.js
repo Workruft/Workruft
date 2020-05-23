@@ -1,8 +1,9 @@
-let game = new Workruft();
 document.addEventListener('beforeunload', DestroyAll);
+window.game = new Workruft();
 function DestroyAll() {
-    game.deconstruct();
-    DeconstructPrimitives();
-    delete game;
+    if (window.game != null) {
+        window.game.deconstruct();
+        DeconstructPrimitives();
+        delete window.game;
+    }
 }
-game.start();

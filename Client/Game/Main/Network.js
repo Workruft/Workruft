@@ -1,7 +1,6 @@
 class Network {
     constructor(chat) {
         this.chat = chat;
-        this.chat.print({ message: 'Workruft!' });
     }
 
     connect() {

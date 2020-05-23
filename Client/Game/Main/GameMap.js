@@ -97,7 +97,11 @@ class GameMap {
 
         this.mesh = new THREE.Mesh(
             this.geometry,
-            new THREE.MeshPhongMaterial({ vertexColors: THREE.FaceColors, side: THREE.DoubleSide }));
+            new THREE.MeshPhongMaterial({
+                vertexColors: THREE.FaceColors,
+                side: THREE.DoubleSide,
+                shininess: 5
+            }));
         this.mesh.receiveShadow = true;
     }
 
@@ -130,6 +134,13 @@ class GameMap {
         return this.geometry.vertices[cell.vio + 3];
     }
 
+    addHeightToCell({ cell, height }) {
+        this.geometry.vertices[cell.vio].y += height;
+        this.geometry.vertices[cell.vio + 1].y += height;
+        this.geometry.vertices[cell.vio + 2].y += height;
+        this.geometry.vertices[cell.vio + 3].y += height;
+    }
+
     setCellFlatHeight({ cell, height }) {
         this.geometry.vertices[cell.vio].y = height;
         this.geometry.vertices[cell.vio + 1].y = height;
@@ -137,6 +148,7 @@ class GameMap {
         this.geometry.vertices[cell.vio + 3].y = height;
     }
 
+    //Remember to call updateCells()!
     getAverageHeight({ cell }) {
         return (this.geometry.vertices[cell.vio].y +
             this.geometry.vertices[cell.vio + 1].y +
@@ -188,8 +200,6 @@ class GameMap {
     //    3-----2
     //    Front
     updateCells({ lowX, lowZ, highX, highZ }) {
-        this.geometry.verticesNeedUpdate = true;
-
         let currentCell;
         //Go through each side within the bounds.
         for (let x = lowX; x < highX; x += CellSize) {
@@ -228,7 +238,9 @@ class GameMap {
             }
         }
 
-        //For lighting.
+        //TODO: This is extraordinarily slow! Update individually as needed!
+        this.geometry.verticesNeedUpdate = true;
+        this.geometry.elementsNeedUpdate = true;
         this.geometry.computeFaceNormals();
     }
 

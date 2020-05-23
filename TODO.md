@@ -1,5 +1,7 @@
 # TODO
 
+- Facade class to clean up overlapping responsibilities between Workruft and other classes?
+
 - Level editor?
 
 - Buildings and other units need to be factored in.

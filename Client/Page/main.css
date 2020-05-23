@@ -48,3 +48,17 @@ canvas {
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.5);
 }
+
+#statusBox {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    width: calc(50%);
+    bottom: 5px;
+    right: 4px;
+    text-align: right;
+    font-family: Montserrat, Open Sans, Verdana;
+    font-size: 16px;
+    background-color: transparent;
+    color: white;
+}
