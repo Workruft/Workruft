@@ -130,6 +130,13 @@ class GameMap {
         return this.geometry.vertices[cell.vio + 3];
     }
 
+    setCellFlatHeight({ cell, height }) {
+        this.geometry.vertices[cell.vio].y = height;
+        this.geometry.vertices[cell.vio + 1].y = height;
+        this.geometry.vertices[cell.vio + 2].y = height;
+        this.geometry.vertices[cell.vio + 3].y = height;
+    }
+
     getAverageHeight({ cell }) {
         return (this.geometry.vertices[cell.vio].y +
             this.geometry.vertices[cell.vio + 1].y +

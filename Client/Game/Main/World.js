@@ -69,10 +69,7 @@ class World {
         let currentCell;
         //Border wall.
         let addBorder = function(currentCell) {
-            this.map.getBackLeftVertex({ cell: currentCell }).y = 1.0;
-            this.map.getBackRightVertex({ cell: currentCell }).y = 1.0;
-            this.map.getFrontRightVertex({ cell: currentCell }).y = 1.0;
-            this.map.getFrontLeftVertex({ cell: currentCell }).y = 1.0;
+            this.map.setCellFlatHeight({ cell: currentCell, height: 1.0 });
         }.bind(this);
         for (let x = this.map.minX; x <= this.map.maxX; x += CellSize) {
             addBorder(this.map.getCell({ x, z: this.map.minZ }));
