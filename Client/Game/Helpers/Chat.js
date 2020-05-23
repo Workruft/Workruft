@@ -1,6 +1,7 @@
 class Chat {
     constructor(onChatEntry) {
         this.onChatEntry = onChatEntry;
+        this.isChatting = false;
 
         this.chatBox = HTML.chatBox;
         while (this.chatBox.firstChild) {
@@ -8,7 +9,9 @@ class Chat {
         }
         this.chatEntryBox = HTML.chatEntryBox;
         this.chatEntryBox.value = '';
-        this.chatEntryBox.addEventListener('focusout', this.onChatEntryFocusOut.bind(this));
+        this.chatEntryBox.addEventListener('focusout', function() {
+            this.cancelChatEntry();
+        }.bind(this));
     }
 
     clear() {
@@ -24,34 +27,25 @@ class Chat {
         this.chatBox.prepend(chatPre);
     }
 
-    isChatEntryBoxOpen() {
-        return this.chatEntryBox.style.display != 'none';
-    }
-
     toggleChatEntryBox() {
-        if (this.isChatEntryBoxOpen()) {
+        if (this.isChatting) {
+            //Stop chatting.
             if (this.chatEntryBox.value.length > 0) {
+                //If text was entered, handle chat entry.
                 this.onChatEntry(this.chatEntryBox.value);
             }
-            this.hideChatEntryBox();
+            this.cancelChatEntry();
         } else {
+            //Start chatting.
             this.chatEntryBox.style.display = 'block';
             this.chatEntryBox.focus();
+            this.isChatting = true;
         }
     }
 
-    hideChatEntryBox() {
+    cancelChatEntry() {
         this.chatEntryBox.style.display = 'none';
         this.chatEntryBox.value = '';
-    }
-
-    focusChatEntryBoxIfOpen() {
-        if (this.isChatEntryBoxOpen()) {
-            this.chatEntryBox.focus();
-        }
-    }
-
-    onChatEntryFocusOut() {
-        this.hideChatEntryBox();
+        this.isChatting = false;
     }
 }

@@ -261,4 +261,11 @@ class World {
     //intersections of the ray passing through the back of a face will not be detected.
     //To raycast against both faces of an object,
     //you'll want to set the material's side property to THREE.DoubleSide.
+
+    getNormalizedCanvasMouse(event) {
+        let canvasRect = this.canvas.getBoundingClientRect();
+        let normalizedX = (event.clientX - canvasRect.left) / canvasRect.width * 2.0 - 1.0;
+        let normalizedY = (event.clientY - canvasRect.top) / canvasRect.height * -2.0 + 1.0;
+        return { x: normalizedX, y: normalizedY };
+    }
 }

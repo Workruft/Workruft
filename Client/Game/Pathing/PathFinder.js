@@ -166,7 +166,7 @@ class PathFinder {
                 solutionPath.splice(pointIndex, 1);
             }
         }
-        for (let pointIndex = solutionPath.length - 1; pointIndex > 1; --pointIndex) {
+        for (let pointIndex = solutionPath.length - 1; pointIndex >= 2; --pointIndex) {
             //Linear optimization.
             this.linearOptimizationTester.setEnds({
                 startX: solutionPath[pointIndex].x,

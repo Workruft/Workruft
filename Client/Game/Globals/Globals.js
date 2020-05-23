@@ -37,6 +37,11 @@ let ColoredMeshPhongMaterialsMap = new Map();
 
 let HalfPI = Math.PI * 0.5;
 
+Enums.create({
+    name: 'GameStates',
+    items: [ 'Playing', 'LevelEditing' ]
+});
+
 // Store all of the HTML DOM elements in the body of the page as an HTMLCollection.
 // Any element with an ID can now simply be accessed by HTML.theID or HTML['theID'].
 // This HTMLCollection can also be iterated through, via.: for (... of ...) { }.

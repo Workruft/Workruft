@@ -1,8 +1,5 @@
 # TODO
 
-- Ensure that PathFinder cleans up every time an order is executed, finished, and/or replaced. See deconstruct() in
-  pathing classes.
-
 - Level editor?
 
 - Buildings and other units need to be factored in.
