@@ -12,7 +12,7 @@ class World {
         this.canvas = HTML.gameCanvas;
         this.renderer = new THREE.WebGLRenderer({
             canvas: this.canvas,
-            // antialias: true,
+            antialias: true,
             powerPreference: 'high-performance'
         });
         this.effectComposer = new EffectComposer(this.renderer);

@@ -1,10 +1,6 @@
 # TODO
 
-- Canvas texturesss!
-
-- Facade class to clean up overlapping responsibilities between Workruft and other classes?
-
-- Level editor?
+- Map editor
 
 - Buildings and other units need to be factored in.
 

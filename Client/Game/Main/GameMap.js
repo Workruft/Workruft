@@ -22,12 +22,6 @@ class GameMap {
         this.topGeometry = new THREE.Geometry();
         this.sideGeometry = new THREE.Geometry();
 
-        //Create border cell placeholder.
-        this.borderCell = {
-            rightTraversable: false,
-            frontTraversable: false
-        };
-
         //Vertex Index Offset.
         let vio;
         for (let x = this.minX; x <= this.maxX; x += CellSize) {
@@ -48,10 +42,10 @@ class GameMap {
                         front: []
                     },
                     neighbors: {
-                        [Enums.CardinalDirections.back]: this.borderCell,
-                        [Enums.CardinalDirections.right]: this.borderCell,
-                        [Enums.CardinalDirections.front]: this.borderCell,
-                        [Enums.CardinalDirections.left]: this.borderCell
+                        [Enums.CardinalDirections.back]: null,
+                        [Enums.CardinalDirections.right]: null,
+                        [Enums.CardinalDirections.front]: null,
+                        [Enums.CardinalDirections.left]: null
                     },
                     rightTraversable: x != this.maxX,
                     frontTraversable: z != this.maxZ
@@ -235,11 +229,19 @@ class GameMap {
     }
 
     isRightTraversable({ cell }) {
-        return cell.rightTraversable;
+        if (cell == null) {
+            return false;
+        } else {
+            return cell.rightTraversable;
+        }
     }
 
     isFrontTraversable({ cell }) {
-        return cell.frontTraversable;
+        if (cell == null) {
+            return false;
+        } else {
+            return cell.frontTraversable;
+        }
     }
 
     isLeftTraversable({ cell }) {
@@ -258,12 +260,27 @@ class GameMap {
         let currentCell;
         //Go through each side within the bounds.
         for (let x = lowX; x < highX; x += CellSize) {
+            if (x < this.minX) {
+                continue;
+            }
+            if (x > this.maxX) {
+                continue;
+            }
             for (let z = lowZ; z < highZ; z += CellSize) {
+                if (z < this.minZ) {
+                    continue;
+                }
+                if (z > this.maxZ) {
+                    continue;
+                }
                 currentCell = this.getCell({ x, z });
+                if (currentCell == null) {
+                    continue;
+                }
                 //Right.
                 if (x < highX) {
                     let otherCell = currentCell.neighbors[Enums.CardinalDirections.right];
-                    if (IsDefined(otherCell)) {
+                    if (otherCell != null) {
                         currentCell.rightTraversable =
                             this.getBackRightHeight({ cell: currentCell }) == this.getBackLeftHeight({ cell: otherCell }) &&
                             this.getFrontRightHeight({ cell: currentCell }) == this.getFrontLeftHeight({ cell: otherCell });
@@ -278,7 +295,7 @@ class GameMap {
                 //Front.
                 if (z < highZ) {
                     let otherCell = currentCell.neighbors[Enums.CardinalDirections.front];
-                    if (IsDefined(otherCell)) {
+                    if (otherCell != null) {
                         currentCell.frontTraversable =
                             this.getFrontRightHeight({ cell: currentCell }) == this.getBackRightHeight({ cell: otherCell }) &&
                             this.getFrontLeftHeight({ cell: currentCell }) == this.getBackLeftHeight({ cell: otherCell });
@@ -308,6 +325,9 @@ class GameMap {
                     continue;
                 }
                 currentCell = this.getCell({ x, z });
+                if (currentCell == null) {
+                    continue;
+                }
                 currentCell.faces.top[0].materialIndex =
                     (this.isBackTraversable({ cell: currentCell }) ? 0 : 4) |
                     (this.isRightTraversable({ cell: currentCell }) ? 0 : 2) |

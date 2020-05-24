@@ -6,6 +6,8 @@ class InputHandler {
         this.keysDown = new Set();
         this.mouseButtonsDown = new Set();
 
+        this.editingSize = 2;
+
         //Disable right click.
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
@@ -56,6 +58,7 @@ class InputHandler {
                         } else if (this.workruft.gameState == Enums.GameStates.MapEditing) {
                             HTML.statusBox.innerHTML = '';
                             this.workruft.gameState = Enums.GameStates.Playing;
+                            this.clearEditorSquares();
                         }
                         break;
                     }
@@ -96,7 +99,6 @@ class InputHandler {
             case Enums.GameStates.Playing: {
                 switch (event.button) {
                     case this.inputBindings.SelectUnitButton: {
-                        //Left click.
                         let pickedObjectArray = this.workruft.world.pickObjects([ this.workruft.world.playerObjects ],
                             this.workruft.world.getNormalizedCanvasMouse(event));
                         if (pickedObjectArray.length > 0) {
@@ -115,7 +117,6 @@ class InputHandler {
                         break;
                     }
                     case this.inputBindings.MiscellaneousButton: {
-                        //Middle click.
                         let pickedMapObjectArray = this.workruft.world.pickMap(
                             this.workruft.world.getNormalizedCanvasMouse(event));
                         if (pickedMapObjectArray.length > 0) {
@@ -127,7 +128,6 @@ class InputHandler {
                         break;
                     }
                     case this.inputBindings.OrderUnitButton: {
-                        //Right click.
                         let pickedMapObjectArray = this.workruft.world.pickMap(
                             this.workruft.world.getNormalizedCanvasMouse(event));
                         if (pickedMapObjectArray.length > 0) {
@@ -135,7 +135,7 @@ class InputHandler {
                             let cellX = FloorToCell(clickCoordinates.x);
                             let cellZ = FloorToCell(clickCoordinates.z);
                             let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
-                            if (IsDefined(clickedCell)) {
+                            if (clickedCell != null) {
                                 for (let selectedObject of this.workruft.world.selectedObjects) {
                                     let newOrderObject = {
                                         order: new Order({
@@ -158,8 +158,8 @@ class InputHandler {
             } //case Enums.GameStates.Playing
             case Enums.GameStates.MapEditing: {
                 switch (event.button) {
-                    case this.inputBindings.SelectUnitButton: {
-                        //Left click.
+                    case this.inputBindings.RaiseTerrainButton:
+                    case this.inputBindings.LowerTerrainButton: {
                         let pickedMapObjectArray = this.workruft.world.pickMap(
                             this.workruft.world.getNormalizedCanvasMouse(event));
                         if (pickedMapObjectArray.length > 0) {
@@ -167,11 +167,33 @@ class InputHandler {
                             let cellX = FloorToCell(clickCoordinates.x);
                             let cellZ = FloorToCell(clickCoordinates.z);
                             let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
-                            if (IsDefined(clickedCell)) {
-                                this.workruft.world.map.addHeightToCell({ cell: clickedCell, height: CellSize });
+                            if (clickedCell != null) {
+                                let raiseLowerOffset =
+                                    (event.button == this.inputBindings.RaiseTerrainButton ? CellSize : -CellSize);
+                                let halfEditingSize = this.editingSize * 0.5;
+                                let floorHalfEditingSize = FloorToCell(halfEditingSize);
+                                let ceilHalfEditingSize = CeilToCell(halfEditingSize);
+                                for (let xOffset = -floorHalfEditingSize;
+                                    xOffset < ceilHalfEditingSize; xOffset += CellSize) {
+                                    for (let zOffset = -floorHalfEditingSize;
+                                        zOffset < ceilHalfEditingSize; zOffset += CellSize) {
+                                        let currentCell = this.workruft.world.map.getCell({
+                                            x: cellX + xOffset,
+                                            z: cellZ + zOffset
+                                        });
+                                        if (currentCell != null) {
+                                            this.workruft.world.map.addHeightToCell({
+                                                cell: currentCell,
+                                                height: raiseLowerOffset
+                                            });
+                                        }
+                                    }
+                                }
                                 this.workruft.world.map.updateCells({
-                                    lowX: cellX - CellSize, lowZ: cellZ - CellSize,
-                                    highX: cellX + CellSize, highZ: cellZ + CellSize
+                                    lowX: cellX - floorHalfEditingSize - CellSize,
+                                    lowZ: cellZ - floorHalfEditingSize - CellSize,
+                                    highX: cellX + ceilHalfEditingSize + CellSize,
+                                    highZ: cellZ + ceilHalfEditingSize + CellSize
                                 });
                                 this.updateMapEditorMouseCells({ cellX, cellZ });
                             }
@@ -179,7 +201,6 @@ class InputHandler {
                         break;
                     }
                     case this.inputBindings.MiscellaneousButton: {
-                        //Middle click.
                         let pickedMapObjectArray = this.workruft.world.pickMap(
                             this.workruft.world.getNormalizedCanvasMouse(event));
                         if (pickedMapObjectArray.length > 0) {
@@ -187,26 +208,6 @@ class InputHandler {
                             let cellX = FloorToCell(clickCoordinates.x);
                             let cellZ = FloorToCell(clickCoordinates.z);
                             alert(clickCoordinates.x + ', ' + clickCoordinates.z + '\n' + cellX + ', ' + cellZ);
-                        }
-                        break;
-                    }
-                    case this.inputBindings.OrderUnitButton: {
-                        //Right click.
-                        let pickedMapObjectArray = this.workruft.world.pickMap(
-                            this.workruft.world.getNormalizedCanvasMouse(event));
-                        if (pickedMapObjectArray.length > 0) {
-                            let clickCoordinates = pickedMapObjectArray[0].point;
-                            let cellX = FloorToCell(clickCoordinates.x);
-                            let cellZ = FloorToCell(clickCoordinates.z);
-                            let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
-                            if (IsDefined(clickedCell)) {
-                                this.workruft.world.map.addHeightToCell({ cell: clickedCell, height: -CellSize });
-                                this.workruft.world.map.updateCells({
-                                    lowX: cellX - CellSize, lowZ: cellZ - CellSize,
-                                    highX: cellX + CellSize, highZ: cellZ + CellSize
-                                });
-                                this.updateMapEditorMouseCells({ cellX, cellZ });
-                            }
                         }
                         break;
                     }
@@ -223,6 +224,7 @@ class InputHandler {
             // }
             case Enums.GameStates.MapEditing: {
                 //TODO: Rate-limit this function.
+                //TODO: Click + hold + drag editing as well.
                 let pickedMapObjectArray = this.workruft.world.pickMap(
                     this.workruft.world.getNormalizedCanvasMouse(event));
                 if (pickedMapObjectArray.length > 0) {
@@ -230,7 +232,7 @@ class InputHandler {
                     let cellX = FloorToCell(clickCoordinates.x);
                     let cellZ = FloorToCell(clickCoordinates.z);
                     let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
-                    if (IsDefined(clickedCell)) {
+                    if (clickedCell != null) {
                         this.updateMapEditorMouseCells({ cellX, cellZ });
                     }
                 }
@@ -245,31 +247,70 @@ class InputHandler {
 
     onWheel(event) {
         let scrollDirection = Math.sign(event.deltaY);
-        if (scrollDirection < 0) {
-            //Negative scroll: up/forward/in.
-            this.workruft.world.camera.position.y = Math.max(MinCameraHeight,
-                this.workruft.world.camera.position.y * (10.0 / 11.0));
-        } else if (scrollDirection > 0) {
-            //Positive scroll: down/backward/out.
-            this.workruft.world.camera.position.y = Math.min(MaxCameraHeight,
-                this.workruft.world.camera.position.y * 1.1);
+        if (this.workruft.gameState == Enums.GameStates.MapEditing && event.ctrlKey) {
+            if (scrollDirection < 0) {
+                //Negative scroll: up/forward/in. Decrease editing size.
+                --this.editingSize;
+                if (this.editingSize < 1) {
+                    this.editingSize = 1;
+                }
+            } else if (scrollDirection > 0) {
+                //Positive scroll: down/backward/out. Increase editing size.
+                ++this.editingSize;
+                if (this.editingSize > 16) {
+                    this.editingSize = 16;
+                }
+            }
+            let pickedMapObjectArray = this.workruft.world.pickMap(
+                this.workruft.world.getNormalizedCanvasMouse(event));
+            if (pickedMapObjectArray.length > 0) {
+                let clickCoordinates = pickedMapObjectArray[0].point;
+                let cellX = FloorToCell(clickCoordinates.x);
+                let cellZ = FloorToCell(clickCoordinates.z);
+                let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
+                if (clickedCell != null) {
+                    this.updateMapEditorMouseCells({ cellX, cellZ });
+                }
+            }
+        } else {
+            if (scrollDirection < 0) {
+                //Negative scroll: up/forward/in. Zoom in.
+                this.workruft.world.camera.position.y = Math.max(MinCameraHeight,
+                    this.workruft.world.camera.position.y * (10.0 / 11.0));
+            } else if (scrollDirection > 0) {
+                //Positive scroll: down/backward/out. Zoom out.
+                this.workruft.world.camera.position.y = Math.min(MaxCameraHeight,
+                    this.workruft.world.camera.position.y * 1.1);
+            }
         }
+
         //Disable mouse scrolling of the page.
         event.preventDefault();
     }
 
-    updateMapEditorMouseCells({ cellX, cellZ }) {
-        if (IsDefined(this.coloredSquares)) {
-            for (let coloredSquare of this.coloredSquares) {
-                coloredSquare.deconstruct();
+    clearEditorSquares() {
+        if (IsDefined(this.editorSquares)) {
+            for (let editorSquare of this.editorSquares) {
+                editorSquare.deconstruct();
             }
         }
-        this.coloredSquares = [];
-        this.coloredSquares.push(new ColoredSquare({
-            workruft: this.workruft,
-            x: cellX + HalfCellSize,
-            z: cellZ + HalfCellSize,
-            color: BlueColor
-        }));
+        this.editorSquares = [];
+    }
+
+    updateMapEditorMouseCells({ cellX, cellZ }) {
+        this.clearEditorSquares();
+        let halfEditingSize = this.editingSize * 0.5;
+        let floorHalfEditingSize = FloorToCell(halfEditingSize);
+        let ceilHalfEditingSize = CeilToCell(halfEditingSize);
+        for (let xOffset = -floorHalfEditingSize; xOffset < ceilHalfEditingSize; xOffset += CellSize) {
+            for (let zOffset = -floorHalfEditingSize; zOffset < ceilHalfEditingSize; zOffset += CellSize) {
+                this.editorSquares.push(new ColoredSquare({
+                    workruft: this.workruft,
+                    x: cellX + xOffset + HalfCellSize,
+                    z: cellZ + zOffset + HalfCellSize,
+                    color: BlueColor
+                }));
+            }
+        }
     }
 }

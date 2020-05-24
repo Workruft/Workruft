@@ -49,9 +49,12 @@ class ColoredSquare {
             for (let zOffset = -HalfCellSize; zOffset < HalfCellSize; zOffset += CellSize) {
                 let cellX = AlignToCell(this.mesh.position.x + xOffset);
                 let cellZ = AlignToCell(this.mesh.position.z + zOffset);
-                maxHeight = Math.max(maxHeight, this.workruft.world.map.getAverageHeight({
-                    cell: this.workruft.world.map.getCell({ x: cellX, z: cellZ })
-                }) + 0.01);
+                let currentCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
+                if (currentCell != null) {
+                    maxHeight = Math.max(maxHeight, this.workruft.world.map.getAverageHeight({
+                        cell: currentCell
+                    }) + 0.01);
+                }
             }
         }
         this.mesh.position.y = maxHeight;
