@@ -19,7 +19,8 @@ class GameMap {
 
     generate() {
         this.grid = {};
-        this.geometry = new THREE.Geometry();
+        this.topGeometry = new THREE.Geometry();
+        this.sideGeometry = new THREE.Geometry();
 
         //Create border cell placeholder.
         this.borderCell = {
@@ -33,7 +34,7 @@ class GameMap {
             let column = {};
             this.grid[x] = column;
             for (let z = this.minZ; z <= this.maxZ; z += CellSize) {
-                vio = this.geometry.vertices.length;
+                vio = this.topGeometry.vertices.length;
                 column[z] = {
                     x, z, vio,
                     //Faces must be in counter-clockwise direction to be facing outside.
@@ -63,13 +64,19 @@ class GameMap {
                 //Left / Top / Right
                 //    3-----2
                 //    Front
-                this.geometry.vertices.push(
+                this.topGeometry.vertices.push(
                     new THREE.Vector3(x, MapBottomY, z),
                     new THREE.Vector3(x + CellSize, MapBottomY, z),
                     new THREE.Vector3(x + CellSize, MapBottomY, z + CellSize),
                     new THREE.Vector3(x, MapBottomY, z + CellSize)
                 );
-                this.geometry.faces.push(...column[z].faces.top);
+                this.sideGeometry.vertices.push(
+                    new THREE.Vector3(x, MapBottomY, z),
+                    new THREE.Vector3(x + CellSize, MapBottomY, z),
+                    new THREE.Vector3(x + CellSize, MapBottomY, z + CellSize),
+                    new THREE.Vector3(x, MapBottomY, z + CellSize)
+                );
+                this.topGeometry.faces.push(...column[z].faces.top);
             }
         }
         //Assign non-border neighbors.
@@ -95,21 +102,31 @@ class GameMap {
             lowX: this.minX, lowZ: this.minZ, highX: this.maxX, highZ: this.maxZ
         });
 
-        this.mesh = new THREE.Mesh(
-            this.geometry,
+        this.topMesh = new THREE.Mesh(
+            this.topGeometry,
             new THREE.MeshPhongMaterial({
                 map: GrassTexture,
                 // side: THREE.DoubleSide,
                 shininess: 10
             })
         );
-        this.mesh.castShadow = true;
-        this.mesh.receiveShadow = true;
+        this.topMesh.castShadow = true;
+        this.topMesh.receiveShadow = true;
+        this.sideMesh = new THREE.Mesh(
+            this.sideGeometry,
+            new THREE.MeshBasicMaterial({
+                color: DirtColor,
+                side: THREE.DoubleSide
+            })
+        );
+        this.sideMesh.receiveShadow = true;
     }
 
     deconstruct() {
-        DisposeThreeObject(this.geometry);
-        DisposeThreeObject(this.mesh.material);
+        DisposeThreeObject(this.topGeometry);
+        DisposeThreeObject(this.sideGeometry);
+        DisposeThreeObject(this.topMesh.material);
+        DisposeThreeObject(this.sideMesh.material);
     }
 
     getCell({ x, z }) {
@@ -120,42 +137,82 @@ class GameMap {
         }
     }
 
-    getBackLeftVertex({ cell }) {
-        return this.geometry.vertices[cell.vio];
+    getBackLeftHeight({ cell }) {
+        return this.topGeometry.vertices[cell.vio].y;
     }
 
-    getBackRightVertex({ cell }) {
-        return this.geometry.vertices[cell.vio + 1];
+    getBackRightHeight({ cell }) {
+        return this.topGeometry.vertices[cell.vio + 1].y;
     }
 
-    getFrontRightVertex({ cell }) {
-        return this.geometry.vertices[cell.vio + 2];
+    getFrontRightHeight({ cell }) {
+        return this.topGeometry.vertices[cell.vio + 2].y;
     }
 
-    getFrontLeftVertex({ cell }) {
-        return this.geometry.vertices[cell.vio + 3];
+    getFrontLeftHeight({ cell }) {
+        return this.topGeometry.vertices[cell.vio + 3].y;
+    }
+
+    addBackLeftHeight({ cell, height }) {
+        this.topGeometry.vertices[cell.vio].y += height;
+        this.sideGeometry.vertices[cell.vio].y += height;
+    }
+
+    addBackRightHeight({ cell, height }) {
+        this.topGeometry.vertices[cell.vio + 1].y += height;
+        this.sideGeometry.vertices[cell.vio + 1].y += height;
+    }
+
+    addFrontRightHeight({ cell, height }) {
+        this.topGeometry.vertices[cell.vio + 2].y += height;
+        this.sideGeometry.vertices[cell.vio + 2].y += height;
+    }
+
+    addFrontLeftHeight({ cell, height }) {
+        this.topGeometry.vertices[cell.vio + 3].y += height;
+        this.sideGeometry.vertices[cell.vio + 3].y += height;
     }
 
     addHeightToCell({ cell, height }) {
-        this.geometry.vertices[cell.vio].y += height;
-        this.geometry.vertices[cell.vio + 1].y += height;
-        this.geometry.vertices[cell.vio + 2].y += height;
-        this.geometry.vertices[cell.vio + 3].y += height;
+        this.addBackLeftHeight({ cell, height });
+        this.addBackRightHeight({ cell, height });
+        this.addFrontRightHeight({ cell, height });
+        this.addFrontLeftHeight({ cell, height });
+    }
+
+    setBackLeftHeight({ cell, height }) {
+        this.topGeometry.vertices[cell.vio].y = height;
+        this.sideGeometry.vertices[cell.vio].y = height;
+    }
+
+    setBackRightHeight({ cell, height }) {
+        this.topGeometry.vertices[cell.vio + 1].y = height;
+        this.sideGeometry.vertices[cell.vio + 1].y = height;
+    }
+
+    setFrontRightHeight({ cell, height }) {
+        this.topGeometry.vertices[cell.vio + 2].y = height;
+        this.sideGeometry.vertices[cell.vio + 2].y = height;
+    }
+
+    setFrontLeftHeight({ cell, height }) {
+        this.topGeometry.vertices[cell.vio + 3].y = height;
+        this.sideGeometry.vertices[cell.vio + 3].y = height;
     }
 
     setCellFlatHeight({ cell, height }) {
-        this.geometry.vertices[cell.vio].y = height;
-        this.geometry.vertices[cell.vio + 1].y = height;
-        this.geometry.vertices[cell.vio + 2].y = height;
-        this.geometry.vertices[cell.vio + 3].y = height;
+        this.setBackLeftHeight({ cell, height });
+        this.setBackRightHeight({ cell, height });
+        this.setFrontRightHeight({ cell, height });
+        this.setFrontLeftHeight({ cell, height });
     }
 
     //Remember to call updateCells()!
     getAverageHeight({ cell }) {
-        return (this.geometry.vertices[cell.vio].y +
-            this.geometry.vertices[cell.vio + 1].y +
-            this.geometry.vertices[cell.vio + 2].y +
-            this.geometry.vertices[cell.vio + 3].y)
+        return (this.topGeometry.vertices[cell.vio].y +
+            this.topGeometry.vertices[cell.vio + 1].y +
+            this.topGeometry.vertices[cell.vio + 2].y +
+            this.topGeometry.vertices[cell.vio + 3].y)
             * 0.25;
     }
 
@@ -212,8 +269,8 @@ class GameMap {
                     let otherCell = currentCell.neighbors[Enums.CardinalDirections.right];
                     if (IsDefined(otherCell)) {
                         currentCell.rightTraversable =
-                            this.getBackRightVertex({ cell: currentCell }).y == this.getBackLeftVertex({ cell: otherCell }).y &&
-                            this.getFrontRightVertex({ cell: currentCell }).y == this.getFrontLeftVertex({ cell: otherCell }).y;
+                            this.getBackRightHeight({ cell: currentCell }) == this.getBackLeftHeight({ cell: otherCell }) &&
+                            this.getFrontRightHeight({ cell: currentCell }) == this.getFrontLeftHeight({ cell: otherCell });
                         this.updateFaces({
                             currentCell, otherCell,
                             direction: 'right',
@@ -227,8 +284,8 @@ class GameMap {
                     let otherCell = currentCell.neighbors[Enums.CardinalDirections.front];
                     if (IsDefined(otherCell)) {
                         currentCell.frontTraversable =
-                            this.getFrontRightVertex({ cell: currentCell }).y == this.getBackRightVertex({ cell: otherCell }).y &&
-                            this.getFrontLeftVertex({ cell: currentCell }).y == this.getBackLeftVertex({ cell: otherCell }).y;
+                            this.getFrontRightHeight({ cell: currentCell }) == this.getBackRightHeight({ cell: otherCell }) &&
+                            this.getFrontLeftHeight({ cell: currentCell }) == this.getBackLeftHeight({ cell: otherCell });
                         this.updateFaces({
                             currentCell, otherCell,
                             direction: 'front',
@@ -241,26 +298,46 @@ class GameMap {
         }
 
         //TODO: This is extraordinarily slow! Update individually as needed!
-        this.geometry.faceVertexUvs[0] = [];
-        this.geometry.faces.forEach(function(face) {
+        this.topGeometry.faceVertexUvs[0] = [];
+        this.topGeometry.faces.forEach(function(face) {
             let components = ['x', 'y', 'z'].sort(function(a, b) {
                 return Math.abs(face.normal[a]) > Math.abs(face.normal[b]);
             });
 
-            let v1 = this.geometry.vertices[face.a];
-            let v2 = this.geometry.vertices[face.b];
-            let v3 = this.geometry.vertices[face.c];
+            let v1 = this.topGeometry.vertices[face.a];
+            let v2 = this.topGeometry.vertices[face.b];
+            let v3 = this.topGeometry.vertices[face.c];
 
-            this.geometry.faceVertexUvs[0].push([
+            this.topGeometry.faceVertexUvs[0].push([
                 new THREE.Vector2(v1[components[0]], v1[components[1]]),
                 new THREE.Vector2(v2[components[0]], v2[components[1]]),
                 new THREE.Vector2(v3[components[0]], v3[components[1]])
             ]);
         }.bind(this));
-        this.geometry.verticesNeedUpdate = true;
-        this.geometry.elementsNeedUpdate = true;
-        this.geometry.uvsNeedUpdate = true;
-        this.geometry.computeFaceNormals();
+        this.topGeometry.verticesNeedUpdate = true;
+        this.topGeometry.elementsNeedUpdate = true;
+        this.topGeometry.uvsNeedUpdate = true;
+        this.topGeometry.computeFaceNormals();
+        // this.sideGeometry.faceVertexUvs[0] = [];
+        // this.sideGeometry.faces.forEach(function(face) {
+        //     let components = ['x', 'y', 'z'].sort(function(a, b) {
+        //         return Math.abs(face.normal[a]) > Math.abs(face.normal[b]);
+        //     });
+
+        //     let v1 = this.sideGeometry.vertices[face.a];
+        //     let v2 = this.sideGeometry.vertices[face.b];
+        //     let v3 = this.sideGeometry.vertices[face.c];
+
+        //     this.sideGeometry.faceVertexUvs[0].push([
+        //         new THREE.Vector2(v1[components[0]], v1[components[1]]),
+        //         new THREE.Vector2(v2[components[0]], v2[components[1]]),
+        //         new THREE.Vector2(v3[components[0]], v3[components[1]])
+        //     ]);
+        // }.bind(this));
+        this.sideGeometry.verticesNeedUpdate = true;
+        this.sideGeometry.elementsNeedUpdate = true;
+        // this.sideGeometry.uvsNeedUpdate = true;
+        this.sideGeometry.computeFaceNormals();
     }
 
     //Corners:
@@ -277,19 +354,19 @@ class GameMap {
     }) {
         currentCell.faces[direction] = [];
         for (let face of currentCell.faces[direction]) {
-            this.geometry.faces.splice(this.geometry.faces.indexOf(face), 1);
+            this.sideGeometry.faces.splice(this.sideGeometry.faces.indexOf(face), 1);
         }
         let newFaces = [];
         //Each integer is merely referencing a corner vertex.
-        if (this.geometry.vertices[currentCell.vio + currentVertexA].y > this.geometry.vertices[otherCell.vio + otherVertexA].y &&
-            this.geometry.vertices[currentCell.vio + currentVertexB].y > this.geometry.vertices[otherCell.vio + otherVertexB].y) {
+        if (this.topGeometry.vertices[currentCell.vio + currentVertexA].y > this.topGeometry.vertices[otherCell.vio + otherVertexA].y &&
+            this.topGeometry.vertices[currentCell.vio + currentVertexB].y > this.topGeometry.vertices[otherCell.vio + otherVertexB].y) {
             //Current side > other side.
             newFaces.push(new THREE.Face3(
                 currentCell.vio + currentVertexA, currentCell.vio + currentVertexB, otherCell.vio + otherVertexA));
             newFaces.push(new THREE.Face3(
                 otherCell.vio + otherVertexA, currentCell.vio + currentVertexB, otherCell.vio + otherVertexB));
-        } else if (this.geometry.vertices[currentCell.vio + currentVertexA].y < this.geometry.vertices[otherCell.vio + otherVertexA].y &&
-            this.geometry.vertices[currentCell.vio + currentVertexB].y < this.geometry.vertices[otherCell.vio + otherVertexB].y) {
+        } else if (this.topGeometry.vertices[currentCell.vio + currentVertexA].y < this.topGeometry.vertices[otherCell.vio + otherVertexA].y &&
+            this.topGeometry.vertices[currentCell.vio + currentVertexB].y < this.topGeometry.vertices[otherCell.vio + otherVertexB].y) {
             //Current side < other side.
             newFaces.push(new THREE.Face3(
                 currentCell.vio + currentVertexA, otherCell.vio + otherVertexA, currentCell.vio + currentVertexB));
@@ -297,8 +374,8 @@ class GameMap {
                 otherCell.vio + otherVertexA, otherCell.vio + otherVertexB, currentCell.vio + currentVertexB));
         } else {
             //Handle the corners individually.
-            if (this.geometry.vertices[currentCell.vio + currentVertexA].y != this.geometry.vertices[otherCell.vio + otherVertexA].y) {
-                if (this.geometry.vertices[currentCell.vio + currentVertexA].y > this.geometry.vertices[otherCell.vio + otherVertexA].y) {
+            if (this.topGeometry.vertices[currentCell.vio + currentVertexA].y != this.topGeometry.vertices[otherCell.vio + otherVertexA].y) {
+                if (this.topGeometry.vertices[currentCell.vio + currentVertexA].y > this.topGeometry.vertices[otherCell.vio + otherVertexA].y) {
                     newFaces.push(new THREE.Face3(
                         currentCell.vio + currentVertexA, currentCell.vio + currentVertexB, otherCell.vio + otherVertexA));
                 } else {
@@ -306,8 +383,8 @@ class GameMap {
                         currentCell.vio + currentVertexA, otherCell.vio + otherVertexA, currentCell.vio + currentVertexB));
                 }
             }
-            if (this.geometry.vertices[currentCell.vio + currentVertexB].y != this.geometry.vertices[otherCell.vio + otherVertexB].y) {
-                if (this.geometry.vertices[currentCell.vio + currentVertexB].y > this.geometry.vertices[otherCell.vio + otherVertexB].y) {
+            if (this.topGeometry.vertices[currentCell.vio + currentVertexB].y != this.topGeometry.vertices[otherCell.vio + otherVertexB].y) {
+                if (this.topGeometry.vertices[currentCell.vio + currentVertexB].y > this.topGeometry.vertices[otherCell.vio + otherVertexB].y) {
                     newFaces.push(new THREE.Face3(
                         currentCell.vio + currentVertexB, otherCell.vio + otherVertexB, currentCell.vio + currentVertexA));
                 } else {
@@ -320,7 +397,7 @@ class GameMap {
             for (let newFace of newFaces) {
                 newFace.color = DirtColor;
                 currentCell.faces[direction].push(newFace);
-                this.geometry.faces.push(newFace);
+                this.sideGeometry.faces.push(newFace);
             }
         }
     }

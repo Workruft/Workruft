@@ -76,48 +76,50 @@ function GenericRound(roundMe) {
     return Math.round(roundMe * 100000000.0) / 100000000.0;
 }
 
-let context = document.createElement('canvas').getContext('2d');
-context.canvas.width = 256;
-context.canvas.height = 256;
-let grassColorHex = '#0c4013';
-let grassColorRed = parseInt(grassColorHex.substr(1, 2), 16);
-let grassColorGreen = parseInt(grassColorHex.substr(3, 2), 16);
-let grassColorBlue = parseInt(grassColorHex.substr(5, 2), 16);
-context.fillStyle = grassColorHex;
-context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-let imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
-let data = imageData.data;
-let grassColorVariance = 10.0;
-let grassColorSubtraction = grassColorVariance * 0.5;
-for (let bladeIndex = 0; bladeIndex < 10000; ++bladeIndex) {
-    let x = Math.random() * context.canvas.width;
-    let y = Math.random() * context.canvas.height;
-    let direction = Math.random() * DoublePI;
-    let length = Math.random() * 14.0 + 1.0;
-    let redDifference = Math.round(Math.random() * grassColorVariance - grassColorSubtraction);
-    let greenDifference = Math.round(Math.random() * grassColorVariance - grassColorSubtraction);
-    let blueDifference = Math.round(Math.random() * grassColorVariance - grassColorSubtraction);
-    for (let pixelIndex = 0; pixelIndex < length; ++pixelIndex) {
-        let currentX = Math.floor(x + Math.cos(direction) * pixelIndex);
-        if (currentX < 0.0) {
-            currentX += context.canvas.width;
-        } else if (currentX >= context.canvas.width) {
-            currentX -= context.canvas.width;
+function CreateCanvasTexture({ width, height, color, colorVariance, colorSubtraction,
+    lineCount, lengthVariance, lengthAddition }) {
+    let context = document.createElement('canvas').getContext('2d');
+    context.canvas.width = width;
+    context.canvas.height = height;
+    context.fillStyle = color;
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+    let imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    let data = imageData.data;
+    for (let lineIndex = 0; lineIndex < lineCount; ++lineIndex) {
+        let x = Math.random() * context.canvas.width;
+        let y = Math.random() * context.canvas.height;
+        let direction = Math.random() * DoublePI;
+        let length = Math.random() * lengthVariance + lengthAddition;
+        let redDifference = Math.round(Math.random() * colorVariance - colorSubtraction);
+        let greenDifference = Math.round(Math.random() * colorVariance - colorSubtraction);
+        let blueDifference = Math.round(Math.random() * colorVariance - colorSubtraction);
+        for (let pixelIndex = 0; pixelIndex < length; ++pixelIndex) {
+            let currentX = Math.floor(x + Math.cos(direction) * pixelIndex);
+            if (currentX < 0.0) {
+                currentX += context.canvas.width;
+            } else if (currentX >= context.canvas.width) {
+                currentX -= context.canvas.width;
+            }
+            let currentY = Math.floor(y + Math.sin(direction) * pixelIndex);
+            if (currentY < 0.0) {
+                currentY += context.canvas.height;
+            } else if (currentX >= context.canvas.height) {
+                currentY -= context.canvas.height;
+            }
+            let currentOffset = currentY * context.canvas.width * 4 + currentX * 4;
+            data[currentOffset] += redDifference;
+            data[currentOffset + 1] += greenDifference;
+            data[currentOffset + 2] += blueDifference;
         }
-        let currentY = Math.floor(y + Math.sin(direction) * pixelIndex);
-        if (currentY < 0.0) {
-            currentY += context.canvas.height;
-        } else if (currentX >= context.canvas.height) {
-            currentY -= context.canvas.height;
-        }
-        let currentOffset = currentY * context.canvas.width * 4 + currentX * 4;
-        data[currentOffset] += redDifference;
-        data[currentOffset + 1] += greenDifference;
-        data[currentOffset + 2] += blueDifference;
     }
+    context.putImageData(imageData, 0, 0);
+    // document.body.prepend(context.canvas);
+    let canvasTexture = new THREE.CanvasTexture(context.canvas);
+    canvasTexture.repeat.set(1.0, 1.0);
+    canvasTexture.wrapS = canvasTexture.wrapT = THREE.RepeatWrapping;
+    return canvasTexture;
 }
-context.putImageData(imageData, 0, 0);
-// document.body.prepend(context.canvas);
-let GrassTexture = new THREE.CanvasTexture(context.canvas);
-GrassTexture.repeat.set(1.0, 1.0);
-GrassTexture.wrapS = GrassTexture.wrapT = THREE.RepeatWrapping;
+let GrassTexture = CreateCanvasTexture({
+    width: 256, height: 256, color: '#0c4013', colorVariance: 10.0, colorSubtraction: 5.0,
+    lineCount: 10000, lengthVariance: 14.0, lengthAddition: 1.0
+});
