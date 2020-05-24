@@ -98,10 +98,12 @@ class GameMap {
         this.mesh = new THREE.Mesh(
             this.geometry,
             new THREE.MeshPhongMaterial({
-                vertexColors: THREE.FaceColors,
-                side: THREE.DoubleSide,
-                shininess: 5
-            }));
+                map: GrassTexture,
+                // side: THREE.DoubleSide,
+                shininess: 10
+            })
+        );
+        this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
     }
 
@@ -239,8 +241,25 @@ class GameMap {
         }
 
         //TODO: This is extraordinarily slow! Update individually as needed!
+        this.geometry.faceVertexUvs[0] = [];
+        this.geometry.faces.forEach(function(face) {
+            let components = ['x', 'y', 'z'].sort(function(a, b) {
+                return Math.abs(face.normal[a]) > Math.abs(face.normal[b]);
+            });
+
+            let v1 = this.geometry.vertices[face.a];
+            let v2 = this.geometry.vertices[face.b];
+            let v3 = this.geometry.vertices[face.c];
+
+            this.geometry.faceVertexUvs[0].push([
+                new THREE.Vector2(v1[components[0]], v1[components[1]]),
+                new THREE.Vector2(v2[components[0]], v2[components[1]]),
+                new THREE.Vector2(v3[components[0]], v3[components[1]])
+            ]);
+        }.bind(this));
         this.geometry.verticesNeedUpdate = true;
         this.geometry.elementsNeedUpdate = true;
+        this.geometry.uvsNeedUpdate = true;
         this.geometry.computeFaceNormals();
     }
 

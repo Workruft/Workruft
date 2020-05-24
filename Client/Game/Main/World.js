@@ -17,6 +17,7 @@ class World {
         });
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.physicallyCorrectLights = true;
         this.selectionCircleModelsMap = new Map();
         this.selectedObjects = new Set();
         this.onResize();
@@ -29,20 +30,21 @@ class World {
         this.ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.0);
         this.scene.add(this.ambientLight);
         //"Sun".
-        this.directionalLight = new THREE.DirectionalLight('white', 1.0);
-        this.directionalLight.castShadow = true;
-        this.directionalLight.position.set(0, 100, 0);
-        this.scene.add(this.directionalLight);
-        this.directionalLight.shadow.camera.left = -100.0;
-        this.directionalLight.shadow.camera.right = 100.0;
-        this.directionalLight.shadow.camera.top = 100.0;
-        this.directionalLight.shadow.camera.bottom = -100.0;
-        this.directionalLight.shadow.camera.far = 1000.0;
-        this.directionalLight.shadow.camera.updateProjectionMatrix();
-        this.directionalLight.shadow.mapSize.width = 2048.0;
-        this.directionalLight.shadow.mapSize.height = 2048.0;
-        //To see the directional light's shadow camera bounds.
-        //this.scene.add(new THREE.CameraHelper(this.directionalLight.shadow.camera));
+        this.spotLight = new THREE.SpotLight('white', 1.0);
+        this.spotLight.castShadow = true;
+        this.spotLight.position.set(0, 100, 0);
+        this.spotLight.power = 1500;
+        this.spotLight.shadow.mapSize.width = 1024.0;
+        this.spotLight.shadow.mapSize.height = 1024.0;
+        this.spotLight.shadow.camera.near = 1;
+        this.spotLight.shadow.camera.far = 500;
+        this.spotLight.shadow.bias = 0.001;
+        this.spotLight.penumba = 0.5;
+        this.spotLight.angle = Math.PI / 3;
+        this.spotLight.distance = 500;
+        this.scene.add(this.spotLight);
+        //To see the spot light's shadow camera bounds.
+        // this.scene.add(new THREE.CameraHelper(this.spotLight.shadow.camera));
 
         //Camera.
         let fieldOfView = 75;
@@ -65,7 +67,7 @@ class World {
 
         //Action.
         //Map.
-        this.map = new GameMap(250, 250);
+        this.map = new GameMap(50, 50);
         let currentCell;
         //Rampsnstuff.
         let rampIncline = 0.5;
