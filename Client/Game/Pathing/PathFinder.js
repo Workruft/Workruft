@@ -73,7 +73,7 @@ class PathFinder {
         });
 
         //Starting point.
-        let currentPoint = {
+        let startPoint = {
             x: this.startX,
             z: this.startZ,
             score: null,
@@ -82,6 +82,7 @@ class PathFinder {
             fromPoint: null,
             travelDirection: null
         };
+        let currentPoint = startPoint;
         CalculateScore({ point: currentPoint });
         this.mappedPoints[currentPoint.x] = {
             [currentPoint.z]: currentPoint
@@ -160,28 +161,30 @@ class PathFinder {
             solutionPath.push(currentPoint);
             currentPoint = currentPoint.fromPoint;
         } while (true);
-        for (let pointIndex = solutionPath.length - 2; pointIndex > 0; --pointIndex) {
+        let optimizedSolutionPath = [];
+        optimizedSolutionPath.push(solutionPath[0]);
+        for (let pointIndex = 1; pointIndex < solutionPath.length; ++pointIndex) {
             //Same-direction optimization.
-            if (solutionPath[pointIndex - 1].travelDirection == solutionPath[pointIndex].travelDirection) {
-                solutionPath.splice(pointIndex, 1);
+            if (solutionPath[pointIndex - 1].travelDirection != solutionPath[pointIndex].travelDirection) {
+                optimizedSolutionPath.push(solutionPath[pointIndex]);
             }
         }
-        for (let pointIndex = solutionPath.length - 1; pointIndex >= 2; --pointIndex) {
+        for (let pointIndex = optimizedSolutionPath.length - 1; pointIndex >= 2; --pointIndex) {
             //Linear optimization.
             this.linearOptimizationTester.setEnds({
-                startX: solutionPath[pointIndex].x,
-                startZ: solutionPath[pointIndex].z,
-                endX: solutionPath[pointIndex - 2].x,
-                endZ: solutionPath[pointIndex - 2].z
+                startX: optimizedSolutionPath[pointIndex].x,
+                startZ: optimizedSolutionPath[pointIndex].z,
+                endX: optimizedSolutionPath[pointIndex - 2].x,
+                endZ: optimizedSolutionPath[pointIndex - 2].z
             });
             this.linearOptimizationTester.updateTraversalAngleAndOffsets();
             this.linearOptimizationTester.computePathingLines();
             this.linearOptimizationTester.computePathability();
             if (this.linearOptimizationTester.isPathable) {
-                solutionPath.splice(pointIndex - 1, 1);
+                optimizedSolutionPath.splice(pointIndex - 1, 1);
             }
         }
-        return solutionPath;
+        return [ optimizedSolutionPath, solutionPath ];
     }
 
     //TODO: Currently ignoring the cases where there are multiple sources for a point. Could affect scoring.

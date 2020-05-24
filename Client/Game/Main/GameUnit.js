@@ -64,7 +64,8 @@ class GameUnit {
                             }
                         }
                         this.coloredSquares = [];
-                        currentOrder.data.path = this.pathFinder.findBestPath({ range: 0.1 });
+                        [ currentOrder.data.path, currentOrder.data.unoptimizedPath ] =
+                            this.pathFinder.findBestPath({ range: 0.1 });
                         for (let point of currentOrder.data.path) {
                             for (let xOffset = -this.gameModel.halfXZSize;
                                 xOffset <= 0.0; xOffset += CellSize) {
@@ -104,27 +105,60 @@ class GameUnit {
                         if (this.position.x == currentPathPoint.x && this.position.z == currentPathPoint.z) {
                             if (currentOrder.data.path.length > 1) {
                                 //Path point complete.
-                                currentOrder.data.path.splice(-1);
+                                let removedPoint = currentOrder.data.path.splice(-1);
+                                if (currentOrder.data.unoptimizedPath != null) {
+                                    for (let pointIndex = currentOrder.data.unoptimizedPath.length - 1;
+                                        pointIndex >= 0; --pointIndex) {
+                                        if (currentOrder.data.unoptimizedPath[pointIndex].x == removedPoint.x &&
+                                            currentOrder.data.unoptimizedPath[pointIndex].z == removedPoint.z) {
+                                            currentOrder.data.unoptimizedPath.splice(-1);
+                                            break;
+                                        } else {
+                                            currentOrder.data.unoptimizedPath.splice(-1);
+                                        }
+                                    }
+                                    if (currentOrder.data.unoptimizedPath.length == 0) {
+                                        delete currentOrder.data.unoptimizedPath;
+                                    }
+                                }
                             } else {
                                 //Order complete.
                                 this.private.orders.splice(0, 1);
                             }
                         }
                     } else {
-                        //Obstructed; stop before the obstruction.
-                        let newLimitedDistance = Math.max(0.0, this.pathingTester.minPathable.distance -
-                            CellSize - this.gameModel.halfXZSize);
-                        //See if the unit can even move at all.
-                        if (newLimitedDistance > 0.0) {
-                            //The unit can move some, just not all the way up to its speed potential.
-                            //Figure out where that is and move.
-                            this.pathingTester.limitDistance({ maxDistance: newLimitedDistance });
-                            this.position.x = this.pathingTester.endX;
-                            this.position.z = this.pathingTester.endZ;
+                        //Obstructed.
+                        let alignedX = AlignToCell(this.position.x - this.gameModel.cellAlignmentOffset) +
+                            this.gameModel.cellAlignmentOffset;
+                        let alignedZ = AlignToCell(this.position.z - this.gameModel.cellAlignmentOffset) +
+                            this.gameModel.cellAlignmentOffset;
+                        if (this.position.x != alignedX || this.position.z != alignedZ) {
+                            //First try aligning the unit.
+                            console.log('alignabru');
+                            this.position.x = alignedX;
+                            this.position.z = alignedZ;
+                        } else if (currentOrder.data.unoptimizedPath != null) {
+                            //Next try the unoptimized path.
+                            console.log('optimabru');
+                            currentOrder.data.path = currentOrder.data.unoptimizedPath;
+                            delete currentOrder.data.unoptimizedPath;
+                        } else {
+                            //No unoptimized path available; cancel all orders (stop unit).
+                            //Stop before the obstruction.
+                            console.log('stoppabru');
+                            let newLimitedDistance = Math.max(0.0, this.pathingTester.minPathable.distance -
+                                CellSize - this.gameModel.halfXZSize);
+                            //See if the unit can even move at all.
+                            if (newLimitedDistance > 0.0) {
+                                //The unit can move some, just not all the way up to its speed potential.
+                                //Figure out where that is and move.
+                                this.pathingTester.limitDistance({ maxDistance: newLimitedDistance });
+                                this.position.x = this.pathingTester.endX;
+                                this.position.z = this.pathingTester.endZ;
+                            }
+                            deltaTimeMS = -Infinity;
+                            this.private.orders = [];
                         }
-                        //Order cannot be completed, so cancel all orders (stop unit).
-                        deltaTimeMS = -Infinity;
-                        this.private.orders = [];
                     }
                     break;
                 } //case Enums.OrderTypes.Move

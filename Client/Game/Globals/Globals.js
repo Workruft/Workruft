@@ -188,16 +188,16 @@ for (let borderFlags = 0; borderFlags < 16; ++borderFlags) {
         map: CreateCanvasTexture({
             width: 256, height: 256, color: '#' + GrassColor.getHexString(),
             colorVariances: {
-                red: 10.0,
-                green: 20.0,
-                blue: 10.0,
+                red: 5.0,
+                green: 15.0,
+                blue: 5.0,
             },
             colorSubtractions: {
-                red: 5.0,
-                green: 10.0,
-                blue: 5.0
+                red: 2.5,
+                green: 7.5,
+                blue: 2.5
             },
-            lineCount: 10000, lengthVariance: 9.0, lengthAddition: 1.0, borderFlags
+            lineCount: 10000, lengthVariance: 4.0, lengthAddition: 1.0, borderFlags
         }),
         shininess: 10
     }));
