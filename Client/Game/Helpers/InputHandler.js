@@ -6,8 +6,6 @@ class InputHandler {
         this.keysDown = new Set();
         this.mouseButtonsDown = new Set();
 
-        this.editingSize = 4;
-
         //Disable right click.
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
@@ -53,12 +51,26 @@ class InputHandler {
                     case this.inputBindings.ToggleMapEditor: {
                         if (this.workruft.gameState == Enums.GameStates.Playing) {
                             this.workruft.world.deselectAll();
+                            for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
+                                this.workruft.randoUnits[n].cancelAllOrders();
+                                this.workruft.randoUnits[n].clearColoredSquares();
+                                this.workruft.randoUnits[n].position.y = -100.0;
+                            }
+                            this.workruft.playerUnit.clearColoredSquares();
                             HTML.statusBox.innerHTML = 'Map Editor mode';
                             this.workruft.gameState = Enums.GameStates.MapEditing;
                         } else if (this.workruft.gameState == Enums.GameStates.MapEditing) {
+                            this.clearEditorSquares();
+                            for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
+                                this.workruft.randoUnits[n].cancelAllOrders();
+                                this.workruft.randoUnits[n].position.x = this.workruft.playerUnit.position.x +
+                                    this.workruft.playerUnit.gameModel.xzSize;
+                                this.workruft.randoUnits[n].position.z = this.workruft.playerUnit.position.z +
+                                    this.workruft.playerUnit.gameModel.xzSize;
+                                this.workruft.randoUnits[n].autoSetHeight();
+                            }
                             HTML.statusBox.innerHTML = '';
                             this.workruft.gameState = Enums.GameStates.Playing;
-                            this.clearEditorSquares();
                         }
                         break;
                     }
@@ -170,7 +182,7 @@ class InputHandler {
                             if (clickedCell != null) {
                                 let raiseLowerOffset =
                                     (event.button == this.inputBindings.RaiseTerrainButton ? CellSize : -CellSize);
-                                let halfEditingSize = this.editingSize * 0.5;
+                                let halfEditingSize = this.workruft.editingSize * 0.5;
                                 let floorHalfEditingSize = FloorToCell(halfEditingSize);
                                 let ceilHalfEditingSize = CeilToCell(halfEditingSize);
                                 for (let xOffset = -floorHalfEditingSize;
@@ -250,16 +262,16 @@ class InputHandler {
         if (this.workruft.gameState == Enums.GameStates.MapEditing && event.ctrlKey) {
             if (scrollDirection < 0) {
                 //Negative scroll: up/forward/in. Increase editing size.
-                ++this.editingSize;
+                ++this.workruft.editingSize;
                 //Note: Increasing this is no problem, except that that's a lot of ColoredSquares to draw lol...
-                if (this.editingSize > 32) {
-                    this.editingSize = 32;
+                if (this.workruft.editingSize > 32) {
+                    this.workruft.editingSize = 32;
                 }
             } else if (scrollDirection > 0) {
                 //Positive scroll: down/backward/out. Decrease editing size.
-                --this.editingSize;
-                if (this.editingSize < 1) {
-                    this.editingSize = 1;
+                --this.workruft.editingSize;
+                if (this.workruft.editingSize < 1) {
+                    this.workruft.editingSize = 1;
                 }
             }
             let pickedMapObjectArray = this.workruft.world.pickMap(
@@ -306,7 +318,7 @@ class InputHandler {
             return;
         }
         this.clearEditorSquares();
-        let halfEditingSize = this.editingSize * 0.5;
+        let halfEditingSize = this.workruft.editingSize * 0.5;
         let floorHalfEditingSize = FloorToCell(halfEditingSize);
         let ceilHalfEditingSize = CeilToCell(halfEditingSize);
         for (let xOffset = -floorHalfEditingSize; xOffset < ceilHalfEditingSize; xOffset += CellSize) {

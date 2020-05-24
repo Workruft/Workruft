@@ -14,6 +14,8 @@ class Workruft {
         this.world.graphicsLoop();
         this.network = new Network(this.chat);
 
+        this.editingSize = 4;
+
         this.objectsToUpdate = new Set();
 
         //Game units etc.
@@ -28,11 +30,12 @@ class Workruft {
 
         this.randoUnits = [];
         for (let n = 0; n < 10; ++n) {
+            let randomPoint = this.world.map.getRandomPointOnMap();
             this.randoUnits.push(new GameUnit({
                 workruft: this,
                 gameModel: n > 5 ? this.world.sheepModel : this.world.wolfModel,
-                x: HalfCellSize,
-                z: HalfCellSize
+                x: randomPoint.x,
+                z: randomPoint.z
             }));
             this.randoUnits[n].addToGroup({ objectGroup: this.world.playerObjects });
         }
@@ -44,10 +47,7 @@ class Workruft {
                 let newOrderObject = {
                     order: new Order({
                         type: Enums.OrderTypes.Move,
-                        data: {
-                            x: Math.random() * (this.world.map.maxX - this.world.map.minX) + this.world.map.minX,
-                            z: Math.random() * (this.world.map.maxZ - this.world.map.minZ) + this.world.map.minZ
-                        }
+                        data: this.world.map.getRandomPointOnMap()
                     })
                 };
                 this.randoUnits[n].issueReplacementOrder(newOrderObject);

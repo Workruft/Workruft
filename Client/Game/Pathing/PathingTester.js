@@ -90,7 +90,7 @@ class PathingTester {
         do {
             for (let pathingLine of this.pathingLines) {
                 currentDirection = pathingLine.testNextCell();
-                if (currentDirection == null) {
+                if (currentDirection == null || pathingLine.currentCell == null) {
                     //End of pathing line.
                     this.pathingLines.delete(pathingLine);
                     continue;

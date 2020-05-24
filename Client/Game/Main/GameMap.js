@@ -225,7 +225,11 @@ class GameMap {
     }
 
     isBackTraversable({ cell }) {
-        return this.isFrontTraversable({ cell: cell.neighbors[Enums.CardinalDirections.back] });
+        if (cell == null) {
+            return false;
+        } else {
+            return this.isFrontTraversable({ cell: cell.neighbors[Enums.CardinalDirections.back] });
+        }
     }
 
     isRightTraversable({ cell }) {
@@ -245,7 +249,11 @@ class GameMap {
     }
 
     isLeftTraversable({ cell }) {
-        return this.isRightTraversable({ cell: cell.neighbors[Enums.CardinalDirections.left] });
+        if (cell == null) {
+            return false;
+        } else {
+            return this.isRightTraversable({ cell: cell.neighbors[Enums.CardinalDirections.left] });
+        }
     }
 
     //Make sure that these bounds wrap around (inclusively) all of the cells involved!
@@ -440,5 +448,12 @@ class GameMap {
                 this.sideGeometry.faces.push(newFace);
             }
         }
+    }
+
+    getRandomPointOnMap() {
+        return {
+            x: Math.random() * (this.sizeX) + this.minX,
+            z: Math.random() * (this.sizeZ) + this.minZ
+        };
     }
 }

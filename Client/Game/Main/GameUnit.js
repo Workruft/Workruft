@@ -32,14 +32,27 @@ class GameUnit {
         this.deselect();
     }
 
-    issueReplacementOrder({ order }) {
+    cancelAllOrders() {
         this.private.orders = [];
+    }
+
+    issueReplacementOrder({ order }) {
+        this.cancelAllOrders();
         this.issueAdditionalOrder({ order });
     }
 
     issueAdditionalOrder({ order }) {
         this.private.orders.push(order);
         this.workruft.objectsToUpdate.add(this);
+    }
+
+    clearColoredSquares() {
+        if (IsDefined(this.coloredSquares)) {
+            for (let coloredSquare of this.coloredSquares) {
+                coloredSquare.deconstruct();
+            }
+        }
+        this.coloredSquares = [];
     }
 
     update({ deltaTimeMS }) {
@@ -58,12 +71,7 @@ class GameUnit {
                     if (IsUndefined(currentOrder.data.path)) {
                         this.pathFinder.setStartPoint({ pointX: this.position.x, pointZ: this.position.z });
                         this.pathFinder.setEndPoint({ pointX: currentOrder.data.x, pointZ: currentOrder.data.z });
-                        if (IsDefined(this.coloredSquares)) {
-                            for (let coloredSquare of this.coloredSquares) {
-                                coloredSquare.deconstruct();
-                            }
-                        }
-                        this.coloredSquares = [];
+                        this.clearColoredSquares();
                         [ currentOrder.data.path, currentOrder.data.unoptimizedPath ] =
                             this.pathFinder.findBestPath({ range: 0.1 });
                         let isFirstPoint = true;
@@ -77,7 +85,7 @@ class GameUnit {
                                         x: point.x + xOffset + HalfCellSize,
                                         z: point.z + zOffset + HalfCellSize,
                                         color: isFirstPoint ? LightGreenColor : BlueColor,
-                                        opacity: isFirstPoint ? 0.5 : 0.25
+                                        opacity: isFirstPoint ? 0.5 : 0.5
                                     }));
                                 }
                             }
@@ -156,7 +164,7 @@ class GameUnit {
                                 this.position.z = this.pathingTester.endZ;
                             }
                             deltaTimeMS = -Infinity;
-                            this.private.orders = [];
+                            this.cancelAllOrders();
                         }
                     }
                     break;
@@ -217,8 +225,11 @@ class GameUnit {
     autoSetHeight() {
         let cellX = AlignToCell(this.position.x);
         let cellZ = AlignToCell(this.position.z);
-        this.position.y = this.workruft.world.map.getAverageHeight({
-            cell: this.workruft.world.map.getCell({ x: cellX, z: cellZ })
-        });
+        let currentCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
+        if (IsDefined(currentCell)) {
+            this.position.y = this.workruft.world.map.getAverageHeight({
+                cell: currentCell
+            });
+        }
     }
 }
