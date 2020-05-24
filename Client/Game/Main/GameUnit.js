@@ -66,20 +66,22 @@ class GameUnit {
                         this.coloredSquares = [];
                         [ currentOrder.data.path, currentOrder.data.unoptimizedPath ] =
                             this.pathFinder.findBestPath({ range: 0.1 });
+                        let isFirstPoint = true;
                         for (let point of currentOrder.data.path) {
                             for (let xOffset = -this.gameModel.halfXZSize;
-                                xOffset <= 0.0; xOffset += CellSize) {
+                                xOffset < this.gameModel.halfXZSize; xOffset += CellSize) {
                                 for (let zOffset = -this.gameModel.halfXZSize;
-                                    zOffset <= 0.0; zOffset += CellSize) {
+                                    zOffset < this.gameModel.halfXZSize; zOffset += CellSize) {
                                     this.coloredSquares.push(new ColoredSquare({
                                         workruft: this.workruft,
                                         x: point.x + xOffset + HalfCellSize,
                                         z: point.z + zOffset + HalfCellSize,
-                                        color: BlueColor,
-                                        opacity: 0.5
+                                        color: isFirstPoint ? LightGreenColor : BlueColor,
+                                        opacity: isFirstPoint ? 0.5 : 0.25
                                     }));
                                 }
                             }
+                            isFirstPoint = false;
                         }
                     }
 
@@ -134,18 +136,15 @@ class GameUnit {
                             this.gameModel.cellAlignmentOffset;
                         if (this.position.x != alignedX || this.position.z != alignedZ) {
                             //First try aligning the unit.
-                            console.log('alignabru');
                             this.position.x = alignedX;
                             this.position.z = alignedZ;
                         } else if (currentOrder.data.unoptimizedPath != null) {
                             //Next try the unoptimized path.
-                            console.log('optimabru');
                             currentOrder.data.path = currentOrder.data.unoptimizedPath;
                             delete currentOrder.data.unoptimizedPath;
                         } else {
                             //No unoptimized path available; cancel all orders (stop unit).
                             //Stop before the obstruction.
-                            console.log('stoppabru');
                             let newLimitedDistance = Math.max(0.0, this.pathingTester.minPathable.distance -
                                 CellSize - this.gameModel.halfXZSize);
                             //See if the unit can even move at all.

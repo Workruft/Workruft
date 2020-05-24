@@ -223,20 +223,20 @@ class PathFinder {
             CalculateScore({ point: newPoint });
             this.mappedPoints[newX][newZ] = newPoint;
             this.heapedPoints.push(newPoint);
-            this.gameUnit.coloredSquares.push(new ColoredSquare({
-                workruft: this.workruft,
-                x: newX - HalfCellSize,
-                z: newZ - HalfCellSize,
-                color: BlackColor,
-                opacity: 0.1
-            }));
+            // this.gameUnit.coloredSquares.push(new ColoredSquare({
+            //     workruft: this.workruft,
+            //     x: newX - HalfCellSize,
+            //     z: newZ - HalfCellSize,
+            //     color: BlackColor,
+            //     opacity: 0.1
+            // }));
         } else {
             this.gameUnit.coloredSquares.push(new ColoredSquare({
                 workruft: this.workruft,
                 x: newX - HalfCellSize,
                 z: newZ - HalfCellSize,
                 color: RedColor,
-                opacity: 0.5
+                opacity: 0.1
             }));
         }
     }

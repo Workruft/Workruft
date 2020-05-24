@@ -26,6 +26,34 @@ class Workruft {
         });
         this.playerUnit.addToGroup({ objectGroup: this.world.playerObjects });
 
+        this.randoUnits = [];
+        for (let n = 0; n < 10; ++n) {
+            this.randoUnits.push(new GameUnit({
+                workruft: this,
+                gameModel: n > 5 ? this.world.sheepModel : this.world.wolfModel,
+                x: HalfCellSize,
+                z: HalfCellSize
+            }));
+            this.randoUnits[n].addToGroup({ objectGroup: this.world.playerObjects });
+        }
+        setInterval(function() {
+            if (this.gameState != Enums.GameStates.Playing) {
+                return;
+            }
+            for (let n = 0; n < this.randoUnits.length; ++n) {
+                let newOrderObject = {
+                    order: new Order({
+                        type: Enums.OrderTypes.Move,
+                        data: {
+                            x: Math.random() * (this.world.map.maxX - this.world.map.minX) + this.world.map.minX,
+                            z: Math.random() * (this.world.map.maxZ - this.world.map.minZ) + this.world.map.minZ
+                        }
+                    })
+                };
+                this.randoUnits[n].issueReplacementOrder(newOrderObject);
+            }
+        }.bind(this), 4000);
+
         //this.network.connect();
 
         setInterval(this.onUpdate.bind(this), 30);

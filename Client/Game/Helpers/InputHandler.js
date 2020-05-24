@@ -6,7 +6,7 @@ class InputHandler {
         this.keysDown = new Set();
         this.mouseButtonsDown = new Set();
 
-        this.editingSize = 2;
+        this.editingSize = 4;
 
         //Disable right click.
         document.addEventListener('contextmenu', function(event) {
@@ -249,16 +249,17 @@ class InputHandler {
         let scrollDirection = Math.sign(event.deltaY);
         if (this.workruft.gameState == Enums.GameStates.MapEditing && event.ctrlKey) {
             if (scrollDirection < 0) {
-                //Negative scroll: up/forward/in. Decrease editing size.
+                //Negative scroll: up/forward/in. Increase editing size.
+                ++this.editingSize;
+                //Note: Increasing this is no problem, except that that's a lot of ColoredSquares to draw lol...
+                if (this.editingSize > 32) {
+                    this.editingSize = 32;
+                }
+            } else if (scrollDirection > 0) {
+                //Positive scroll: down/backward/out. Decrease editing size.
                 --this.editingSize;
                 if (this.editingSize < 1) {
                     this.editingSize = 1;
-                }
-            } else if (scrollDirection > 0) {
-                //Positive scroll: down/backward/out. Increase editing size.
-                ++this.editingSize;
-                if (this.editingSize > 16) {
-                    this.editingSize = 16;
                 }
             }
             let pickedMapObjectArray = this.workruft.world.pickMap(
@@ -298,6 +299,14 @@ class InputHandler {
     }
 
     updateMapEditorMouseCells({ cellX, cellZ }) {
+        if (!RateLimitRecall({
+            callingFunction: this.updateMapEditorMouseCells,
+            minimumInterval: 1000.0 / 30.0,
+            thisToBind: this,
+            paramsToPass: { cellX, cellZ }
+        })) {
+            return;
+        }
         this.clearEditorSquares();
         let halfEditingSize = this.editingSize * 0.5;
         let floorHalfEditingSize = FloorToCell(halfEditingSize);
@@ -308,7 +317,7 @@ class InputHandler {
                     workruft: this.workruft,
                     x: cellX + xOffset + HalfCellSize,
                     z: cellZ + zOffset + HalfCellSize,
-                    color: BlueColor
+                    color: BlackColor
                 }));
             }
         }

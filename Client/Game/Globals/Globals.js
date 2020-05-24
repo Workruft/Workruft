@@ -31,6 +31,7 @@ let GrassColor = new THREE.Color('#0c4013');
 let DirtColor = new THREE.Color('#2b3c1f');
 let RedColor = new THREE.Color('#A02000');
 let BlueColor = new THREE.Color('#001080');
+let LightGreenColor = new THREE.Color('#188026');
 let YellowColor = new THREE.Color('#FFFF00');
 let BlackColor = new THREE.Color('#000000');
 let ColoredMeshPhongMaterialsMap = new Map();
@@ -289,7 +290,7 @@ for (let borderFlags = 0; borderFlags < 16; ++borderFlags) {
                 green: 7.5,
                 blue: 2.5
             },
-            lineCount: 10000, lengthVariance: 4.0, lengthAddition: 1.0, borderFlags
+            lineCount: 5000, lengthVariance: 14.0, lengthAddition: 1.0, borderFlags
         }),
         shininess: 10
     }));

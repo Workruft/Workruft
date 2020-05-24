@@ -29,21 +29,21 @@ class World {
         this.clock = new THREE.Clock();
 
         //Lights.
-        // this.ambientLight = new THREE.AmbientLight('white', 1.0);
-        // this.scene.add(this.ambientLight);
+        this.ambientLight = new THREE.AmbientLight('white', 2.0);
+        this.scene.add(this.ambientLight);
         //"Sun".
-        this.spotLight = new THREE.SpotLight('white', 1.0);
+        this.spotLight = new THREE.SpotLight('white', 0.5);
         this.spotLight.castShadow = true;
-        this.spotLight.position.set(0, 150, 0);
+        this.spotLight.position.set(0, 250, 0);
         this.spotLight.power = 2000;
         this.spotLight.shadow.mapSize.width = 2048.0;
         this.spotLight.shadow.mapSize.height = 2048.0;
         this.spotLight.shadow.camera.near = 1;
-        this.spotLight.shadow.camera.far = 500;
+        this.spotLight.shadow.camera.far = 5000;
         this.spotLight.shadow.bias = 0.0001;
         this.spotLight.penumba = 0.0;
         this.spotLight.angle = Math.PI / 3;
-        this.spotLight.distance = 500;
+        this.spotLight.distance = 5000;
         this.scene.add(this.spotLight);
         //To see the spot light's shadow camera bounds.
         // this.scene.add(new THREE.CameraHelper(this.spotLight.shadow.camera));
@@ -54,6 +54,20 @@ class World {
         let far = 1000;
         this.camera = new THREE.PerspectiveCamera(fieldOfView, this.aspectRatio, near, far);
         this.camera.layers.enableAll();
+
+        //Post-processing.
+        let renderPass = new RenderPass(this.scene, this.camera);
+        // renderPass.renderToScreen = true;
+        this.effectComposer.addPass(renderPass);
+        let unrealBloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.2, 0.4, 0.0);
+        this.effectComposer.addPass(unrealBloomPass);
+        let smaaPass = new SMAAPass(window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio());
+        smaaPass.renderToScreen = true;
+        this.effectComposer.addPass(smaaPass);
+        // // // let copyPass = new ShaderPass(CopyShader);
+        // // // copyPass.renderToScreen = true;
+        // // // this.effectComposer.addPass(copyPass);
+
         //For terrain picking.
         this.mapRaycaster = new THREE.Raycaster();
         this.mapRaycaster.near = near;
@@ -67,22 +81,9 @@ class World {
         //TODO: Why does this not work?
         //this.objectsRaycaster.params.Mesh.threshold = 5;
 
-        //Post-processing.
-        let renderPass = new RenderPass(this.scene, this.camera);
-        // renderPass.renderToScreen = true;
-        this.effectComposer.addPass(renderPass);
-        let unrealBloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.2, 0.4, 0.0);
-        this.effectComposer.addPass(unrealBloomPass);
-        let smaaPass = new SMAAPass(window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio());
-        smaaPass.renderToScreen = true;
-        this.effectComposer.addPass(smaaPass);
-        // let copyPass = new ShaderPass(CopyShader);
-        // copyPass.renderToScreen = true;
-        // this.effectComposer.addPass(copyPass);
-
         //Action.
         //Map.
-        this.map = new GameMap(50, 50);
+        this.map = new GameMap(100, 100);
         let currentCell;
         //Rampsnstuff.
         let rampIncline = 0.5;
