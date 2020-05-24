@@ -72,6 +72,16 @@ class InputHandler {
                 }
             }
         }
+        //Disable scrolling of the page with the arrow keys.
+        switch (event.key) {
+            case 'ArrowUp':
+            case 'ArrowDown':
+            case 'ArrowLeft':
+            case 'ArrowRight': {
+                event.preventDefault();
+                return false;
+            }
+        }
     }
 
     onKeyUp(event) {
@@ -244,6 +254,8 @@ class InputHandler {
             this.workruft.world.camera.position.y = Math.min(MaxCameraHeight,
                 this.workruft.world.camera.position.y * 1.1);
         }
+        //Disable mouse scrolling of the page.
+        event.preventDefault();
     }
 
     updateMapEditorMouseCells({ cellX, cellZ }) {
