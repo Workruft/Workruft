@@ -38,6 +38,10 @@ let ColoredMeshPhongMaterialsMap = new Map();
 let HalfPI = Math.PI * 0.5;
 let DoublePI = Math.PI * 2.0;
 
+function HasFlag({ borderFlags, testFlag }) {
+    return !!(borderFlags & testFlag);
+}
+
 Enums.create({
     name: 'GameStates',
     items: [ 'Playing', 'MapEditing' ]
@@ -76,8 +80,26 @@ function GenericRound(roundMe) {
     return Math.round(roundMe * 100000000.0) / 100000000.0;
 }
 
-function CreateCanvasTexture({ width, height, color, colorVariance, colorSubtraction,
-    lineCount, lengthVariance, lengthAddition }) {
+function LerpBorderWaveLine({ context, startX, startY, endX, endY, lineCount,
+    horizontalWaveFrequency, horizontalWaveAmplitude, verticalWaveFrequency, verticalWaveAmplitude
+}) {
+    context.beginPath();
+    context.moveTo(startX, startY);
+    let lerpInterval = 1.0 / lineCount;
+    let oneMinus;
+    for (let lerpRatio = 0.0; lerpRatio <= 1.0; lerpRatio += lerpInterval) {
+        oneMinus = 1.0 - lerpRatio;
+        context.lineTo(
+            oneMinus * startX + lerpRatio * endX +
+                Math.sin(verticalWaveFrequency * lerpRatio + Math.random() * 5.0) * verticalWaveAmplitude,
+            oneMinus * startY + lerpRatio * endY +
+                Math.sin(horizontalWaveFrequency * lerpRatio + Math.random() * 5.0) * horizontalWaveAmplitude
+        );
+    }
+    context.stroke();
+}
+function CreateCanvasTexture({ width, height, color, colorVariances, colorSubtractions,
+    lineCount, lengthVariance, lengthAddition, borderFlags }) {
     let context = document.createElement('canvas').getContext('2d');
     context.canvas.width = width;
     context.canvas.height = height;
@@ -90,9 +112,9 @@ function CreateCanvasTexture({ width, height, color, colorVariance, colorSubtrac
         let y = Math.random() * context.canvas.height;
         let direction = Math.random() * DoublePI;
         let length = Math.random() * lengthVariance + lengthAddition;
-        let redDifference = Math.round(Math.random() * colorVariance - colorSubtraction);
-        let greenDifference = Math.round(Math.random() * colorVariance - colorSubtraction);
-        let blueDifference = Math.round(Math.random() * colorVariance - colorSubtraction);
+        let redDifference = Math.round(Math.random() * colorVariances.red - colorSubtractions.red);
+        let greenDifference = Math.round(Math.random() * colorVariances.green - colorSubtractions.green);
+        let blueDifference = Math.round(Math.random() * colorVariances.blue - colorSubtractions.blue);
         for (let pixelIndex = 0; pixelIndex < length; ++pixelIndex) {
             let currentX = Math.floor(x + Math.cos(direction) * pixelIndex);
             if (currentX < 0.0) {
@@ -113,13 +135,70 @@ function CreateCanvasTexture({ width, height, color, colorVariance, colorSubtrac
         }
     }
     context.putImageData(imageData, 0, 0);
+    let clipPath = new Path2D();
+    let clipSize = 4;
+    let doubleClipSize = clipSize * 2.0;
+    clipPath.rect(clipSize, clipSize, context.canvas.width - doubleClipSize, context.canvas.height - doubleClipSize);
+    context.clip(clipPath);
+    context.strokeStyle = '#' + GrassColor.clone().multiplyScalar(0.5).getHexString();
+    let lineWidth = 10.0;
+    context.lineWidth = lineWidth;
+    let waveAmplitude = 1.0;
+    let waveFrequency = 100.0;
+    if (HasFlag({ borderFlags, testFlag: 1 })) {
+        LerpBorderWaveLine({
+            context, startX: 0.0, startY: 0.0,
+            endX: width, endY: 0.0, lineCount: width,
+            horizontalWaveFrequency: waveFrequency, horizontalWaveAmplitude: waveAmplitude,
+            verticalWaveFrequency: waveFrequency, verticalWaveAmplitude: 0.0
+        });
+    }
+    if (HasFlag({ borderFlags, testFlag: 2 })) {
+        LerpBorderWaveLine({
+            context, startX: width, startY: 0.0,
+            endX: width, endY: height, lineCount: height,
+            horizontalWaveFrequency: waveFrequency, horizontalWaveAmplitude: 0.0,
+            verticalWaveFrequency: waveFrequency, verticalWaveAmplitude: waveAmplitude
+        });
+    }
+    if (HasFlag({ borderFlags, testFlag: 4 })) {
+        LerpBorderWaveLine({
+            context, startX: width, startY: height,
+            endX: 0.0, endY: height, lineCount: width,
+            horizontalWaveFrequency: waveFrequency, horizontalWaveAmplitude: waveAmplitude,
+            verticalWaveFrequency: waveFrequency, verticalWaveAmplitude: 0.0
+        });
+    }
+    if (HasFlag({ borderFlags, testFlag: 8 })) {
+        LerpBorderWaveLine({
+            context, startX: 0.0, startY: height,
+            endX: 0.0, endY: 0.0, lineCount: height,
+            horizontalWaveFrequency: waveFrequency, horizontalWaveAmplitude: 0.0,
+            verticalWaveFrequency: waveFrequency, verticalWaveAmplitude: waveAmplitude
+        });
+    }
     // document.body.prepend(context.canvas);
     let canvasTexture = new THREE.CanvasTexture(context.canvas);
-    canvasTexture.repeat.set(1.0, 1.0);
     canvasTexture.wrapS = canvasTexture.wrapT = THREE.RepeatWrapping;
     return canvasTexture;
 }
-let GrassTexture = CreateCanvasTexture({
-    width: 256, height: 256, color: '#0c4013', colorVariance: 10.0, colorSubtraction: 5.0,
-    lineCount: 10000, lengthVariance: 14.0, lengthAddition: 1.0
-});
+let GrassMaterials = [];
+for (let borderFlags = 0; borderFlags < 16; ++borderFlags) {
+    GrassMaterials.push(new THREE.MeshPhongMaterial({
+        map: CreateCanvasTexture({
+            width: 256, height: 256, color: '#' + GrassColor.getHexString(),
+            colorVariances: {
+                red: 10.0,
+                green: 20.0,
+                blue: 10.0,
+            },
+            colorSubtractions: {
+                red: 5.0,
+                green: 10.0,
+                blue: 5.0
+            },
+            lineCount: 10000, lengthVariance: 9.0, lengthAddition: 1.0, borderFlags
+        }),
+        shininess: 10
+    }));
+}

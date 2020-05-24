@@ -12,12 +12,14 @@ class World {
         this.canvas = HTML.gameCanvas;
         this.renderer = new THREE.WebGLRenderer({
             canvas: this.canvas,
-            antialias: true,
+            // antialias: true,
             powerPreference: 'high-performance'
         });
+        this.effectComposer = new EffectComposer(this.renderer);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.physicallyCorrectLights = true;
+        this.renderer.setPixelRatio(window.devicePixelRatio);
         this.selectionCircleModelsMap = new Map();
         this.selectedObjects = new Set();
         this.onResize();
@@ -27,19 +29,19 @@ class World {
         this.clock = new THREE.Clock();
 
         //Lights.
-        this.ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.0);
-        this.scene.add(this.ambientLight);
+        // this.ambientLight = new THREE.AmbientLight('white', 1.0);
+        // this.scene.add(this.ambientLight);
         //"Sun".
         this.spotLight = new THREE.SpotLight('white', 1.0);
         this.spotLight.castShadow = true;
-        this.spotLight.position.set(0, 100, 0);
-        this.spotLight.power = 1500;
-        this.spotLight.shadow.mapSize.width = 1024.0;
-        this.spotLight.shadow.mapSize.height = 1024.0;
+        this.spotLight.position.set(0, 150, 0);
+        this.spotLight.power = 2000;
+        this.spotLight.shadow.mapSize.width = 2048.0;
+        this.spotLight.shadow.mapSize.height = 2048.0;
         this.spotLight.shadow.camera.near = 1;
         this.spotLight.shadow.camera.far = 500;
-        this.spotLight.shadow.bias = 0.001;
-        this.spotLight.penumba = 0.5;
+        this.spotLight.shadow.bias = 0.0001;
+        this.spotLight.penumba = 0.0;
         this.spotLight.angle = Math.PI / 3;
         this.spotLight.distance = 500;
         this.scene.add(this.spotLight);
@@ -64,6 +66,19 @@ class World {
         this.objectsRaycaster.layers.set(0);
         //TODO: Why does this not work?
         //this.objectsRaycaster.params.Mesh.threshold = 5;
+
+        //Post-processing.
+        let renderPass = new RenderPass(this.scene, this.camera);
+        // renderPass.renderToScreen = true;
+        this.effectComposer.addPass(renderPass);
+        let unrealBloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.2, 0.4, 0.0);
+        this.effectComposer.addPass(unrealBloomPass);
+        let smaaPass = new SMAAPass(window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio());
+        smaaPass.renderToScreen = true;
+        this.effectComposer.addPass(smaaPass);
+        // let copyPass = new ShaderPass(CopyShader);
+        // copyPass.renderToScreen = true;
+        // this.effectComposer.addPass(copyPass);
 
         //Action.
         //Map.
@@ -145,7 +160,13 @@ class World {
 
     onResize() {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.effectComposer.setSize(window.innerWidth, window.innerHeight);
         this.aspectRatio = window.innerWidth / window.innerHeight;
+
+        //Update the camera aspect ratio if needed.
+        if (IsDefined(this.camera)) {
+            this.camera.aspect = this.aspectRatio;
+        }
 
         this.setupResizeGameModels();
     }
@@ -195,7 +216,7 @@ class World {
         this.wolfModel = new GameModel({
             world: this,
             geometry: SmallSphereGeometry,
-            material: new THREE.MeshPhongMaterial({ color: '#555' }),
+            material: new THREE.MeshPhongMaterial({ color: '#666' }),
             xzSize: SmallSize,
             ySize: SmallSize
         });
@@ -213,7 +234,8 @@ class World {
         if (this.isDeconstructing) {
             return;
         }
-        this.renderer.render(this.scene, this.camera);
+        // this.renderer.render(this.scene, this.camera);
+        this.effectComposer.render();
         requestAnimationFrame(this.boundGraphicsLoop);
     }
 
@@ -234,7 +256,7 @@ class World {
     pickMap(mousePositionVector) {
         this.mapRaycaster.setFromCamera(mousePositionVector, this.camera);
         //TODO: If this yields nothing, use this.mapRaycaster.ray.intersectPlane() and bound the point to the map.
-        return this.mapRaycaster.intersectObjects([ this.map.topMesh ], true);
+        return this.mapRaycaster.intersectObjects([ this.map.topMesh, this.map.sideMesh ], true);
     }
     //From the docs: {
         //distance – distance between the origin of the ray and the intersection

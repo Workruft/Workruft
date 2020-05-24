@@ -104,11 +104,7 @@ class GameMap {
 
         this.topMesh = new THREE.Mesh(
             this.topGeometry,
-            new THREE.MeshPhongMaterial({
-                map: GrassTexture,
-                // side: THREE.DoubleSide,
-                shininess: 10
-            })
+            GrassMaterials
         );
         this.topMesh.castShadow = true;
         this.topMesh.receiveShadow = true;
@@ -294,6 +290,30 @@ class GameMap {
                         });
                     }
                 }
+            }
+        }
+        //Go through each side within and just beyond the bounds.
+        for (let x = lowX - 1; x < highX + 1; x += CellSize) {
+            if (x < this.minX) {
+                continue;
+            }
+            if (x > this.maxX) {
+                continue;
+            }
+            for (let z = lowZ - 1; z < highZ + 1; z += CellSize) {
+                if (z < this.minZ) {
+                    continue;
+                }
+                if (z > this.maxZ) {
+                    continue;
+                }
+                currentCell = this.getCell({ x, z });
+                currentCell.faces.top[0].materialIndex =
+                    (this.isBackTraversable({ cell: currentCell }) ? 0 : 4) |
+                    (this.isRightTraversable({ cell: currentCell }) ? 0 : 2) |
+                    (this.isFrontTraversable({ cell: currentCell }) ? 0 : 1) |
+                    (this.isLeftTraversable({ cell: currentCell }) ? 0 : 8);
+                currentCell.faces.top[1].materialIndex = currentCell.faces.top[0].materialIndex;
             }
         }
 

@@ -8,7 +8,7 @@ class GameUnit {
         this.private = {
             mesh: gameModel.createNewMesh(),
             orders: [],
-            speed: 50.0
+            speed: 25.0
         };
         this.private.mesh.position.y = this.gameModel.halfYSize;
         this.private.mesh.userData = this;
