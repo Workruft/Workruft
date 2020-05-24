@@ -80,6 +80,98 @@ function GenericRound(roundMe) {
     return Math.round(roundMe * 100000000.0) / 100000000.0;
 }
 
+//Must be a WeakMap to store the functions as keys by reference rather than having JS auto-convert them into strings...
+let OverExecutionGuard = new WeakMap();
+//Call this from the specified calling function to rate limit how often the rest of
+//the function gets executed at a specified minimum interval. Utilize the return value of this
+//function to determine whether to continue execution of the specified calling function. The
+//calling function will *not* be recalled at a later time if it cannot execute immediately.
+//Note: Do not bind the callingFunction parameter passed to this function!
+//Returns whether to continue on with the rest of the function (true) or return out of it immediately (false).
+function RateLimit({ callingFunction, minimumInterval }) {
+    //Get the current ticks.
+    let currentTicks = performance.now;
+
+    //Get or create the current over execution guard object.
+    let currentGuard;
+    if (OverExecutionGuard.has(callingFunction)) {
+        currentGuard = OverExecutionGuard.get(callingFunction);
+    } else {
+        //Go ahead and call the function now, since this is the first time.
+        currentGuard = {
+            lastTicks: currentTicks
+        };
+        OverExecutionGuard.set(callingFunction, currentGuard);
+    }
+
+    //Check to ensure that the minimum interval has passed since the last execution time.
+    if (currentGuard.lastTicks + minimumInterval <= currentTicks) {
+        currentGuard.lastTicks = currentTicks;
+        return true;
+    }
+
+    return false;
+}
+
+//Call this from the specified calling function to rate limit how often the rest of
+//the function gets executed at a specified minimum interval. Utilize the return value of this
+//function to determine whether to continue execution of the specified calling function. The
+//calling function will be recalled at a later time if it cannot execute immediately.
+//Note: Do not bind the callingFunction parameter passed to this function!
+//Returns whether to continue on with the rest of the function (true) or return out of it immediately (false).
+function RateLimitRecall({ callingFunction, minimumInterval, thisToBind, paramsToPass }) {
+    //Get the current ticks.
+    let currentTicks = performance.now;
+
+    //Get or create the current over execution guard object.
+    let currentGuard;
+    if (OverExecutionGuard.has(callingFunction)) {
+        currentGuard = OverExecutionGuard.get(callingFunction);
+    } else {
+        //Go ahead and call the function now, since this is the first time.
+        currentGuard = {
+            isCallingNow: true,
+            lastTicks: currentTicks,
+            alreadyHasTimeout: false
+        };
+        OverExecutionGuard.set(callingFunction, currentGuard);
+    }
+
+    //Avoid recursion: if the function is being called from a RateLimitRecall timeout, go ahead and
+    //let it execute.
+    if (currentGuard.isCallingNow) {
+        currentGuard.isCallingNow = false;
+        currentGuard.lastTicks = currentTicks;
+        return true;
+    }
+
+    //Check to ensure that the minimum interval has passed since the last execution time.
+    if (currentGuard.lastTicks + minimumInterval <= currentTicks) {
+        currentGuard.lastTicks = currentTicks;
+        return true;
+    }
+
+    //See if a timeout has already been created.
+    if (currentGuard.alreadyHasTimeout) {
+        //Do nothing. When the timeout expires, it will call the function.
+        return false;
+    }
+
+    //The function is not currently being called, the minimum interval has not passed since the
+    //last execution time, and a timeout for the next call has not already been created.
+    //Therefore, create a timeout.
+    currentGuard.alreadyHasTimeout = true;
+    //eslint-disable-next-line no-shadow
+    setTimeout(function (currentGuard, callingFunction, thisToBind, paramsToPass) {
+        //There's no longer a timeout, and the function is being called now, so don't rate limit
+        //it this time.
+        currentGuard.alreadyHasTimeout = false;
+        currentGuard.isCallingNow = true;
+        callingFunction.call(thisToBind, paramsToPass);
+    }.bind(this, currentGuard, callingFunction, thisToBind, paramsToPass),
+    currentGuard.lastTicks + minimumInterval - currentTicks);
+}
+
 function LerpBorderWaveLine({ context, startX, startY, endX, endY, lineCount,
     horizontalWaveFrequency, horizontalWaveAmplitude, verticalWaveFrequency, verticalWaveAmplitude
 }) {
