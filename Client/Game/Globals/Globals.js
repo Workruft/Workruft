@@ -91,7 +91,7 @@ let OverExecutionGuard = new WeakMap();
 //Returns whether to continue on with the rest of the function (true) or return out of it immediately (false).
 function RateLimit({ callingFunction, minimumInterval }) {
     //Get the current ticks.
-    let currentTicks = performance.now;
+    let currentTicks = performance.now();
 
     //Get or create the current over execution guard object.
     let currentGuard;
@@ -122,7 +122,7 @@ function RateLimit({ callingFunction, minimumInterval }) {
 //Returns whether to continue on with the rest of the function (true) or return out of it immediately (false).
 function RateLimitRecall({ callingFunction, minimumInterval, thisToBind, paramsToPass }) {
     //Get the current ticks.
-    let currentTicks = performance.now;
+    let currentTicks = performance.now();
 
     //Get or create the current over execution guard object.
     let currentGuard;

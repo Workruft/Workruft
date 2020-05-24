@@ -299,11 +299,9 @@ class InputHandler {
     }
 
     updateMapEditorMouseCells({ cellX, cellZ }) {
-        if (!RateLimitRecall({
+        if (!RateLimit({
             callingFunction: this.updateMapEditorMouseCells,
-            minimumInterval: 1000.0 / 30.0,
-            thisToBind: this,
-            paramsToPass: { cellX, cellZ }
+            minimumInterval: 1000.0 / 30.0
         })) {
             return;
         }
