@@ -174,7 +174,7 @@ function RateLimitRecall({ callingFunction, minimumInterval, thisToBind, paramsT
 }
 
 function LerpBorderWaveLine({ context, startX, startY, endX, endY, lineCount,
-    horizontalWaveFrequency, horizontalWaveAmplitude, verticalWaveFrequency, verticalWaveAmplitude
+    waveFrequency, horizontalWaveAmplitude, verticalWaveAmplitude, waveRandomness
 }) {
     context.beginPath();
     context.moveTo(startX, startY);
@@ -184,20 +184,20 @@ function LerpBorderWaveLine({ context, startX, startY, endX, endY, lineCount,
         oneMinus = 1.0 - lerpRatio;
         context.lineTo(
             oneMinus * startX + lerpRatio * endX +
-                Math.sin(verticalWaveFrequency * lerpRatio + Math.random() * 5.0) * verticalWaveAmplitude,
+                Math.sin(waveFrequency * lerpRatio + Math.random() * waveRandomness) * verticalWaveAmplitude,
             oneMinus * startY + lerpRatio * endY +
-                Math.sin(horizontalWaveFrequency * lerpRatio + Math.random() * 5.0) * horizontalWaveAmplitude
+                Math.sin(waveFrequency * lerpRatio + Math.random() * waveRandomness) * horizontalWaveAmplitude
         );
     }
     context.stroke();
 }
-function CreateCanvasTexture({ width, height, color, colorVariances, colorSubtractions,
+function CreateCanvasTexture({ width, height, color, borderColor, colorVariances, colorSubtractions,
     lineCount, lengthVariance, lengthAddition,
-    borderLineWidth, borderWaveAmplitude, borderWaveFrequency, borderFlags }) {
+    borderLineWidth, waveFrequency, waveAmplitude, waveRandomness, borderFlags }) {
     let context = document.createElement('canvas').getContext('2d');
     context.canvas.width = width;
     context.canvas.height = height;
-    context.fillStyle = color;
+    context.fillStyle = '#' + color.getHexString();
     context.fillRect(0, 0, width, height);
     let imageData = context.getImageData(0, 0, width, height);
     let data = imageData.data;
@@ -229,38 +229,34 @@ function CreateCanvasTexture({ width, height, color, colorVariances, colorSubtra
         }
     }
     context.putImageData(imageData, 0, 0);
-    context.strokeStyle = '#' + GrassColor.clone().multiplyScalar(0.5).getHexString();
+    context.strokeStyle = '#' + borderColor.getHexString();
     context.lineWidth = borderLineWidth;
     if (HasFlag({ borderFlags, testFlag: 1 })) {
         LerpBorderWaveLine({
             context, startX: 0.0, startY: 0.0,
             endX: width, endY: 0.0, lineCount: width,
-            horizontalWaveFrequency: borderWaveFrequency, horizontalWaveAmplitude: borderWaveAmplitude,
-            verticalWaveFrequency: borderWaveFrequency, verticalWaveAmplitude: 0.0
+            waveFrequency, horizontalWaveAmplitude: waveAmplitude, verticalWaveAmplitude: 0.0, waveRandomness
         });
     }
     if (HasFlag({ borderFlags, testFlag: 2 })) {
         LerpBorderWaveLine({
             context, startX: width, startY: 0.0,
             endX: width, endY: height, lineCount: height,
-            horizontalWaveFrequency: borderWaveFrequency, horizontalWaveAmplitude: 0.0,
-            verticalWaveFrequency: borderWaveFrequency, verticalWaveAmplitude: borderWaveAmplitude
+            waveFrequency, horizontalWaveAmplitude: 0.0, verticalWaveAmplitude: waveAmplitude, waveRandomness
         });
     }
     if (HasFlag({ borderFlags, testFlag: 4 })) {
         LerpBorderWaveLine({
             context, startX: width, startY: height,
             endX: 0.0, endY: height, lineCount: width,
-            horizontalWaveFrequency: borderWaveFrequency, horizontalWaveAmplitude: borderWaveAmplitude,
-            verticalWaveFrequency: borderWaveFrequency, verticalWaveAmplitude: 0.0
+            waveFrequency, horizontalWaveAmplitude: waveAmplitude, verticalWaveAmplitude: 0.0, waveRandomness
         });
     }
     if (HasFlag({ borderFlags, testFlag: 8 })) {
         LerpBorderWaveLine({
             context, startX: 0.0, startY: height,
             endX: 0.0, endY: 0.0, lineCount: height,
-            horizontalWaveFrequency: borderWaveFrequency, horizontalWaveAmplitude: 0.0,
-            verticalWaveFrequency: borderWaveFrequency, verticalWaveAmplitude: borderWaveAmplitude
+            waveFrequency, horizontalWaveAmplitude: 0.0, verticalWaveAmplitude: waveAmplitude, waveRandomness
         });
     }
     // document.body.prepend(context.canvas);
@@ -269,23 +265,28 @@ function CreateCanvasTexture({ width, height, color, colorVariances, colorSubtra
     return canvasTexture;
 }
 let GrassMaterials = [];
-for (let borderFlags = 0; borderFlags < 16; ++borderFlags) {
-    GrassMaterials.push(new THREE.MeshPhongMaterial({
-        map: CreateCanvasTexture({
-            width: 256, height: 256, color: '#' + GrassColor.getHexString(),
-            colorVariances: {
-                red: 5.0,
-                green: 15.0,
-                blue: 5.0,
-            },
-            colorSubtractions: {
-                red: 2.5,
-                green: 7.5,
-                blue: 2.5
-            },
-            lineCount: 5000, lengthVariance: 14.0, lengthAddition: 1.0,
-            borderLineWidth: 20.0, borderWaveAmplitude: 1.0, borderWaveFrequency: 100.0, borderFlags
-        }),
-        shininess: 10
-    }));
+{
+    let grassBorderColor = GrassColor.clone().multiplyScalar(0.4);
+    for (let borderFlags = 0; borderFlags < 16; ++borderFlags) {
+        GrassMaterials.push(new THREE.MeshPhongMaterial({
+            map: CreateCanvasTexture({
+                width: 256, height: 256,
+                color: GrassColor,
+                borderColor: grassBorderColor,
+                colorVariances: {
+                    red: 5.0,
+                    green: 15.0,
+                    blue: 5.0,
+                },
+                colorSubtractions: {
+                    red: 2.5,
+                    green: 7.5,
+                    blue: 2.5
+                },
+                lineCount: 5000, lengthVariance: 14.0, lengthAddition: 1.0, borderLineWidth: 40.0,
+                waveFrequency: 100.0, waveAmplitude: 1.0, waveRandomness: 1.5, borderFlags
+            }),
+            shininess: 10
+        }));
+    }
 }
