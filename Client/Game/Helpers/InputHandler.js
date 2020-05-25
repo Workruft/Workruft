@@ -54,16 +54,17 @@ class InputHandler {
                     case this.inputBindings.ToggleMapEditor: {
                         if (this.workruft.gameState == Enums.GameStates.Playing) {
                             this.workruft.world.deselectAll();
-                            for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
-                                this.workruft.randoUnits[n].cancelAllOrders();
-                                this.workruft.randoUnits[n].clearColoredSquares();
-                                this.workruft.randoUnits[n].position.y = -100.0;
-                            }
-                            this.workruft.playerUnit.clearColoredSquares();
-                            HTML.statusBox.innerHTML = 'Map Editor mode';
                             this.workruft.gameState = Enums.GameStates.MapEditing;
                         } else if (this.workruft.gameState == Enums.GameStates.MapEditing) {
                             this.clearEditorSquares();
+                            this.workruft.gameState = Enums.GameStates.Playing;
+                        }
+                        this.workruft.updateStatusBox();
+                        break;
+                    }
+                    case this.inputBindings.TogglePathTesting: {
+                        this.workruft.isPathTesting = !this.workruft.isPathTesting;
+                        if (this.workruft.isPathTesting) {
                             for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
                                 this.workruft.randoUnits[n].cancelAllOrders();
                                 this.workruft.randoUnits[n].position.x = this.workruft.playerUnit.position.x +
@@ -72,9 +73,15 @@ class InputHandler {
                                     this.workruft.playerUnit.gameModel.xzSize;
                                 this.workruft.randoUnits[n].autoSetHeight();
                             }
-                            HTML.statusBox.innerHTML = '';
-                            this.workruft.gameState = Enums.GameStates.Playing;
+                        } else {
+                            for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
+                                this.workruft.randoUnits[n].cancelAllOrders();
+                                this.workruft.randoUnits[n].clearColoredSquares();
+                                this.workruft.randoUnits[n].position.y = -100.0;
+                            }
+                            this.workruft.playerUnit.clearColoredSquares();
                         }
+                        this.workruft.updateStatusBox();
                         break;
                     }
                     case this.inputBindings.RotateCameraClockwise: {
@@ -257,8 +264,11 @@ class InputHandler {
     }
 
     onDocumentMouseMove(event) {
+        if (event.target == HTML.gameCanvas) {
+            return;
+        }
         let newEvent;
-        if (event.target.classList.contains('maintainCanvasMouse')) {
+        if (event.target.classList != null && event.target.classList.contains('maintainCanvasMouse')) {
             newEvent = new MouseEvent('mousemove', event);
         } else {
             newEvent = new MouseEvent('mousemove', {
@@ -275,7 +285,7 @@ class InputHandler {
         if (event.relatedTarget == null) {
             return;
         }
-        if (!event.relatedTarget.classList.contains('maintainCanvasMouse')) {
+        if (event.relatedTarget.classList == null || !event.relatedTarget.classList.contains('maintainCanvasMouse')) {
             let newEvent = new MouseEvent('mousemove', {
                 clientX: window.innerWidth * 0.5,
                 clientY: window.innerHeight * 0.5,

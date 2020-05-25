@@ -1,11 +1,11 @@
 html {
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
 }
 
 body {
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
     background-color: black;
     color: white;
 }
@@ -15,7 +15,7 @@ canvas {
 }
 
 #chatBox {
-    margin: 0;
+    margin: 0px;
     padding: 0px 0px 4px 6px;
     position: absolute;
     display: flex;
@@ -28,16 +28,16 @@ canvas {
 }
 
 .chatMessage {
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
     text-align: left;
     font-family: Montserrat, Open Sans, Verdana;
     font-size: 16px;
 }
 
 #chatEntryBox {
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
     position: absolute;
     width: calc(50%);
     bottom: 5px;
@@ -50,8 +50,8 @@ canvas {
 }
 
 #statusBox {
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
     position: absolute;
     width: calc(50%);
     bottom: 5px;
@@ -64,20 +64,22 @@ canvas {
 }
 
 #mapEditToolPanel {
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 4px;
     position: absolute;
     display: flex;
     align-items: flex-end;
     flex-wrap: wrap;
     flex-direction: row;
-    width: 88px;
-    top: 5px;
-    right: 4px;
+    width: 80px;
+    top: 0px;
+    right: 0px;
+    background-color: #000000A0;
+    border-radius: 0px 0px 0px 8px;
 }
 
 .iconButton {
-    margin: 4px;
+    margin: 2px;
     width: 36px;
     height: 36px;
     background-color: #000000;
@@ -106,5 +108,5 @@ canvas {
 }
 
 button::-moz-focus-inner {
-    border: 0;
+    border: 0px;
 }

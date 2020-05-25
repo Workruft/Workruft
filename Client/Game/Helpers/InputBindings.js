@@ -12,6 +12,7 @@ class InputBindings {
         this.ToggleChat = 'Enter';
         this.CancelChat = 'Escape';
         this.ToggleMapEditor = 'm';
+        this.TogglePathTesting = 'p';
 
         //Mouse button down's. Left: 0, Middle: 1, Right: 2.
 

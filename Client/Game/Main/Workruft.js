@@ -1,13 +1,16 @@
 class Workruft {
     constructor() {
-        this.gameState = Enums.GameStates.MapEditing;
+        this.gameState = Enums.GameStates.Playing;
+        this.isPathTesting = false;
+        this.updateStatusBox();
 
         this.inputBindings = new InputBindings();
         this.inputHandler = new InputHandler({ workruft: this, inputBindings: this.inputBindings });
 
         this.chat = new Chat(this.onChatEntry.bind(this));
         this.chat.print({ message: 'Workruft!' });
-        this.chat.print({ message: 'Press \'m\' to toggle map editing mode.' });
+        this.chat.print({ message: 'Press \'' + this.inputBindings.ToggleMapEditor + '\' to toggle map editing mode.' });
+        this.chat.print({ message: 'Press \'' + this.inputBindings.TogglePathTesting + '\' to toggle map path testing.' });
         this.world = new World(this.chat, this.onUpdate.bind(this));
         this.world.camera.position.set(0, 75, 10);
         this.world.camera.lookAt(0, 0, this.world.camera.position.z - 10);
@@ -34,15 +37,17 @@ class Workruft {
             this.randoUnits.push(new GameUnit({
                 workruft: this,
                 gameModel: n > 5 ? this.world.sheepModel : this.world.wolfModel,
-                x: randomPoint.x,
-                z: randomPoint.z
+                x: this.playerUnit.position.x,
+                z: this.playerUnit.position.x
             }));
+            this.randoUnits[n].position.y = -100.0;
             this.randoUnits[n].addToGroup({ objectGroup: this.world.playerObjects });
         }
         setInterval(function() {
-            if (this.gameState != Enums.GameStates.Playing) {
+            if (!this.isPathTesting) {
                 return;
             }
+            this.playerUnit.clearColoredSquares();
             for (let n = 0; n < this.randoUnits.length; ++n) {
                 let newOrderObject = {
                     order: new Order({
@@ -90,5 +95,12 @@ class Workruft {
 
     onChatEntry(text) {
         this.chat.print({ message: 'You: ' + text });
+    }
+
+    updateStatusBox() {
+        HTML.statusBox.innerHTML = Enums.GameStates.items[this.gameState] + ' mode';
+        if (this.isPathTesting) {
+            HTML.statusBox.innerHTML += ' (Path Testing)';
+        }
     }
 }
