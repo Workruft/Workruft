@@ -78,8 +78,22 @@ canvas {
 .iconButton {
     width: 28px;
     height: 28px;
-    background-color: black;
+    background-color: #000000;
     background-position: center;
     border: none;
     border-radius: 5px;
+    cursor: pointer;
+    outline: none;
+}
+
+.iconButton:hover {
+    background-color: #303030;
+}
+
+.iconButton:active {
+    background-color: #606060;
+}
+
+button::-moz-focus-inner {
+    border: 0;
 }
