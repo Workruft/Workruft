@@ -69,29 +69,40 @@ canvas {
     position: absolute;
     display: flex;
     align-items: flex-end;
-    flex-direction: row-reverse;
-    width: calc(20%);
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 88px;
     top: 5px;
     right: 4px;
 }
 
 .iconButton {
-    width: 28px;
-    height: 28px;
+    margin: 4px;
+    width: 36px;
+    height: 36px;
     background-color: #000000;
-    background-position: center;
-    border: none;
+    background-repeat: no-repeat;
+    border: 1px solid #404040;
     border-radius: 5px;
     cursor: pointer;
     outline: none;
 }
 
+.centerIcons {
+    background-position: center, center;
+}
+
+.cornerCenterIcons {
+    background-position: bottom right, center;
+}
+
 .iconButton:hover {
-    background-color: #303030;
+    border-color: #707070;
 }
 
 .iconButton:active {
-    background-color: #606060;
+    background-color: #303030;
+    border-color: #A0A0A0;
 }
 
 button::-moz-focus-inner {
