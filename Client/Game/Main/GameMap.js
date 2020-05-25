@@ -50,8 +50,6 @@ class GameMap {
                     rightTraversable: x != this.maxX,
                     frontTraversable: z != this.maxZ
                 };
-                column[z].faces.top[0].color = GrassColor;
-                column[z].faces.top[1].color = GrassColor;
                 //Corners:
                 //        Back
                 //      0-----1
@@ -59,16 +57,16 @@ class GameMap {
                 //    3-----2
                 //    Front
                 this.topGeometry.vertices.push(
-                    new THREE.Vector3(x, MapBottomY, z),
+                    new THREE.Vector3(x,            MapBottomY, z),
                     new THREE.Vector3(x + CellSize, MapBottomY, z),
                     new THREE.Vector3(x + CellSize, MapBottomY, z + CellSize),
-                    new THREE.Vector3(x, MapBottomY, z + CellSize)
+                    new THREE.Vector3(x,            MapBottomY, z + CellSize)
                 );
                 this.sideGeometry.vertices.push(
-                    new THREE.Vector3(x, MapBottomY, z),
+                    new THREE.Vector3(x,            MapBottomY, z),
                     new THREE.Vector3(x + CellSize, MapBottomY, z),
                     new THREE.Vector3(x + CellSize, MapBottomY, z + CellSize),
-                    new THREE.Vector3(x, MapBottomY, z + CellSize)
+                    new THREE.Vector3(x,            MapBottomY, z + CellSize)
                 );
                 this.topGeometry.faces.push(...column[z].faces.top);
             }
@@ -91,6 +89,31 @@ class GameMap {
                 }
             }
         }
+
+        //All of this code only needs to be evaluated once because the X and Z coordinates don't change.
+        //Need normals to be calculated before calculating faceVertexUvs.
+        this.topGeometry.computeFaceNormals();
+        this.topGeometry.faces.forEach(function(face) {
+            //Sort the normals, the direction of the face XYZ components.
+            //Only the highest 2 will be utilized; Y has been ommitted for optimization.
+            let components = ['x', 'z'].sort(function(a, b) {
+                return Math.abs(face.normal[a]) > Math.abs(face.normal[b]);
+            });
+
+            //Get the vertices for each point of the face triangle.
+            let v1 = this.topGeometry.vertices[face.a];
+            let v2 = this.topGeometry.vertices[face.b];
+            let v3 = this.topGeometry.vertices[face.c];
+
+            //Specify the U & V texture mapping coordinate for each vertex of the face triangle.
+            //U & V values range from 0.0-1.0 as a percentage of the texture width and height, but
+            //RepeatWrapping will take care of this math just fine, since this is a "regular grid".
+            this.topGeometry.faceVertexUvs[0].push([
+                new THREE.Vector2(v1[components[0]], v1[components[1]]),
+                new THREE.Vector2(v2[components[0]], v2[components[1]]),
+                new THREE.Vector2(v3[components[0]], v3[components[1]])
+            ]);
+        }.bind(this));
 
         this.updateCells({
             lowX: this.minX, lowZ: this.minZ, highX: this.maxX, highZ: this.maxZ
@@ -345,46 +368,9 @@ class GameMap {
             }
         }
 
-        //TODO: This is extraordinarily slow! Update individually as needed!
-        this.topGeometry.faceVertexUvs[0] = [];
-        this.topGeometry.faces.forEach(function(face) {
-            let components = ['x', 'y', 'z'].sort(function(a, b) {
-                return Math.abs(face.normal[a]) > Math.abs(face.normal[b]);
-            });
-
-            let v1 = this.topGeometry.vertices[face.a];
-            let v2 = this.topGeometry.vertices[face.b];
-            let v3 = this.topGeometry.vertices[face.c];
-
-            this.topGeometry.faceVertexUvs[0].push([
-                new THREE.Vector2(v1[components[0]], v1[components[1]]),
-                new THREE.Vector2(v2[components[0]], v2[components[1]]),
-                new THREE.Vector2(v3[components[0]], v3[components[1]])
-            ]);
-        }.bind(this));
-        this.topGeometry.verticesNeedUpdate = true;
         this.topGeometry.elementsNeedUpdate = true;
-        this.topGeometry.uvsNeedUpdate = true;
         this.topGeometry.computeFaceNormals();
-        // this.sideGeometry.faceVertexUvs[0] = [];
-        // this.sideGeometry.faces.forEach(function(face) {
-        //     let components = ['x', 'y', 'z'].sort(function(a, b) {
-        //         return Math.abs(face.normal[a]) > Math.abs(face.normal[b]);
-        //     });
-
-        //     let v1 = this.sideGeometry.vertices[face.a];
-        //     let v2 = this.sideGeometry.vertices[face.b];
-        //     let v3 = this.sideGeometry.vertices[face.c];
-
-        //     this.sideGeometry.faceVertexUvs[0].push([
-        //         new THREE.Vector2(v1[components[0]], v1[components[1]]),
-        //         new THREE.Vector2(v2[components[0]], v2[components[1]]),
-        //         new THREE.Vector2(v3[components[0]], v3[components[1]])
-        //     ]);
-        // }.bind(this));
-        this.sideGeometry.verticesNeedUpdate = true;
         this.sideGeometry.elementsNeedUpdate = true;
-        // this.sideGeometry.uvsNeedUpdate = true;
         this.sideGeometry.computeFaceNormals();
     }
 

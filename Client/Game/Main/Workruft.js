@@ -1,6 +1,6 @@
 class Workruft {
     constructor() {
-        this.gameState = Enums.GameStates.Playing;
+        this.gameState = Enums.GameStates.MapEditing;
 
         this.inputBindings = new InputBindings();
         this.inputHandler = new InputHandler({ workruft: this, inputBindings: this.inputBindings });

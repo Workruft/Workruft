@@ -192,17 +192,18 @@ function LerpBorderWaveLine({ context, startX, startY, endX, endY, lineCount,
     context.stroke();
 }
 function CreateCanvasTexture({ width, height, color, colorVariances, colorSubtractions,
-    lineCount, lengthVariance, lengthAddition, borderFlags }) {
+    lineCount, lengthVariance, lengthAddition,
+    borderLineWidth, borderWaveAmplitude, borderWaveFrequency, borderFlags }) {
     let context = document.createElement('canvas').getContext('2d');
     context.canvas.width = width;
     context.canvas.height = height;
     context.fillStyle = color;
-    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-    let imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    context.fillRect(0, 0, width, height);
+    let imageData = context.getImageData(0, 0, width, height);
     let data = imageData.data;
     for (let lineIndex = 0; lineIndex < lineCount; ++lineIndex) {
-        let x = Math.random() * context.canvas.width;
-        let y = Math.random() * context.canvas.height;
+        let x = Math.random() * width;
+        let y = Math.random() * height;
         let direction = Math.random() * DoublePI;
         let length = Math.random() * lengthVariance + lengthAddition;
         let redDifference = Math.round(Math.random() * colorVariances.red - colorSubtractions.red);
@@ -211,68 +212,60 @@ function CreateCanvasTexture({ width, height, color, colorVariances, colorSubtra
         for (let pixelIndex = 0; pixelIndex < length; ++pixelIndex) {
             let currentX = Math.floor(x + Math.cos(direction) * pixelIndex);
             if (currentX < 0.0) {
-                currentX += context.canvas.width;
-            } else if (currentX >= context.canvas.width) {
-                currentX -= context.canvas.width;
+                currentX += width;
+            } else if (currentX >= width) {
+                currentX -= width;
             }
             let currentY = Math.floor(y + Math.sin(direction) * pixelIndex);
             if (currentY < 0.0) {
-                currentY += context.canvas.height;
-            } else if (currentX >= context.canvas.height) {
-                currentY -= context.canvas.height;
+                currentY += height;
+            } else if (currentX >= height) {
+                currentY -= height;
             }
-            let currentOffset = currentY * context.canvas.width * 4 + currentX * 4;
+            let currentOffset = currentY * width * 4 + currentX * 4;
             data[currentOffset] += redDifference;
             data[currentOffset + 1] += greenDifference;
             data[currentOffset + 2] += blueDifference;
         }
     }
     context.putImageData(imageData, 0, 0);
-    let clipPath = new Path2D();
-    let clipSize = 4;
-    let doubleClipSize = clipSize * 2.0;
-    clipPath.rect(clipSize, clipSize, context.canvas.width - doubleClipSize, context.canvas.height - doubleClipSize);
-    context.clip(clipPath);
     context.strokeStyle = '#' + GrassColor.clone().multiplyScalar(0.5).getHexString();
-    let lineWidth = 10.0;
-    context.lineWidth = lineWidth;
-    let waveAmplitude = 1.0;
-    let waveFrequency = 100.0;
+    context.lineWidth = borderLineWidth;
     if (HasFlag({ borderFlags, testFlag: 1 })) {
         LerpBorderWaveLine({
             context, startX: 0.0, startY: 0.0,
             endX: width, endY: 0.0, lineCount: width,
-            horizontalWaveFrequency: waveFrequency, horizontalWaveAmplitude: waveAmplitude,
-            verticalWaveFrequency: waveFrequency, verticalWaveAmplitude: 0.0
+            horizontalWaveFrequency: borderWaveFrequency, horizontalWaveAmplitude: borderWaveAmplitude,
+            verticalWaveFrequency: borderWaveFrequency, verticalWaveAmplitude: 0.0
         });
     }
     if (HasFlag({ borderFlags, testFlag: 2 })) {
         LerpBorderWaveLine({
             context, startX: width, startY: 0.0,
             endX: width, endY: height, lineCount: height,
-            horizontalWaveFrequency: waveFrequency, horizontalWaveAmplitude: 0.0,
-            verticalWaveFrequency: waveFrequency, verticalWaveAmplitude: waveAmplitude
+            horizontalWaveFrequency: borderWaveFrequency, horizontalWaveAmplitude: 0.0,
+            verticalWaveFrequency: borderWaveFrequency, verticalWaveAmplitude: borderWaveAmplitude
         });
     }
     if (HasFlag({ borderFlags, testFlag: 4 })) {
         LerpBorderWaveLine({
             context, startX: width, startY: height,
             endX: 0.0, endY: height, lineCount: width,
-            horizontalWaveFrequency: waveFrequency, horizontalWaveAmplitude: waveAmplitude,
-            verticalWaveFrequency: waveFrequency, verticalWaveAmplitude: 0.0
+            horizontalWaveFrequency: borderWaveFrequency, horizontalWaveAmplitude: borderWaveAmplitude,
+            verticalWaveFrequency: borderWaveFrequency, verticalWaveAmplitude: 0.0
         });
     }
     if (HasFlag({ borderFlags, testFlag: 8 })) {
         LerpBorderWaveLine({
             context, startX: 0.0, startY: height,
             endX: 0.0, endY: 0.0, lineCount: height,
-            horizontalWaveFrequency: waveFrequency, horizontalWaveAmplitude: 0.0,
-            verticalWaveFrequency: waveFrequency, verticalWaveAmplitude: waveAmplitude
+            horizontalWaveFrequency: borderWaveFrequency, horizontalWaveAmplitude: 0.0,
+            verticalWaveFrequency: borderWaveFrequency, verticalWaveAmplitude: borderWaveAmplitude
         });
     }
     // document.body.prepend(context.canvas);
-    let canvasTexture = new THREE.CanvasTexture(context.canvas);
-    canvasTexture.wrapS = canvasTexture.wrapT = THREE.RepeatWrapping;
+    let canvasTexture = new THREE.CanvasTexture(context.canvas, THREE.UVMapping,
+        THREE.RepeatWrapping, THREE.RepeatWrapping, THREE.NearestFilter, THREE.NearestMipmapNearestFilter);
     return canvasTexture;
 }
 let GrassMaterials = [];
@@ -290,7 +283,8 @@ for (let borderFlags = 0; borderFlags < 16; ++borderFlags) {
                 green: 7.5,
                 blue: 2.5
             },
-            lineCount: 5000, lengthVariance: 14.0, lengthAddition: 1.0, borderFlags
+            lineCount: 5000, lengthVariance: 14.0, lengthAddition: 1.0,
+            borderLineWidth: 20.0, borderWaveAmplitude: 1.0, borderWaveFrequency: 100.0, borderFlags
         }),
         shininess: 10
     }));
