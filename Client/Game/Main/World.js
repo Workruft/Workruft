@@ -57,16 +57,19 @@ class World {
 
         //Post-processing.
         let renderPass = new RenderPass(this.scene, this.camera);
-        // renderPass.renderToScreen = true;
         this.effectComposer.addPass(renderPass);
-        let unrealBloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.2, 0.4, 0.0);
-        this.effectComposer.addPass(unrealBloomPass);
-        let smaaPass = new SMAAPass(window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio());
-        smaaPass.renderToScreen = true;
-        this.effectComposer.addPass(smaaPass);
-        // // // let copyPass = new ShaderPass(CopyShader);
-        // // // copyPass.renderToScreen = true;
-        // // // this.effectComposer.addPass(copyPass);
+        if (!PostProcessing) {
+            renderPass.renderToScreen = true;
+        } else {
+            let unrealBloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.2, 0.4, 0.0);
+            this.effectComposer.addPass(unrealBloomPass);
+            let smaaPass = new SMAAPass(window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio());
+            smaaPass.renderToScreen = true;
+            this.effectComposer.addPass(smaaPass);
+            // let copyPass = new ShaderPass(CopyShader);
+            // copyPass.renderToScreen = true;
+            // this.effectComposer.addPass(copyPass);
+        }
 
         //For terrain picking.
         this.mapRaycaster = new THREE.Raycaster();

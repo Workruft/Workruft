@@ -1,3 +1,5 @@
+let PostProcessing = true;
+
 let PathTestingLeniency = 0.2;
 let PathFindingGreediness = 2.0;
 let PathFindingMaxPoints = 5000;
@@ -260,8 +262,7 @@ function CreateCanvasTexture({ width, height, color, borderColor, colorVariances
         });
     }
     // document.body.prepend(context.canvas);
-    let canvasTexture = new THREE.CanvasTexture(context.canvas, THREE.UVMapping,
-        THREE.RepeatWrapping, THREE.RepeatWrapping, THREE.NearestFilter, THREE.NearestMipmapNearestFilter);
+    let canvasTexture = new THREE.CanvasTexture(context.canvas);
     return canvasTexture;
 }
 let GrassMaterials = [];

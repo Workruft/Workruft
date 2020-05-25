@@ -69,6 +69,24 @@ class GameMap {
                     new THREE.Vector3(x,            MapBottomY, z + CellSize)
                 );
                 this.topGeometry.faces.push(...column[z].faces.top);
+                //Corners in UV coordinates:
+                //   (0, 0)   Back  (1, 0)
+                //          0-----1
+                //    Left / Top / Right
+                //        3-----2
+                //(0, 1)  Front  (1, 1)
+                //First face is corners (0, 3, 1).
+                this.topGeometry.faceVertexUvs[0].push([
+                    new THREE.Vector2(0.0, 0.0),
+                    new THREE.Vector2(0.0, 1.0),
+                    new THREE.Vector2(1.0, 0.0)
+                ]);
+                //Second face is corners (2, 1, 3).
+                this.topGeometry.faceVertexUvs[0].push([
+                    new THREE.Vector2(1.0, 1.0),
+                    new THREE.Vector2(1.0, 0.0),
+                    new THREE.Vector2(0.0, 1.0)
+                ]);
             }
         }
         //Assign non-border neighbors.
@@ -89,31 +107,6 @@ class GameMap {
                 }
             }
         }
-
-        //All of this code only needs to be evaluated once because the X and Z coordinates don't change.
-        //Need normals to be calculated before calculating faceVertexUvs.
-        this.topGeometry.computeFaceNormals();
-        this.topGeometry.faces.forEach(function(face) {
-            //Sort the normals, the direction of the face XYZ components.
-            //Only the highest 2 will be utilized; Y has been ommitted for optimization.
-            let components = ['x', 'z'].sort(function(a, b) {
-                return Math.abs(face.normal[a]) > Math.abs(face.normal[b]);
-            });
-
-            //Get the vertices for each point of the face triangle.
-            let v1 = this.topGeometry.vertices[face.a];
-            let v2 = this.topGeometry.vertices[face.b];
-            let v3 = this.topGeometry.vertices[face.c];
-
-            //Specify the U & V texture mapping coordinate for each vertex of the face triangle.
-            //U & V values range from 0.0-1.0 as a percentage of the texture width and height, but
-            //RepeatWrapping will take care of this math just fine, since this is a "regular grid".
-            this.topGeometry.faceVertexUvs[0].push([
-                new THREE.Vector2(v1[components[0]], v1[components[1]]),
-                new THREE.Vector2(v2[components[0]], v2[components[1]]),
-                new THREE.Vector2(v3[components[0]], v3[components[1]])
-            ]);
-        }.bind(this));
 
         this.updateCells({
             lowX: this.minX, lowZ: this.minZ, highX: this.maxX, highZ: this.maxZ
