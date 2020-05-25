@@ -16,7 +16,7 @@ class InputHandler {
         document.addEventListener('keydown', this.onKeyDown.bind(this));
         document.addEventListener('keyup', this.onKeyUp.bind(this));
         HTML.gameCanvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-        HTML.gameCanvas.addEventListener('mousemove', this.onMouseMove.bind(this));
+        document.addEventListener('mousemove', this.onMouseMove.bind(this));
         HTML.gameCanvas.addEventListener('mouseup', this.onMouseUp.bind(this));
         HTML.gameCanvas.addEventListener('wheel', this.onWheel.bind(this));
     }
