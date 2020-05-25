@@ -16,7 +16,10 @@ class InputHandler {
         document.addEventListener('keydown', this.onKeyDown.bind(this));
         document.addEventListener('keyup', this.onKeyUp.bind(this));
         HTML.gameCanvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-        document.addEventListener('mousemove', this.onMouseMove.bind(this));
+        HTML.gameCanvas.addEventListener('mousemove', this.onMouseMove.bind(this));
+        document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this));
+        HTML.gameCanvas.addEventListener('mouseout', this.onMouseOut.bind(this));
+        HTML.gameCanvas.addEventListener('mouseover', this.onMouseOver.bind(this));
         HTML.gameCanvas.addEventListener('mouseup', this.onMouseUp.bind(this));
         HTML.gameCanvas.addEventListener('wheel', this.onWheel.bind(this));
     }
@@ -251,6 +254,40 @@ class InputHandler {
                 break;
             }
         }
+    }
+
+    onDocumentMouseMove(event) {
+        let newEvent;
+        if (event.target.classList.contains('maintainCanvasMouse')) {
+            newEvent = new MouseEvent('mousemove', event);
+        } else {
+            newEvent = new MouseEvent('mousemove', {
+                clientX: window.innerWidth * 0.5,
+                clientY: window.innerHeight * 0.5,
+                screenX: window.screenX + window.innerWidth * 0.5,
+                screenY: window.screenY + window.innerHeight * 0.5
+            });
+        }
+        HTML.gameCanvas.dispatchEvent(newEvent);
+    }
+
+    onMouseOut(event) {
+        if (event.relatedTarget == null) {
+            return;
+        }
+        if (!event.relatedTarget.classList.contains('maintainCanvasMouse')) {
+            let newEvent = new MouseEvent('mousemove', {
+                clientX: window.innerWidth * 0.5,
+                clientY: window.innerHeight * 0.5,
+                screenX: window.screenX + window.innerWidth * 0.5,
+                screenY: window.screenY + window.innerHeight * 0.5
+            });
+            HTML.gameCanvas.dispatchEvent(newEvent);
+        }
+    }
+
+    onMouseOver(event) {
+
     }
 
     onMouseUp(event) {
