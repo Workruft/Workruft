@@ -62,3 +62,24 @@ canvas {
     background-color: transparent;
     color: white;
 }
+
+#mapEditToolPanel {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    display: flex;
+    align-items: flex-end;
+    flex-direction: row-reverse;
+    width: calc(20%);
+    top: 5px;
+    right: 4px;
+}
+
+.iconButton {
+    width: 28px;
+    height: 28px;
+    background-color: black;
+    background-position: center;
+    border: none;
+    border-radius: 5px;
+}
