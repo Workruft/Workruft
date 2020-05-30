@@ -29,8 +29,6 @@
         <script src="Game/Globals/PathingGlobals.js" defer></script>
 
         <script src="Game/Helpers/ColoredSquare.js" defer></script>
-        <script src="Game/Helpers/InputBindings.js" defer></script>
-        <script src="Game/Helpers/InputHandler.js" defer></script>
         <script src="Game/Helpers/Chat.js" defer></script>
         <script src="Game/Helpers/GameModel.js" defer></script>
         <script src="Game/Helpers/Order.js" defer></script>
@@ -43,7 +41,10 @@
         <script src="Game/Main/GameUnit.js" defer></script>
         <script src="Game/Main/GameMap.js" defer></script>
         <script src="Game/Main/World.js" defer></script>
-        <script src="Game/Main/Workruft.js" defer></script>
+
+        <script src="Game/Main/Workruft/InputBindings.js" defer></script>
+        <script src="Game/Main/Workruft/InputHandler.js" defer></script>
+        <script src="Game/Main/Workruft/Workruft.js" defer></script>
 
         <script src="Page/index.js" defer></script>
     </head>
@@ -53,16 +54,16 @@
         <input id="chatEntryBox" type="text" style="display: none;"/>
         <div id="statusBox"></div>
         <div id="mapEditToolPanel">
-            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-drag-32.png')"></button>
-            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-height-32.png')"></button>
-            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-hammer-32.png')"></button>
-            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-magnetic-32.png')"></button>
-            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-resize-vertical-16.png'), url('../Common/Icons/icons8-ramp-32.png')"></button>
-            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-resize-horizontal-16.png'), url('../Common/Icons/icons8-ramp-32.png')"></button>
-            <button class="iconButton cornerCenterIcons" style="background-image: url('../Common/Icons/icons8-add-14.png'), url('../Common/Icons/icons8-resize-vertical-32.png')"></button>
-            <button class="iconButton cornerCenterIcons" style="background-image: url('../Common/Icons/icons8-add-14.png'), url('../Common/Icons/icons8-resize-horizontal-32.png')"></button>
-            <button class="iconButton cornerCenterIcons" style="background-image: url('../Common/Icons/icons8-minus-sign-14.png'), url('../Common/Icons/icons8-resize-vertical-32.png')"></button>
-            <button class="iconButton cornerCenterIcons" style="background-image: url('../Common/Icons/icons8-minus-sign-14.png'), url('../Common/Icons/icons8-resize-horizontal-32.png')"></button>
+            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-drag-32.png');"></button>
+            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-height-32.png');"></button>
+            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-hammer-32.png');"></button>
+            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-magnetic-32.png');"></button>
+            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-resize-vertical-16.png'), url('../Common/Icons/icons8-ramp-32.png');"></button>
+            <button class="iconButton centerIcons" style="background-image: url('../Common/Icons/icons8-resize-horizontal-16.png'), url('../Common/Icons/icons8-ramp-32.png');"></button>
+            <button class="iconButton cornerCenterIcons" style="background-image: url('../Common/Icons/icons8-add-14.png'), url('../Common/Icons/icons8-resize-vertical-32.png');"></button>
+            <button class="iconButton cornerCenterIcons" style="background-image: url('../Common/Icons/icons8-add-14.png'), url('../Common/Icons/icons8-resize-horizontal-32.png');"></button>
+            <button class="iconButton cornerCenterIcons" style="background-image: url('../Common/Icons/icons8-minus-sign-14.png'), url('../Common/Icons/icons8-resize-vertical-32.png');"></button>
+            <button class="iconButton cornerCenterIcons" style="background-image: url('../Common/Icons/icons8-minus-sign-14.png'), url('../Common/Icons/icons8-resize-horizontal-32.png');"></button>
         </div>
     </body>
 </html>

@@ -6,6 +6,9 @@ class InputHandler {
         this.keysDown = new Set();
         this.mouseButtonsDown = new Set();
 
+        //TODO:
+        //this.bindInputHandlerFunctions(this.workruft);
+
         //Disable right click.
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
