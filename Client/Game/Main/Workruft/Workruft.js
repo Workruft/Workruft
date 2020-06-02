@@ -1,3 +1,11 @@
+let InputBindings = require('./InputBindings');
+let InputHandler = require('./InputHandler');
+let Chat = require('../../Helpers/Chat');
+let World = require('../World');
+let Network = require('../Network');
+let GameUnit = require('../GameUnit');
+let Order = require('../../Helpers/Order');
+
 class Workruft {
     constructor() {
         this.gameState = Enums.GameStates.Playing;
@@ -104,3 +112,5 @@ class Workruft {
         }
     }
 }
+
+module.exports = Workruft;

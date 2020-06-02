@@ -66,3 +66,5 @@ class PathingLine {
         }
     }
 }
+
+module.exports = PathingLine;

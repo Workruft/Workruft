@@ -37,3 +37,5 @@ class Network {
         this.disconnect();
     }
 }
+
+module.exports = Network;

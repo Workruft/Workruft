@@ -9,3 +9,5 @@ class Order {
         this.data = data;
     }
 }
+
+module.exports = Order;

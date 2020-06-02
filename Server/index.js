@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-require('../Common/statusCodes');
+require('../Common/StatusCodes');
 
 let serverPort = 1337;
 let messageOfTheDay = 'Why, hello, and welcome to my crap server!';
@@ -24,7 +24,7 @@ server.on('connection', function(socket, request) {
     }).on('close', function(code) {
         //On client disconnected.
         console.log();
-        console.log('Client disconnected! Address: ' + clientAddress + ' Code: ' + code + ' (' + getStatusCodeString(code) + ')');
+        console.log('Client disconnected! Address: ' + clientAddress + ' Code: ' + code + ' (' + GetStatusCodeString(code) + ')');
     }).on('error', function(error) {
         //On client error.
         console.log('Client error encountered! Address: ' + clientAddress + ' Error: ' + error.name + ': ' + error.message);

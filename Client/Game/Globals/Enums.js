@@ -26,3 +26,5 @@ class Enums {
             "[" + this.items.toString() + "]";
     }
 }
+
+module.exports = Enums;

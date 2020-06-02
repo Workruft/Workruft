@@ -85,3 +85,5 @@ class BinaryHeap extends Array {
         }
     }
 }
+
+module.exports = BinaryHeap;

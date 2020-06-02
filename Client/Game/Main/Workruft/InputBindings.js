@@ -24,3 +24,5 @@ class InputBindings {
         this.LowerTerrainButton = 2;
     }
 }
+
+module.exports = InputBindings;

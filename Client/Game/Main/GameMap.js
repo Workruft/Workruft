@@ -436,3 +436,5 @@ class GameMap {
         };
     }
 }
+
+module.exports = GameMap;

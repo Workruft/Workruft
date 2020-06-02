@@ -1,47 +1,47 @@
-let PostProcessing = true;
+window.PostProcessing = true;
 
-let PathTestingLeniency = 0.2;
-let PathFindingGreediness = 2.0;
-let PathFindingMaxPoints = 5000;
-let PathFindingMaxPointsWithoutImprovement = 1000;
+window.PathTestingLeniency = 0.2;
+window.PathFindingGreediness = 2.0;
+window.PathFindingMaxPoints = 5000;
+window.PathFindingMaxPointsWithoutImprovement = 1000;
 
-let CellSize = 1.0;
-let HalfCellSize = CellSize * 0.5;
-let QuarterCellSize = HalfCellSize * 0.5;
-let ThreeHalvesCellSize = CellSize * 1.5;
-let DoubleCellSize = CellSize * 2.0;
+window.CellSize = 1.0;
+window.HalfCellSize = CellSize * 0.5;
+window.QuarterCellSize = HalfCellSize * 0.5;
+window.ThreeHalvesCellSize = CellSize * 1.5;
+window.DoubleCellSize = CellSize * 2.0;
 
-let HalfTinySize = CellSize;
-let TinySize = DoubleCellSize;
-let SmallSize = TinySize * 2.0;
-let BigSize = SmallSize * 2.0;
+window.HalfTinySize = CellSize;
+window.TinySize = DoubleCellSize;
+window.SmallSize = TinySize * 2.0;
+window.BigSize = SmallSize * 2.0;
 
-let SelectionExtraRadius = QuarterCellSize;
+window.SelectionExtraRadius = QuarterCellSize;
 
-let CommonUnitHalfSizes = [];
+window.CommonUnitHalfSizes = [];
 for (let halfXZSize = HalfTinySize; halfXZSize <= SmallSize; halfXZSize += HalfTinySize) {
     CommonUnitHalfSizes.push(halfXZSize);
 }
 
-let MapBottomY = 0.0;
-let MapMinimumHeight = 0.0;
+window.MapBottomY = 0.0;
+window.MapMinimumHeight = 0.0;
 
-let MinCameraHeight = 3.0;
-let MaxCameraHeight = 500.0;
+window.MinCameraHeight = 3.0;
+window.MaxCameraHeight = 500.0;
 
-let GrassColor = new THREE.Color('#0c4013');
-let DirtColor = new THREE.Color('#2b3c1f');
-let RedColor = new THREE.Color('#A02000');
-let BlueColor = new THREE.Color('#001080');
-let LightGreenColor = new THREE.Color('#188026');
-let YellowColor = new THREE.Color('#FFFF00');
-let BlackColor = new THREE.Color('#000000');
-let ColoredMeshPhongMaterialsMap = new Map();
+window.GrassColor = new THREE.Color('#0c4013');
+window.DirtColor = new THREE.Color('#2b3c1f');
+window.RedColor = new THREE.Color('#A02000');
+window.BlueColor = new THREE.Color('#001080');
+window.LightGreenColor = new THREE.Color('#188026');
+window.YellowColor = new THREE.Color('#FFFF00');
+window.BlackColor = new THREE.Color('#000000');
+window.ColoredMeshPhongMaterialsMap = new Map();
 
-let HalfPI = Math.PI * 0.5;
-let DoublePI = Math.PI * 2.0;
+window.HalfPI = Math.PI * 0.5;
+window.DoublePI = Math.PI * 2.0;
 
-function HasFlag({ borderFlags, testFlag }) {
+window.HasFlag = function({ borderFlags, testFlag }) {
     return !!(borderFlags & testFlag);
 }
 
@@ -56,10 +56,10 @@ Enums.create({
 // Note that this HTMLCollection is live/dynamic, it changes in sync with the DOM.
 // If accessing HTML elements by class, use:
 // Array.from(document.getElementsByClassName('className')).forEach(function (className) {
-let HTML = document.body.getElementsByTagName('*');
+window.HTML = document.body.getElementsByTagName('*');
 
 //Make sure to delete it as well!
-function DisposeThreeObject(disposeMe) {
+window.DisposeThreeObject = function(disposeMe) {
     if (disposeMe == null) {
         return;
     }
@@ -69,29 +69,29 @@ function DisposeThreeObject(disposeMe) {
     if (disposeMe.dispose) {
         disposeMe.dispose();
     }
-}
+};
 
-function IsUndefined(checkMe) {
+window.IsUndefined = function(checkMe) {
     return typeof checkMe == 'undefined';
-}
+};
 
-function IsDefined(checkMe) {
+window.IsDefined = function(checkMe) {
     return typeof checkMe !== 'undefined';
-}
+};
 
-function GenericRound(roundMe) {
+window.GenericRound = function(roundMe) {
     return Math.round(roundMe * 100000000.0) / 100000000.0;
-}
+};
 
 //Must be a WeakMap to store the functions as keys by reference rather than having JS auto-convert them into strings...
-let OverExecutionGuard = new WeakMap();
+window.OverExecutionGuard = new WeakMap();
 //Call this from the specified calling function to rate limit how often the rest of
 //the function gets executed at a specified minimum interval. Utilize the return value of this
 //function to determine whether to continue execution of the specified calling function. The
 //calling function will *not* be recalled at a later time if it cannot execute immediately.
 //Note: Do not bind the callingFunction parameter passed to this function!
 //Returns whether to continue on with the rest of the function (true) or return out of it immediately (false).
-function RateLimit({ callingFunction, minimumInterval }) {
+window.RateLimit = function({ callingFunction, minimumInterval }) {
     //Get the current ticks.
     let currentTicks = performance.now();
 
@@ -114,7 +114,7 @@ function RateLimit({ callingFunction, minimumInterval }) {
     }
 
     return false;
-}
+};
 
 //Call this from the specified calling function to rate limit how often the rest of
 //the function gets executed at a specified minimum interval. Utilize the return value of this
@@ -122,7 +122,7 @@ function RateLimit({ callingFunction, minimumInterval }) {
 //calling function will be recalled at a later time if it cannot execute immediately.
 //Note: Do not bind the callingFunction parameter passed to this function!
 //Returns whether to continue on with the rest of the function (true) or return out of it immediately (false).
-function RateLimitRecall({ callingFunction, minimumInterval, thisToBind, paramsToPass }) {
+window.RateLimitRecall = function({ callingFunction, minimumInterval, thisToBind, paramsToPass }) {
     //Get the current ticks.
     let currentTicks = performance.now();
 
@@ -173,9 +173,9 @@ function RateLimitRecall({ callingFunction, minimumInterval, thisToBind, paramsT
         callingFunction.call(thisToBind, paramsToPass);
     }.bind(this, currentGuard, callingFunction, thisToBind, paramsToPass),
     currentGuard.lastTicks + minimumInterval - currentTicks);
-}
+};
 
-function LerpBorderWaveLine({ context, startX, startY, endX, endY, lineCount,
+window.LerpBorderWaveLine = function({ context, startX, startY, endX, endY, lineCount,
     waveFrequency, horizontalWaveAmplitude, verticalWaveAmplitude, waveRandomness
 }) {
     context.beginPath();
@@ -192,8 +192,8 @@ function LerpBorderWaveLine({ context, startX, startY, endX, endY, lineCount,
         );
     }
     context.stroke();
-}
-function CreateCanvasTexture({ width, height, color, borderColor, colorVariances, colorSubtractions,
+};
+window.CreateCanvasTexture = function({ width, height, color, borderColor, colorVariances, colorSubtractions,
     lineCount, lengthVariance, lengthAddition,
     borderLineWidth, waveFrequency, waveAmplitude, waveRandomness, borderFlags }) {
     let context = document.createElement('canvas').getContext('2d');
@@ -264,8 +264,8 @@ function CreateCanvasTexture({ width, height, color, borderColor, colorVariances
     // document.body.prepend(context.canvas);
     let canvasTexture = new THREE.CanvasTexture(context.canvas);
     return canvasTexture;
-}
-let GrassMaterials = [];
+};
+window.GrassMaterials = [];
 {
     let grassBorderColor = GrassColor.clone().multiplyScalar(0.4);
     for (let borderFlags = 0; borderFlags < 16; ++borderFlags) {

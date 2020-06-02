@@ -32,3 +32,5 @@ class GameModel {
         return newMesh;
     }
 }
+
+module.exports = GameModel;

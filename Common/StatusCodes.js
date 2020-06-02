@@ -17,7 +17,7 @@ let specificStatusCodeMappings = {
     '1015': 'TLS Handshake'
 };
 
-globalThis.getStatusCodeString = function(code) {
+function GetStatusCodeString(code) {
     if (code >= 0 && code <= 999) {
         return '(Unused)';
     } else if (code >= 1016) {
@@ -35,4 +35,6 @@ globalThis.getStatusCodeString = function(code) {
         return specificStatusCodeMappings[code];
     }
     return '(Unknown)';
-}
+};
+
+module.exports = GetStatusCodeString;

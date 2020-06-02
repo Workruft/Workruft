@@ -1,3 +1,6 @@
+let Order = require('../../Helpers/Order');
+let ColoredSquare = require('../../Helpers/ColoredSquare');
+
 class InputHandler {
     constructor({ workruft, inputBindings }) {
         this.workruft = workruft;
@@ -428,3 +431,5 @@ class InputHandler {
         }
     }
 }
+
+module.exports = InputHandler;

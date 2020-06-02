@@ -60,3 +60,5 @@ class ColoredSquare {
         this.mesh.position.y = maxHeight;
     }
 }
+
+module.exports = ColoredSquare;

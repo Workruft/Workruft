@@ -1,22 +1,27 @@
 {
   "name": "workruft",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Workruft!",
   "main": "Server/index.js",
   "scripts": {
-    "start": "node 'Server/index.js'"
+    "start-server": "node 'Server/index.js'"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://Workruft@github.com/Workruft/Workruft.git"
+    "url": "git+https://github.com/Workruft/Workruft.git"
   },
   "author": "AName",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Workruft/Workruft/issues"
   },
-  "homepage": "https://github.com/Workruft/Workruft#readme",
+  "homepage": "https://github.com/Workruft/Workruft",
   "dependencies": {
+    "three": "0.117.1",
+    "threejs-meshline": "2.0.11",
+    "webpack": "4.43.0",
+    "webpack-cli": "3.3.11",
     "ws": "7.2.3"
-  }
+  },
+  "devDependencies": {}
 }

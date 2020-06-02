@@ -1,3 +1,7 @@
+let PathFinder = require('../Pathing/PathFinder');
+let PathingTester = require('../Pathing/PathingTester');
+let ColoredSquare = require('../Helpers/ColoredSquare');
+
 class GameUnit {
     constructor({ workruft, gameModel, x, z }) {
         this.workruft = workruft;
@@ -233,3 +237,5 @@ class GameUnit {
         }
     }
 }
+
+module.exports = GameUnit;

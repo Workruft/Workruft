@@ -49,3 +49,5 @@ class Chat {
         this.isChatting = false;
     }
 }
+
+module.exports = Chat;

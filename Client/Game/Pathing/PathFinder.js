@@ -1,3 +1,7 @@
+let PathingTester = require('./PathingTester');
+let BinaryHeap = require('../Helpers/BinaryHeap');
+let ColoredSquare = require('../Helpers/ColoredSquare');
+
 function CalculateScore({ point }) {
     point.score = point.manhattanTraveled + point.distance * PathFindingGreediness;
 }
@@ -241,3 +245,5 @@ class PathFinder {
         }
     }
 }
+
+module.exports = PathFinder;

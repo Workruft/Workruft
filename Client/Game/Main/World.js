@@ -1,3 +1,11 @@
+let EffectComposer = require('../../../node_modules/three/examples/jsm/postprocessing/EffectComposer').EffectComposer;
+let RenderPass = require('../../../node_modules/three/examples/jsm/postprocessing/RenderPass').RenderPass;
+let UnrealBloomPass = require('../../../node_modules/three/examples/jsm/postprocessing/UnrealBloomPass').UnrealBloomPass;
+let SMAAPass = require('../../../node_modules/three/examples/jsm/postprocessing/SMAAPass').SMAAPass;
+//let ShaderPass = require('../../../node_modules/three/examples/jsm/postprocessing/ShaderPass').ShaderPass;
+let GameMap = require('./GameMap');
+let GameModel = require('../Helpers/GameModel');
+
 //Directions:
 //  -Z    /\+Y
 //-X  +X  ||
@@ -182,7 +190,7 @@ class World {
             selectionCircleModel.deconstruct();
         }
         this.selectionCircleModelsMap.clear();
-        this.selectionCircleMaterial = new MeshLineMaterial({
+        this.selectionCircleMaterial = new MeshLine.MeshLineMaterial({
             color: 'blue',
             resolution: new THREE.Vector2(this.canvas.width, this.canvas.height),
             sizeAttenuation: 0,
@@ -287,3 +295,5 @@ class World {
         return { x: normalizedX, y: normalizedY };
     }
 }
+
+module.exports = World;

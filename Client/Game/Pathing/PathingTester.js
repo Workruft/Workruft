@@ -1,3 +1,5 @@
+let PathingLine = require('./PathingLine');
+
 //A path tester, using multiple PathingLines, one direction at a time.
 //This class is designed to promote reusability.
 class PathingTester {
@@ -185,3 +187,5 @@ class PathingTester {
         this.isPathable;
     }
 }
+
+module.exports = PathingTester;
