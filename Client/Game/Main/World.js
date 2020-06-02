@@ -1,3 +1,5 @@
+let MeshLine = require('threejs-meshline');
+
 let EffectComposer = require('../../../node_modules/three/examples/jsm/postprocessing/EffectComposer').EffectComposer;
 let RenderPass = require('../../../node_modules/three/examples/jsm/postprocessing/RenderPass').RenderPass;
 let UnrealBloomPass = require('../../../node_modules/three/examples/jsm/postprocessing/UnrealBloomPass').UnrealBloomPass;

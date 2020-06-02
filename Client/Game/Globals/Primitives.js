@@ -1,3 +1,5 @@
+let MeshLine = require('threejs-meshline');
+
 //Directions:
 //  -Z    /\+Y
 //-X  +X  ||

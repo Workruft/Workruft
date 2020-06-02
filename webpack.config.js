@@ -11,7 +11,6 @@ module.exports = {
     plugins: [
         new webpack.ProvidePlugin({
             THREE: 'three/src/Three',
-            MeshLine: 'threejs-meshline',
             Enums: path.resolve(__dirname, 'Client/Game/Globals/Enums')
         }),
     ]
