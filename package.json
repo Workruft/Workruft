@@ -4,6 +4,9 @@
   "description": "Workruft!",
   "main": "Server/index.js",
   "scripts": {
+    "build-serverless-client": "npx parcel watch Client/Page/index.html --no-hmr --public-url .",
+    "build-client-release": "npx parcel build Client/Page/index.html --public-url .",
+    "start-client": "npx parcel Client/Page/index.html --no-hmr",
     "start-server": "node 'Server/index.js'"
   },
   "repository": {
