@@ -4,9 +4,10 @@
   "description": "Workruft!",
   "main": "Server/index.js",
   "scripts": {
-    "build-serverless-client": "npx parcel watch Client/Page/index.html --no-hmr --public-url .",
-    "build-client-release": "npx parcel build Client/Page/index.html --public-url .",
-    "start-client": "npx parcel Client/Page/index.html --no-hmr",
+    "clean-client": "del-cli dist/ .cache/",
+    "build-client": "npx parcel watch Client/Page/index.html --no-hmr --public-url . --out-dir /dist/client",
+    "build-client-release": "npx parcel build Client/Page/index.html --no-source-maps --public-url . --out-dir dist/client-release",
+    "build-client-public-release": "npx inliner -m dist/client-release/index.html > Release/workruft.html",
     "start-server": "node 'Server/index.js'"
   },
   "repository": {
@@ -25,6 +26,8 @@
     "ws": "7.2.3"
   },
   "devDependencies": {
+    "del-cli": "3.0.1",
+    "inliner": "1.13.1",
     "parcel-bundler": "1.12.4"
   }
 }

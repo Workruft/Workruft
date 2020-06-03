@@ -1,0 +1,4 @@
+{
+    "start-client": "npx parcel Client/Page/index.html --no-hmr --out-dir dist/client",
+    "start-client-release": "npx parcel serve Client/Page/index.html --minify --no-source-maps --no-hmr --out-dir dist/client-release"
+}
