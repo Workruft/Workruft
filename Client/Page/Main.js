@@ -8,14 +8,18 @@ require('../Game/Globals/Globals');
 require('../Game/Globals/PathingGlobals');
 require('../Game/Globals/Primitives');
 
-let Workruft = require('../Game/Main/Workruft/Workruft');
+window.onload = function() {
+    require('../Game/Globals/PageLoadedGlobals');
 
-document.addEventListener('beforeunload', DestroyAll);
-window.game = new Workruft();
-function DestroyAll() {
-    if (window.game != null) {
-        window.game.deconstruct();
-        DeconstructPrimitives();
-        delete window.game;
+    let Workruft = require('../Game/Main/Workruft/Workruft');
+
+    document.addEventListener('beforeunload', DestroyAll);
+    window.game = new Workruft();
+    function DestroyAll() {
+        if (window.game != null) {
+            window.game.deconstruct();
+            DeconstructPrimitives();
+            delete window.game;
+        }
     }
-}
+};
