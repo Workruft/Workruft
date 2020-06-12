@@ -2,9 +2,7 @@
 
 - Map editor
 
-- Buildings and other units need to be factored in.
-
-  - Add in buildings and other units...
+- Add in buildings and other units...
 
 - Give PathFinder class so many "attempts"/calculations per X time period.
 
