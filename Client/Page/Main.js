@@ -2,6 +2,19 @@ window.THREE = require('three');
 window.MeshLine = require('threejs-meshline');
 window.Enums = require('../Game/Globals/Enums');
 
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
+tippy('#mapEditToolPanel>button', {
+    content: function(element) {
+        return `<p class='tooltip'>${element.getAttribute('data-tippy-title')}</p>`
+    },
+    allowHTML: true,
+    placement: 'left',
+    duration: 0,
+    delay: 0,
+    theme: 'material'
+});
+
 require('../../Common/StatusCodes');
 
 require('../Game/Globals/Globals');

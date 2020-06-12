@@ -110,3 +110,11 @@ canvas {
 button::-moz-focus-inner {
     border: 0px;
 }
+
+.tooltip {
+    flex: auto;
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+    max-width: 200px;
+}
