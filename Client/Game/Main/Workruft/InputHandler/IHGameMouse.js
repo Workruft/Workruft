@@ -1,132 +1,6 @@
-let Order = require('../../Helpers/Order');
-let ColoredSquare = require('../../Helpers/ColoredSquare');
+let Order = require('../../../Helpers/Order');
 
-class InputHandler {
-    constructor({ workruft, inputBindings }) {
-        this.workruft = workruft;
-        this.inputBindings = inputBindings;
-
-        this.keysDown = new Set();
-        this.mouseButtonsDown = new Set();
-
-        //TODO:
-        //this.bindInputHandlerFunctions(this.workruft);
-
-        //Disable right click.
-        document.addEventListener('contextmenu', function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
-        });
-
-        document.addEventListener('keydown', this.onKeyDown.bind(this));
-        document.addEventListener('keyup', this.onKeyUp.bind(this));
-        HTML.gameCanvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-        HTML.gameCanvas.addEventListener('mouseup', this.onMouseUp.bind(this));
-        HTML.gameCanvas.addEventListener('wheel', this.onWheel.bind(this));
-        HTML.gameCanvas.addEventListener('mousemove', this.onMouseMove.bind(this));
-        document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this));
-        document.addEventListener('mouseup', this.onDocumentMouseUp.bind(this));
-        document.addEventListener('wheel', this.onDocumentWheel.bind(this));
-        document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this));
-        HTML.gameCanvas.addEventListener('mouseout', this.onMouseOut.bind(this));
-        HTML.gameCanvas.addEventListener('mouseover', this.onMouseOver.bind(this));
-    }
-
-    onKeyDown(event) {
-        this.keysDown.add(event.key);
-        if (!event.repeat) {
-            switch (event.key) {
-                case this.inputBindings.ToggleChat: {
-                    this.workruft.chat.toggleChatEntry();
-                    break;
-                }
-                case this.inputBindings.CancelChat: {
-                    this.workruft.chat.cancelChatEntry();
-                    break;
-                }
-                case 'F5': {
-                    if (event.ctrlKey) {
-                        //For Ctrl+F5, force a full page reload.
-                        DestroyAll();
-                        window.location.reload(true);
-                    } else {
-                        //Disable regular F5.
-                        event.preventDefault();
-                        event.stopPropagation();
-                        return false;
-                    }
-                    break;
-                }
-            }
-
-            if (!this.workruft.chat.isChatting) {
-                switch (event.key) {
-                    case this.inputBindings.ToggleMapEditor: {
-                        if (this.workruft.gameState == Enums.GameStates.Playing) {
-                            this.workruft.world.deselectAll();
-                            this.workruft.gameState = Enums.GameStates.MapEditing;
-                        } else if (this.workruft.gameState == Enums.GameStates.MapEditing) {
-                            this.clearEditorSquares();
-                            this.workruft.gameState = Enums.GameStates.Playing;
-                        }
-                        this.workruft.updateStatusBox();
-                        break;
-                    }
-                    case this.inputBindings.TogglePathTesting: {
-                        this.workruft.isPathTesting = !this.workruft.isPathTesting;
-                        if (this.workruft.isPathTesting) {
-                            for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
-                                this.workruft.randoUnits[n].cancelAllOrders();
-                                this.workruft.randoUnits[n].position.x = this.workruft.playerUnit.position.x +
-                                    this.workruft.playerUnit.gameModel.xzSize;
-                                this.workruft.randoUnits[n].position.z = this.workruft.playerUnit.position.z +
-                                    this.workruft.playerUnit.gameModel.xzSize;
-                                this.workruft.randoUnits[n].autoSetHeight();
-                            }
-                        } else {
-                            for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
-                                this.workruft.randoUnits[n].cancelAllOrders();
-                                this.workruft.randoUnits[n].clearColoredSquares();
-                                this.workruft.randoUnits[n].position.y = -100.0;
-                            }
-                            this.workruft.playerUnit.clearColoredSquares();
-                        }
-                        this.workruft.updateStatusBox();
-                        break;
-                    }
-                    case this.inputBindings.RotateCameraClockwise: {
-                        //TODO: Screws with camera movement; also, repositioning will need to handle zoom.
-                        // this.workruft.world.camera.rotation.z -= HalfPI;
-                        break;
-                    }
-                    case this.inputBindings.RotateCameraCounterclockwise: {
-                        //TODO: Screws with camera movement; also, repositioning will need to handle zoom.
-                        // this.workruft.world.camera.rotation.z += HalfPI;
-                        break;
-                    }
-                }
-            }
-        }
-        //Disable scrolling of the page with the arrow keys.
-        switch (event.key) {
-            case 'ArrowUp':
-            case 'ArrowDown':
-            case 'ArrowLeft':
-            case 'ArrowRight': {
-                event.preventDefault();
-                event.stopPropagation();
-                return false;
-            }
-        }
-    }
-
-    onKeyUp(event) {
-        this.keysDown.delete(event.key);
-        // switch (event.key) {
-        // }
-    }
-
+module.exports = {
     onMouseDown(event) {
         this.mouseButtonsDown.add(event.button);
         switch (this.workruft.gameState) {
@@ -249,11 +123,11 @@ class InputHandler {
                 break;
             } //case Enums.GameStates.MapEditing
         }
-    }
+    },
 
     onMouseUp(event) {
         this.mouseButtonsDown.delete(event.button);
-    }
+    },
 
     onWheel(event) {
         let scrollDirection = Math.sign(event.deltaY);
@@ -299,7 +173,7 @@ class InputHandler {
         event.preventDefault();
         event.stopPropagation();
         return false;
-    }
+    },
 
     onMouseMove(event) {
         switch (this.workruft.gameState) {
@@ -323,62 +197,7 @@ class InputHandler {
                 break;
             }
         }
-    }
-
-    onDocumentMouseDown(event) {
-        if (event.target == HTML.gameCanvas) {
-            return;
-        }
-        if (event.target.classList != null && event.target.classList.contains('maintainCanvasMouse')) {
-            let newEvent = new MouseEvent('mousedown', event);
-            HTML.gameCanvas.dispatchEvent(newEvent);
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
-        }
-    }
-
-    onDocumentMouseUp(event) {
-        if (event.target == HTML.gameCanvas) {
-            return;
-        }
-        if (event.target.classList != null && event.target.classList.contains('maintainCanvasMouse')) {
-            let newEvent = new MouseEvent('mouseup', event);
-            HTML.gameCanvas.dispatchEvent(newEvent);
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
-        }
-    }
-
-    onDocumentWheel(event) {
-        if (event.target == HTML.gameCanvas) {
-            return;
-        }
-        let newEvent = new WheelEvent('wheel', event);
-        HTML.gameCanvas.dispatchEvent(newEvent);
-        event.preventDefault();
-        event.stopPropagation();
-        return false;
-    }
-
-    onDocumentMouseMove(event) {
-        if (event.target == HTML.gameCanvas) {
-            return;
-        }
-        let newEvent;
-        if (event.target.classList != null && event.target.classList.contains('maintainCanvasMouse')) {
-            newEvent = new MouseEvent('mousemove', event);
-        } else {
-            newEvent = new MouseEvent('mousemove', {
-                clientX: window.innerWidth * 0.5,
-                clientY: window.innerHeight * 0.5,
-                screenX: window.screenX + window.innerWidth * 0.5,
-                screenY: window.screenY + window.innerHeight * 0.5
-            });
-        }
-        HTML.gameCanvas.dispatchEvent(newEvent);
-    }
+    },
 
     onMouseOut(event) {
         if (event.relatedTarget == null) {
@@ -393,43 +212,9 @@ class InputHandler {
             });
             HTML.gameCanvas.dispatchEvent(newEvent);
         }
-    }
+    },
 
     onMouseOver(event) {
 
     }
-
-    clearEditorSquares() {
-        if (IsDefined(this.editorSquares)) {
-            for (let editorSquare of this.editorSquares) {
-                editorSquare.deconstruct();
-            }
-        }
-        this.editorSquares = [];
-    }
-
-    updateMapEditorMouseCells({ cellX, cellZ }) {
-        if (!RateLimit({
-            callingFunction: this.updateMapEditorMouseCells,
-            minimumInterval: 1000.0 / 30.0
-        })) {
-            return;
-        }
-        this.clearEditorSquares();
-        let halfEditingSize = this.workruft.editingSize * 0.5;
-        let floorHalfEditingSize = FloorToCell(halfEditingSize);
-        let ceilHalfEditingSize = CeilToCell(halfEditingSize);
-        for (let xOffset = -floorHalfEditingSize; xOffset < ceilHalfEditingSize; xOffset += CellSize) {
-            for (let zOffset = -floorHalfEditingSize; zOffset < ceilHalfEditingSize; zOffset += CellSize) {
-                this.editorSquares.push(new ColoredSquare({
-                    workruft: this.workruft,
-                    x: cellX + xOffset + HalfCellSize,
-                    z: cellZ + zOffset + HalfCellSize,
-                    color: BlackColor
-                }));
-            }
-        }
-    }
-}
-
-module.exports = InputHandler;
+};

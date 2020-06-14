@@ -167,6 +167,14 @@ window.RateLimitRecall = function({ callingFunction, minimumInterval, thisToBind
     currentGuard.lastTicks + minimumInterval - currentTicks);
 };
 
+//Bind an object of functions to a particular class, as if the functions belonged to it.
+//Call this in the class's constructor.
+window.BindToClass = function(functionsObject, thisClass) {
+    for (let [ functionKey, functionValue ] of Object.entries(functionsObject)) {
+        thisClass[functionKey] = functionValue.bind(thisClass);
+    }
+};
+
 window.LerpBorderWaveLine = function({ context, startX, startY, endX, endY, lineCount,
     waveFrequency, horizontalWaveAmplitude, verticalWaveAmplitude, waveRandomness
 }) {

@@ -1,5 +1,5 @@
 let InputBindings = require('./InputBindings');
-let InputHandler = require('./InputHandler');
+let InputHandler = require('./InputHandler/InputHandler');
 let Chat = require('../../Helpers/Chat');
 let World = require('../World');
 let Network = require('../Network');
