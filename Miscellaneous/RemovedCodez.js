@@ -188,3 +188,6 @@ function GetOrCreateTraversalOffsets({ unitRadius }) {
     }
     return UnitTraversalOffsetsMap[unitRadius];
 }
+
+
+/* cursor: url('Icons/icons8-ramp-32.png'), default; */
