@@ -13,15 +13,40 @@
         <input id="chatEntryBox" type="text" style="display: none;"/>
         <div id="statusBox"></div>
         <div id="mapEditToolPanel">
-            <button id="increaseHeightButton"
-                data-tippy-title="Increase Height<br/>(right click)"
-                class="iconButton centerIcons"
-                style="background-image: url('Icons/icons8-upload-32.png');">
+            <button id="decreaseLongButton"
+                data-tippy-title="Decrease Longitude"
+                class="iconButton cornerCenterIcons"
+                style="background-image: url('Icons/icons8-minus-sign-14.png'),
+                    url('Icons/icons8-resize-vertical-32.png');">
             </button>
+            <button id="increaseLongButton"
+                data-tippy-title="Increase Longitude"
+                class="iconButton cornerCenterIcons"
+                style="background-image: url('Icons/icons8-add-14.png'),
+                    url('Icons/icons8-resize-vertical-32.png');">
+            </button>
+            <button id="decreaseLatButton"
+                data-tippy-title="Decrease Latitude"
+                class="iconButton cornerCenterIcons"
+                style="background-image: url('Icons/icons8-minus-sign-14.png'),
+                    url('Icons/icons8-resize-horizontal-32.png');">
+            </button>
+            <button id="increaseLatButton"
+                data-tippy-title="Increase Latitude"
+                class="iconButton cornerCenterIcons"
+                style="background-image: url('Icons/icons8-add-14.png'),
+                    url('Icons/icons8-resize-horizontal-32.png');">
+            </button>
+            <hr style="width: 100%;"/>
             <button id="decreaseHeightButton"
                 data-tippy-title="Decrease Height<br/>(right click)"
                 class="iconButton centerIcons"
                 style="background-image: url('Icons/icons8-download-32.png');">
+            </button>
+            <button id="increaseHeightButton"
+                data-tippy-title="Increase Height<br/>(right click)"
+                class="iconButton centerIcons"
+                style="background-image: url('Icons/icons8-upload-32.png');">
             </button>
             <button id="flattenHeightButton"
                 data-tippy-title="Flatten (Lowest Height)<br/>(right click)"
@@ -54,30 +79,6 @@
                 class="iconButton centerIcons"
                 style="background-image: url('Icons/icons8-resize-horizontal-16.png'),
                     url('Icons/icons8-ramp-32.png');">
-            </button>
-            <button id="increaseLongButton"
-                data-tippy-title="Increase Longitude"
-                class="iconButton cornerCenterIcons"
-                style="background-image: url('Icons/icons8-add-14.png'),
-                    url('Icons/icons8-resize-vertical-32.png');">
-            </button>
-            <button id="increaseLatButton"
-                data-tippy-title="Increase Latitude"
-                class="iconButton cornerCenterIcons"
-                style="background-image: url('Icons/icons8-add-14.png'),
-                    url('Icons/icons8-resize-horizontal-32.png');">
-            </button>
-            <button id="decreaseLongButton"
-                data-tippy-title="Decrease Longitude"
-                class="iconButton cornerCenterIcons"
-                style="background-image: url('Icons/icons8-minus-sign-14.png'),
-                    url('Icons/icons8-resize-vertical-32.png');">
-            </button>
-            <button id="decreaseLatButton"
-                data-tippy-title="Decrease Latitude"
-                class="iconButton cornerCenterIcons"
-                style="background-image: url('Icons/icons8-minus-sign-14.png'),
-                    url('Icons/icons8-resize-horizontal-32.png');">
             </button>
         </div>
     </body>
