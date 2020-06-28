@@ -53,10 +53,9 @@ canvas {
     margin: 0px;
     padding: 0px;
     position: absolute;
-    width: calc(50%);
     bottom: 5px;
     right: 4px;
-    text-align: right;
+    text-align: center;
     font-family: Montserrat, Open Sans, Verdana;
     font-size: 16px;
     background-color: transparent;

@@ -43,14 +43,11 @@ module.exports = {
         //Terrain height handlers.
         Array.from(document.getElementsByClassName('terrainModeButtons')).forEach(
             function (terrainModeButton) {
-                let terrainEditingMode;
-                //terrainEditingMode = Enums.TerrainEditingModes.IncreaseHeight;
                 terrainModeButton.onclick = function(event) {
-                    //TODO: Don't alert; handle.
-                    alert(terrainModeButton.getAttribute('data-tippy-title'));
-                    alert(Enums.TerrainEditingModes[terrainEditingIDs[terrainModeButton.id]]);
-                };
-            }
+                    this.workruft.terrainEditingMode = terrainEditingIDs[terrainModeButton.id];
+                    this.workruft.updateStatusBox();
+                }.bind(this);
+            }.bind(this)
         );
     }
 };

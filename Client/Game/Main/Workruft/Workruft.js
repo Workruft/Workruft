@@ -40,6 +40,7 @@ class Workruft {
         this.world.graphicsLoop();
         this.network = new Network(this.chat);
 
+        this.terrainEditingMode = Enums.TerrainEditingModes.IncreaseHeight;
         this.editingLatSize = 4;
         this.editingLongSize = 4;
 
@@ -123,12 +124,13 @@ class Workruft {
 
     updateStatusBox() {
         HTML.statusBox.innerHTML = '';
-        HTML.statusBox.innerHTML += 'Mode: ' + Enums.GameStates.items[this.gameState];
+        HTML.statusBox.innerHTML += 'Game Mode: ' + Enums.GameStates.items[this.gameState];
         if (this.isPathTesting) {
             HTML.statusBox.innerHTML += ' (Path Testing)';
         }
         if (this.gameState == Enums.GameStates.MapEditing) {
-            HTML.statusBox.innerHTML +=  '<br/>Editing Size: ' + this.editingLatSize + 'X' + this.editingLongSize;
+            HTML.statusBox.innerHTML +=  '<br/>Editing Mode: ' + Enums.TerrainEditingModes[this.terrainEditingMode];
+            HTML.statusBox.innerHTML +=  '<br/>Editing Size: ' + this.editingLatSize + 'x' + this.editingLongSize;
         }
     }
 }
