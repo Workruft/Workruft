@@ -78,13 +78,17 @@ module.exports = {
                             if (clickedCell != null) {
                                 let raiseLowerOffset =
                                     (event.button == this.inputBindings.RaiseTerrainButton ? CellSize : -CellSize);
-                                let halfEditingSize = this.workruft.editingSize * 0.5;
-                                let floorHalfEditingSize = FloorToCell(halfEditingSize);
-                                let ceilHalfEditingSize = CeilToCell(halfEditingSize);
-                                for (let xOffset = -floorHalfEditingSize;
-                                    xOffset < ceilHalfEditingSize; xOffset += CellSize) {
-                                    for (let zOffset = -floorHalfEditingSize;
-                                        zOffset < ceilHalfEditingSize; zOffset += CellSize) {
+
+                                let halfEditingLongSize = this.workruft.editingLongSize * 0.5;
+                                let halfEditingLatSize = this.workruft.editingLatSize * 0.5;
+                                let floorHalfEditingLongSize = FloorToCell(halfEditingLongSize);
+                                let ceilHalfEditingLongSize = CeilToCell(halfEditingLongSize);
+                                let floorHalfEditingLatSize = FloorToCell(halfEditingLatSize);
+                                let ceilHalfEditingLatSize = CeilToCell(halfEditingLatSize);
+                                for (let xOffset = -floorHalfEditingLatSize; xOffset < ceilHalfEditingLatSize;
+                                    xOffset += CellSize) {
+                                    for (let zOffset = -floorHalfEditingLongSize; zOffset < ceilHalfEditingLongSize;
+                                        zOffset += CellSize) {
                                         let currentCell = this.workruft.world.map.getCell({
                                             x: cellX + xOffset,
                                             z: cellZ + zOffset
@@ -98,10 +102,10 @@ module.exports = {
                                     }
                                 }
                                 this.workruft.world.map.updateCells({
-                                    lowX: cellX - floorHalfEditingSize - CellSize,
-                                    lowZ: cellZ - floorHalfEditingSize - CellSize,
-                                    highX: cellX + ceilHalfEditingSize + CellSize,
-                                    highZ: cellZ + ceilHalfEditingSize + CellSize
+                                    lowX: cellX - floorHalfEditingLatSize - CellSize,
+                                    lowZ: cellZ - floorHalfEditingLongSize - CellSize,
+                                    highX: cellX + floorHalfEditingLatSize + CellSize,
+                                    highZ: cellZ + ceilHalfEditingLongSize + CellSize
                                 });
                                 this.updateMapEditorMouseCells({ cellX, cellZ });
                             }
@@ -134,17 +138,13 @@ module.exports = {
         if (this.workruft.gameState == Enums.GameStates.MapEditing && event.ctrlKey) {
             if (scrollDirection < 0) {
                 //Negative scroll: up/forward/in. Increase editing size.
-                ++this.workruft.editingSize;
                 //Note: Increasing this is no problem, except that that's a lot of ColoredSquares to draw lol...
-                if (this.workruft.editingSize > 32) {
-                    this.workruft.editingSize = 32;
-                }
+                this.workruft.editingLongSize = Math.min(32, this.workruft.editingLongSize + 1);
+                this.workruft.editingLatSize = Math.min(32, this.workruft.editingLatSize + 1);
             } else if (scrollDirection > 0) {
                 //Positive scroll: down/backward/out. Decrease editing size.
-                --this.workruft.editingSize;
-                if (this.workruft.editingSize < 1) {
-                    this.workruft.editingSize = 1;
-                }
+                this.workruft.editingLongSize = Math.max(1, this.workruft.editingLongSize - 1);
+                this.workruft.editingLatSize = Math.max(1, this.workruft.editingLatSize - 1);
             }
             let pickedMapObjectArray = this.workruft.world.pickMap(
                 this.workruft.world.getNormalizedCanvasMouse(event));
@@ -157,6 +157,7 @@ module.exports = {
                     this.updateMapEditorMouseCells({ cellX, cellZ });
                 }
             }
+            this.workruft.updateStatusBox();
         } else {
             if (scrollDirection < 0) {
                 //Negative scroll: up/forward/in. Zoom in.

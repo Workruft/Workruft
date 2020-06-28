@@ -17,15 +17,31 @@ class Workruft {
 
         this.chat = new Chat(this.onChatEntry.bind(this));
         this.chat.print({ message: 'Workruft!' });
-        this.chat.print({ message: 'Press \'' + this.inputBindings.ToggleMapEditor + '\' to toggle map editing mode.' });
-        this.chat.print({ message: 'Press \'' + this.inputBindings.TogglePathTesting + '\' to toggle map path testing.' });
+        this.chat.print({ message: 'Controls:' });
+        this.chat.print({
+            message: '  '+ this.inputBindings.MoveCameraUp + this.inputBindings.MoveCameraLeft +
+                this.inputBindings.MoveCameraDown + this.inputBindings.MoveCameraRight + ': pan the camera'
+        });
+        this.chat.print({
+            message: '  ' + this.inputBindings.ToggleChat + ': toggle chat'
+        });
+        this.chat.print({ message: '  Left click: select unit' });
+        this.chat.print({ message: '  Right click: order unit' });
+        this.chat.print({ message: '  Mouse scroll: zoom in/out' });
+        this.chat.print({
+            message: '  ' + this.inputBindings.ToggleMapEditor + ': toggle map editing mode'
+        });
+        this.chat.print({
+            message: '  ' + this.inputBindings.TogglePathTesting + ': toggle map path testing'
+        });
         this.world = new World(this.chat, this.onUpdate.bind(this));
         this.world.camera.position.set(0, 75, 10);
         this.world.camera.lookAt(0, 0, this.world.camera.position.z - 10);
         this.world.graphicsLoop();
         this.network = new Network(this.chat);
 
-        this.editingSize = 4;
+        this.editingLatSize = 4;
+        this.editingLongSize = 4;
 
         this.objectsToUpdate = new Set();
 
@@ -106,9 +122,13 @@ class Workruft {
     }
 
     updateStatusBox() {
-        HTML.statusBox.innerHTML = Enums.GameStates.items[this.gameState] + ' mode';
+        HTML.statusBox.innerHTML = '';
+        HTML.statusBox.innerHTML += 'Mode: ' + Enums.GameStates.items[this.gameState];
         if (this.isPathTesting) {
             HTML.statusBox.innerHTML += ' (Path Testing)';
+        }
+        if (this.gameState == Enums.GameStates.MapEditing) {
+            HTML.statusBox.innerHTML +=  '<br/>Editing Size: ' + this.editingLatSize + 'X' + this.editingLongSize;
         }
     }
 }

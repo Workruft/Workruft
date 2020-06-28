@@ -38,11 +38,11 @@ module.exports = {
     },
 
     onDocumentMouseMove(event) {
-        if (event.target == HTML.gameCanvas) {
+        if (event && event.target == HTML.gameCanvas) {
             return;
         }
         let newEvent;
-        if (event.target.classList != null && event.target.classList.contains('maintainCanvasMouse')) {
+        if (event && event.target.classList != null && event.target.classList.contains('maintainCanvasMouse')) {
             newEvent = new MouseEvent('mousemove', event);
         } else {
             newEvent = new MouseEvent('mousemove', {
