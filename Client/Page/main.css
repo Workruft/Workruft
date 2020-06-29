@@ -62,11 +62,13 @@ canvas {
     color: white;
 }
 
+#mapEditToolPanel:not([hidden]) {
+    display: flex;
+}
 #mapEditToolPanel {
     margin: 0px;
     padding: 4px;
     position: absolute;
-    display: flex;
     align-items: flex-end;
     flex-wrap: wrap;
     flex-direction: row;

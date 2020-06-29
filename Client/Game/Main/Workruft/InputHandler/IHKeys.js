@@ -31,9 +31,11 @@ module.exports = {
                     case this.inputBindings.ToggleMapEditor: {
                         if (this.workruft.gameState == Enums.GameStates.Playing) {
                             this.workruft.world.deselectAll();
+                            HTML.mapEditToolPanel.hidden = false;
                             this.workruft.gameState = Enums.GameStates.MapEditing;
                         } else if (this.workruft.gameState == Enums.GameStates.MapEditing) {
                             this.clearEditorSquares();
+                            HTML.mapEditToolPanel.hidden = true;
                             this.workruft.gameState = Enums.GameStates.Playing;
                         }
                         this.workruft.updateStatusBox();
