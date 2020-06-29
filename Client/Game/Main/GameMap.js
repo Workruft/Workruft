@@ -213,13 +213,26 @@ class GameMap {
         this.setFrontLeftHeight({ cell, height });
     }
 
-    //Remember to call updateCells()!
     getAverageHeight({ cell }) {
         return (this.topGeometry.vertices[cell.vio].y +
             this.topGeometry.vertices[cell.vio + 1].y +
             this.topGeometry.vertices[cell.vio + 2].y +
             this.topGeometry.vertices[cell.vio + 3].y)
             * 0.25;
+    }
+
+    getMinHeight({ cell }) {
+        return Math.min(this.topGeometry.vertices[cell.vio].y,
+            this.topGeometry.vertices[cell.vio + 1].y,
+            this.topGeometry.vertices[cell.vio + 2].y,
+            this.topGeometry.vertices[cell.vio + 3].y);
+    }
+
+    getMaxHeight({ cell }) {
+        return Math.max(this.topGeometry.vertices[cell.vio].y,
+            this.topGeometry.vertices[cell.vio + 1].y,
+            this.topGeometry.vertices[cell.vio + 2].y,
+            this.topGeometry.vertices[cell.vio + 3].y);
     }
 
     isTraversible({ cell, direction }) {

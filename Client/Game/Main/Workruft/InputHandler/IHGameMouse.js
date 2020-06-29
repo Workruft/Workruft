@@ -86,6 +86,7 @@ module.exports = {
                     let cellZ = FloorToCell(clickCoordinates.z);
                     let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
                     if (clickedCell != null) {
+                        let forEachObject;
                         switch (this.workruft.terrainEditingMode) {
                             case Enums.TerrainEditingModes.DecreaseHeight:
                             case Enums.TerrainEditingModes.IncreaseHeight:
@@ -93,7 +94,7 @@ module.exports = {
                                     (this.workruft.terrainEditingMode == Enums.TerrainEditingModes.IncreaseHeight ?
                                         CellSize : -CellSize);
                                 let currentCell;
-                                let forEachObject = ForEachCell(this.workruft, cellX, cellZ,
+                                forEachObject = ForEachCell(this.workruft, cellX, cellZ,
                                     this.workruft.editingLatSize, this.workruft.editingLongSize,
                                     function(forEachObject) {
                                         currentCell = this.workruft.world.map.getCell({
@@ -108,17 +109,102 @@ module.exports = {
                                         }
                                     }.bind(this)
                                 );
-                                this.workruft.world.map.updateCells({
-                                    lowX: cellX - forEachObject.floorHalfLatSize - CellSize,
-                                    lowZ: cellZ - forEachObject.floorHalfLongSize - CellSize,
-                                    highX: cellX + forEachObject.ceilHalfLatSize + CellSize,
-                                    highZ: cellZ + forEachObject.ceilHalfLongSize + CellSize
-                                });
                                 break;
                             case Enums.TerrainEditingModes.FlattenHeight:
+                                let lowestHeight = Infinity;
+                                ForEachCell(this.workruft, cellX, cellZ,
+                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
+                                    function(forEachObject) {
+                                        currentCell = this.workruft.world.map.getCell({
+                                            x: cellX + forEachObject.xOffset,
+                                            z: cellZ + forEachObject.zOffset
+                                        });
+                                        if (currentCell != null) {
+                                            lowestHeight = Math.min(lowestHeight,
+                                                this.workruft.world.map.getMinHeight({ cell: currentCell }));
+                                        }
+                                    }.bind(this)
+                                );
+                                forEachObject = ForEachCell(this.workruft, cellX, cellZ,
+                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
+                                    function(forEachObject) {
+                                        currentCell = this.workruft.world.map.getCell({
+                                            x: cellX + forEachObject.xOffset,
+                                            z: cellZ + forEachObject.zOffset
+                                        });
+                                        if (currentCell != null) {
+                                            this.workruft.world.map.setCellFlatHeight({
+                                                cell: currentCell,
+                                                height: lowestHeight
+                                            });
+                                        }
+                                    }.bind(this)
+                                );
+                                break;
                             case Enums.TerrainEditingModes.RaiseHeight:
+                                let highestHeight = -Infinity;
+                                ForEachCell(this.workruft, cellX, cellZ,
+                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
+                                    function(forEachObject) {
+                                        currentCell = this.workruft.world.map.getCell({
+                                            x: cellX + forEachObject.xOffset,
+                                            z: cellZ + forEachObject.zOffset
+                                        });
+                                        if (currentCell != null) {
+                                            highestHeight = Math.max(highestHeight,
+                                                this.workruft.world.map.getMaxHeight({ cell: currentCell }));
+                                        }
+                                    }.bind(this)
+                                );
+                                forEachObject = ForEachCell(this.workruft, cellX, cellZ,
+                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
+                                    function(forEachObject) {
+                                        currentCell = this.workruft.world.map.getCell({
+                                            x: cellX + forEachObject.xOffset,
+                                            z: cellZ + forEachObject.zOffset
+                                        });
+                                        if (currentCell != null) {
+                                            this.workruft.world.map.setCellFlatHeight({
+                                                cell: currentCell,
+                                                height: highestHeight
+                                            });
+                                        }
+                                    }.bind(this)
+                                );
+                                break;
                             case Enums.TerrainEditingModes.LevelHeight:
-
+                                let totalAverageHeights = 0.0;
+                                let cellCount = 0;
+                                forEachObject = ForEachCell(this.workruft, cellX, cellZ,
+                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
+                                    function(forEachObject) {
+                                        currentCell = this.workruft.world.map.getCell({
+                                            x: cellX + forEachObject.xOffset,
+                                            z: cellZ + forEachObject.zOffset
+                                        });
+                                        if (currentCell != null) {
+                                            ++cellCount;
+                                            totalAverageHeights +=
+                                                this.workruft.world.map.getAverageHeight({ cell: currentCell });
+                                        }
+                                    }.bind(this)
+                                );
+                                totalAverageHeights /= Math.max(1.0, cellCount);
+                                forEachObject = ForEachCell(this.workruft, cellX, cellZ,
+                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
+                                    function(forEachObject) {
+                                        currentCell = this.workruft.world.map.getCell({
+                                            x: cellX + forEachObject.xOffset,
+                                            z: cellZ + forEachObject.zOffset
+                                        });
+                                        if (currentCell != null) {
+                                            this.workruft.world.map.setCellFlatHeight({
+                                                cell: currentCell,
+                                                height: totalAverageHeights
+                                            });
+                                        }
+                                    }.bind(this)
+                                );
                                 break;
                             case Enums.TerrainEditingModes.CloneHeight:
 
@@ -133,6 +219,12 @@ module.exports = {
                                 alert('Unhandled terrain editing mode button!');
                                 break;
                         }
+                        this.workruft.world.map.updateCells({
+                            lowX: cellX - forEachObject.floorHalfLatSize - CellSize,
+                            lowZ: cellZ - forEachObject.floorHalfLongSize - CellSize,
+                            highX: cellX + forEachObject.ceilHalfLatSize + CellSize,
+                            highZ: cellZ + forEachObject.ceilHalfLongSize + CellSize
+                        });
                         this.updateMapEditorMouseCells({ cellX, cellZ });
                     }
                 }
