@@ -31,7 +31,7 @@ module.exports = {
                             this.workruft.editingLongSize = Math.max(1, this.workruft.editingLongSize - 1);
                             break;
                         default:
-                            alert('Unhandled terrain edit size button!');
+                            alert('Unhandled terrain editing size button!');
                             break;
                     }
                     this.onDocumentMouseMove();

@@ -20,8 +20,7 @@ class InputBindings {
         this.SelectUnitButton = 0;
         this.MiscellaneousButton = 1;
         this.OrderUnitButton = 2;
-        this.RaiseTerrainButton = 0;
-        this.LowerTerrainButton = 2;
+        this.TerrainActivityButton = 2;
     }
 }
 

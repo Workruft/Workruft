@@ -22,6 +22,27 @@ window.CeilToCell = function(alignMe) {
     return Math.ceil(alignMe / CellSize) * CellSize;
 };
 
+window.ForEachCell = function(workruft, cellX, cellZ, latSize, longSize, callback) {
+    let forEachObject = {
+        halfLatSize: latSize * 0.5,
+        halfLongSize: longSize * 0.5
+    };
+    forEachObject.floorHalfLatSize = FloorToCell(forEachObject.halfLatSize);
+    forEachObject.ceilHalfLatSize = CeilToCell(forEachObject.halfLatSize);
+    forEachObject.floorHalfLongSize = FloorToCell(forEachObject.halfLongSize);
+    forEachObject.ceilHalfLongSize = CeilToCell(forEachObject.halfLongSize);
+    for (forEachObject.xOffset = -forEachObject.floorHalfLatSize;
+        forEachObject.xOffset < forEachObject.ceilHalfLatSize;
+        forEachObject.xOffset += CellSize) {
+        for (forEachObject.zOffset = -forEachObject.floorHalfLongSize;
+            forEachObject.zOffset < forEachObject.ceilHalfLongSize;
+            forEachObject.zOffset += CellSize) {
+            callback(forEachObject);
+        }
+    }
+    return forEachObject;
+};
+
 //Get the closest distance to the cell from a given point.
 window.CellClosestDistance = function({ cellX, cellZ, pointX, pointZ }) {
     //Check to see if the point is inside the cell.

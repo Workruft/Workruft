@@ -5,93 +5,100 @@ module.exports = {
         this.mouseButtonsDown.add(event.button);
         switch (this.workruft.gameState) {
             case Enums.GameStates.Playing: {
-                switch (event.button) {
-                    case this.inputBindings.SelectUnitButton: {
-                        let pickedObjectArray = this.workruft.world.pickObjects([ this.workruft.world.playerObjects ],
-                            this.workruft.world.getNormalizedCanvasMouse(event));
-                        if (pickedObjectArray.length > 0) {
-                            let pickedGameObject = pickedObjectArray[0].object.userData;
-                            if (pickedGameObject.isSelected) {
-                                pickedGameObject.deselect();
+                this.onMouseDownPlaying(event);
+                break;
+            }
+            case Enums.GameStates.MapEditing: {
+                this.onMouseDownMapEditing(event);
+                break;
+            }
+        }
+    },
+
+    onMouseDownPlaying(event) {
+        switch (event.button) {
+            case this.inputBindings.SelectUnitButton: {
+                let pickedObjectArray = this.workruft.world.pickObjects([ this.workruft.world.playerObjects ],
+                    this.workruft.world.getNormalizedCanvasMouse(event));
+                if (pickedObjectArray.length > 0) {
+                    let pickedGameObject = pickedObjectArray[0].object.userData;
+                    if (pickedGameObject.isSelected) {
+                        pickedGameObject.deselect();
+                    } else {
+                        pickedGameObject.select();
+                    }
+                } else {
+                    for (let selectedObject of this.workruft.world.selectedObjects) {
+                        selectedObject.deselect();
+                    }
+                    this.workruft.world.selectedObjects.clear();
+                }
+                break;
+            }
+            case this.inputBindings.MiscellaneousButton: {
+                let pickedMapObjectArray = this.workruft.world.pickMap(
+                    this.workruft.world.getNormalizedCanvasMouse(event));
+                if (pickedMapObjectArray.length > 0) {
+                    let clickCoordinates = pickedMapObjectArray[0].point;
+                    let cellX = FloorToCell(clickCoordinates.x);
+                    let cellZ = FloorToCell(clickCoordinates.z);
+                    alert(clickCoordinates.x + ', ' + clickCoordinates.z + '\n' + cellX + ', ' + cellZ);
+                }
+                break;
+            }
+            case this.inputBindings.OrderUnitButton: {
+                let pickedMapObjectArray = this.workruft.world.pickMap(
+                    this.workruft.world.getNormalizedCanvasMouse(event));
+                if (pickedMapObjectArray.length > 0) {
+                    let clickCoordinates = pickedMapObjectArray[0].point;
+                    let cellX = FloorToCell(clickCoordinates.x);
+                    let cellZ = FloorToCell(clickCoordinates.z);
+                    let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
+                    if (clickedCell != null) {
+                        for (let selectedObject of this.workruft.world.selectedObjects) {
+                            let newOrderObject = {
+                                order: new Order({
+                                    type: Enums.OrderTypes.Move,
+                                    data: { x: clickCoordinates.x, z: clickCoordinates.z }
+                                })
+                            };
+                            if (this.keysDown.has('Control')) {
+                                selectedObject.issueAdditionalOrder(newOrderObject);
                             } else {
-                                pickedGameObject.select();
-                            }
-                        } else {
-                            for (let selectedObject of this.workruft.world.selectedObjects) {
-                                selectedObject.deselect();
-                            }
-                            this.workruft.world.selectedObjects.clear();
-                        }
-                        break;
-                    }
-                    case this.inputBindings.MiscellaneousButton: {
-                        let pickedMapObjectArray = this.workruft.world.pickMap(
-                            this.workruft.world.getNormalizedCanvasMouse(event));
-                        if (pickedMapObjectArray.length > 0) {
-                            let clickCoordinates = pickedMapObjectArray[0].point;
-                            let cellX = FloorToCell(clickCoordinates.x);
-                            let cellZ = FloorToCell(clickCoordinates.z);
-                            alert(clickCoordinates.x + ', ' + clickCoordinates.z + '\n' + cellX + ', ' + cellZ);
-                        }
-                        break;
-                    }
-                    case this.inputBindings.OrderUnitButton: {
-                        let pickedMapObjectArray = this.workruft.world.pickMap(
-                            this.workruft.world.getNormalizedCanvasMouse(event));
-                        if (pickedMapObjectArray.length > 0) {
-                            let clickCoordinates = pickedMapObjectArray[0].point;
-                            let cellX = FloorToCell(clickCoordinates.x);
-                            let cellZ = FloorToCell(clickCoordinates.z);
-                            let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
-                            if (clickedCell != null) {
-                                for (let selectedObject of this.workruft.world.selectedObjects) {
-                                    let newOrderObject = {
-                                        order: new Order({
-                                            type: Enums.OrderTypes.Move,
-                                            data: { x: clickCoordinates.x, z: clickCoordinates.z }
-                                        })
-                                    };
-                                    if (this.keysDown.has('Control')) {
-                                        selectedObject.issueAdditionalOrder(newOrderObject);
-                                    } else {
-                                        selectedObject.issueReplacementOrder(newOrderObject);
-                                    }
-                                }
+                                selectedObject.issueReplacementOrder(newOrderObject);
                             }
                         }
-                        break;
                     }
                 }
                 break;
-            } //case Enums.GameStates.Playing
-            case Enums.GameStates.MapEditing: {
-                switch (event.button) {
-                    case this.inputBindings.RaiseTerrainButton:
-                    case this.inputBindings.LowerTerrainButton: {
-                        let pickedMapObjectArray = this.workruft.world.pickMap(
-                            this.workruft.world.getNormalizedCanvasMouse(event));
-                        if (pickedMapObjectArray.length > 0) {
-                            let clickCoordinates = pickedMapObjectArray[0].point;
-                            let cellX = FloorToCell(clickCoordinates.x);
-                            let cellZ = FloorToCell(clickCoordinates.z);
-                            let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
-                            if (clickedCell != null) {
-                                let raiseLowerOffset =
-                                    (event.button == this.inputBindings.RaiseTerrainButton ? CellSize : -CellSize);
+            }
+        }
+    },
 
-                                let halfEditingLongSize = this.workruft.editingLongSize * 0.5;
-                                let halfEditingLatSize = this.workruft.editingLatSize * 0.5;
-                                let floorHalfEditingLongSize = FloorToCell(halfEditingLongSize);
-                                let ceilHalfEditingLongSize = CeilToCell(halfEditingLongSize);
-                                let floorHalfEditingLatSize = FloorToCell(halfEditingLatSize);
-                                let ceilHalfEditingLatSize = CeilToCell(halfEditingLatSize);
-                                for (let xOffset = -floorHalfEditingLatSize; xOffset < ceilHalfEditingLatSize;
-                                    xOffset += CellSize) {
-                                    for (let zOffset = -floorHalfEditingLongSize; zOffset < ceilHalfEditingLongSize;
-                                        zOffset += CellSize) {
-                                        let currentCell = this.workruft.world.map.getCell({
-                                            x: cellX + xOffset,
-                                            z: cellZ + zOffset
+    onMouseDownMapEditing(event) {
+        switch (event.button) {
+            case this.inputBindings.TerrainActivityButton: {
+                let pickedMapObjectArray = this.workruft.world.pickMap(
+                    this.workruft.world.getNormalizedCanvasMouse(event));
+                if (pickedMapObjectArray.length > 0) {
+                    let clickCoordinates = pickedMapObjectArray[0].point;
+                    let cellX = FloorToCell(clickCoordinates.x);
+                    let cellZ = FloorToCell(clickCoordinates.z);
+                    let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
+                    if (clickedCell != null) {
+                        switch (this.workruft.terrainEditingMode) {
+                            case Enums.TerrainEditingModes.DecreaseHeight:
+                            case Enums.TerrainEditingModes.IncreaseHeight:
+                                let raiseLowerOffset =
+                                    (this.workruft.terrainEditingMode == Enums.TerrainEditingModes.IncreaseHeight ?
+                                        CellSize : -CellSize);
+                                let currentCell;
+                                let forEachObject = ForEachCell(this.workruft, cellX, cellZ,
+                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
+                                    function(forEachObject) {
+                                        currentCell = this.workruft.world.map.getCell({
+                                            x: cellX + forEachObject.xOffset,
+                                            z: cellZ + forEachObject.zOffset
                                         });
                                         if (currentCell != null) {
                                             this.workruft.world.map.addHeightToCell({
@@ -99,33 +106,49 @@ module.exports = {
                                                 height: raiseLowerOffset
                                             });
                                         }
-                                    }
-                                }
+                                    }.bind(this)
+                                );
                                 this.workruft.world.map.updateCells({
-                                    lowX: cellX - floorHalfEditingLatSize - CellSize,
-                                    lowZ: cellZ - floorHalfEditingLongSize - CellSize,
-                                    highX: cellX + floorHalfEditingLatSize + CellSize,
-                                    highZ: cellZ + ceilHalfEditingLongSize + CellSize
+                                    lowX: cellX - forEachObject.floorHalfLatSize - CellSize,
+                                    lowZ: cellZ - forEachObject.floorHalfLongSize - CellSize,
+                                    highX: cellX + forEachObject.ceilHalfLatSize + CellSize,
+                                    highZ: cellZ + forEachObject.ceilHalfLongSize + CellSize
                                 });
-                                this.updateMapEditorMouseCells({ cellX, cellZ });
-                            }
+                                break;
+                            case Enums.TerrainEditingModes.FlattenHeight:
+                            case Enums.TerrainEditingModes.RaiseHeight:
+                            case Enums.TerrainEditingModes.LevelHeight:
+
+                                break;
+                            case Enums.TerrainEditingModes.CloneHeight:
+
+                                break;
+                            case Enums.TerrainEditingModes.LongRamp:
+
+                                break;
+                            case Enums.TerrainEditingModes.LatRamp:
+
+                                break;
+                            default:
+                                alert('Unhandled terrain editing mode button!');
+                                break;
                         }
-                        break;
-                    }
-                    case this.inputBindings.MiscellaneousButton: {
-                        let pickedMapObjectArray = this.workruft.world.pickMap(
-                            this.workruft.world.getNormalizedCanvasMouse(event));
-                        if (pickedMapObjectArray.length > 0) {
-                            let clickCoordinates = pickedMapObjectArray[0].point;
-                            let cellX = FloorToCell(clickCoordinates.x);
-                            let cellZ = FloorToCell(clickCoordinates.z);
-                            alert(clickCoordinates.x + ', ' + clickCoordinates.z + '\n' + cellX + ', ' + cellZ);
-                        }
-                        break;
+                        this.updateMapEditorMouseCells({ cellX, cellZ });
                     }
                 }
                 break;
-            } //case Enums.GameStates.MapEditing
+            }
+            case this.inputBindings.MiscellaneousButton: {
+                let pickedMapObjectArray = this.workruft.world.pickMap(
+                    this.workruft.world.getNormalizedCanvasMouse(event));
+                if (pickedMapObjectArray.length > 0) {
+                    let clickCoordinates = pickedMapObjectArray[0].point;
+                    let cellX = FloorToCell(clickCoordinates.x);
+                    let cellZ = FloorToCell(clickCoordinates.z);
+                    alert(clickCoordinates.x + ', ' + clickCoordinates.z + '\n' + cellX + ', ' + cellZ);
+                }
+                break;
+            }
         }
     },
 

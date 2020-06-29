@@ -67,22 +67,16 @@ class InputHandler {
             return;
         }
         this.clearEditorSquares();
-        let halfEditingLongSize = this.workruft.editingLongSize * 0.5;
-        let halfEditingLatSize = this.workruft.editingLatSize * 0.5;
-        let floorHalfEditingLongSize = FloorToCell(halfEditingLongSize);
-        let ceilHalfEditingLongSize = CeilToCell(halfEditingLongSize);
-        let floorHalfEditingLatSize = FloorToCell(halfEditingLatSize);
-        let ceilHalfEditingLatSize = CeilToCell(halfEditingLatSize);
-        for (let xOffset = -floorHalfEditingLatSize; xOffset < ceilHalfEditingLatSize; xOffset += CellSize) {
-            for (let zOffset = -floorHalfEditingLongSize; zOffset < ceilHalfEditingLongSize; zOffset += CellSize) {
+        ForEachCell(this.workruft, cellX, cellZ, this.workruft.editingLatSize, this.workruft.editingLongSize,
+            function(forEachObject) {
                 this.editorSquares.push(new ColoredSquare({
                     workruft: this.workruft,
-                    x: cellX + xOffset + HalfCellSize,
-                    z: cellZ + zOffset + HalfCellSize,
+                    x: cellX + forEachObject.xOffset + HalfCellSize,
+                    z: cellZ + forEachObject.zOffset + HalfCellSize,
                     color: BlackColor
                 }));
-            }
-        }
+            }.bind(this)
+        );
     }
 }
 
