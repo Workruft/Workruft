@@ -1,18 +1,18 @@
 class InputBindings {
     constructor() {
         //Key down's.
-        this.MoveCameraUp = 'w';
-        this.MoveCameraRight = 'd';
-        this.MoveCameraDown = 's';
-        this.MoveCameraLeft = 'a';
-        this.RotateCameraClockwise = 'q';
-        this.RotateCameraCounterclockwise = 'e';
+        this.MoveCameraUp = 'W';
+        this.MoveCameraRight = 'D';
+        this.MoveCameraDown = 'S';
+        this.MoveCameraLeft = 'A';
+        this.RotateCameraClockwise = 'Q';
+        this.RotateCameraCounterclockwise = 'E';
 
         //Key press's.
         this.ToggleChat = 'Enter';
         this.CancelChat = 'Escape';
-        this.ToggleMapEditor = 'm';
-        this.TogglePathTesting = 'p';
+        this.ToggleMapEditor = 'M';
+        this.TogglePathTesting = 'P';
 
         //Mouse button down's. Left: 0, Middle: 1, Right: 2.
 

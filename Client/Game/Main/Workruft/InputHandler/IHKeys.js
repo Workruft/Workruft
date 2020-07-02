@@ -1,8 +1,9 @@
 module.exports = {
     onKeyDown(event) {
-        this.keysDown.add(event.key);
+        let upperKey = event.key.toUpperCase();
+        this.keysDown.add(upperKey);
         if (!event.repeat) {
-            switch (event.key) {
+            switch (upperKey) {
                 case this.inputBindings.ToggleChat: {
                     this.workruft.chat.toggleChatEntry();
                     break;
@@ -27,7 +28,7 @@ module.exports = {
             }
 
             if (!this.workruft.chat.isChatting) {
-                switch (event.key) {
+                switch (upperKey) {
                     case this.inputBindings.ToggleMapEditor: {
                         if (this.workruft.gameState == Enums.GameStates.Playing) {
                             this.workruft.world.deselectAll();
@@ -90,8 +91,9 @@ module.exports = {
     },
 
     onKeyUp(event) {
-        this.keysDown.delete(event.key);
-        // switch (event.key) {
+        let upperKey = event.key.toUpperCase();
+        this.keysDown.delete(upperKey);
+        // switch (upperKey) {
         // }
     }
 };
