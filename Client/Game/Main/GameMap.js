@@ -213,6 +213,13 @@ class GameMap {
         this.setFrontLeftHeight({ cell, height });
     }
 
+    copyCellHeights({ copyToCell, copyFromCell }) {
+        this.setBackLeftHeight({ cell: copyToCell, height: this.getBackLeftHeight({ cell: copyFromCell }) });
+        this.setBackRightHeight({ cell: copyToCell, height: this.getBackRightHeight({ cell: copyFromCell }) });
+        this.setFrontRightHeight({ cell: copyToCell, height: this.getFrontRightHeight({ cell: copyFromCell }) });
+        this.setFrontLeftHeight({ cell: copyToCell, height: this.getFrontLeftHeight({ cell: copyFromCell }) });
+    }
+
     getAverageHeight({ cell }) {
         return (this.topGeometry.vertices[cell.vio].y +
             this.topGeometry.vertices[cell.vio + 1].y +

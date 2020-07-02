@@ -67,16 +67,46 @@ class InputHandler {
             return;
         }
         this.clearEditorSquares();
-        ForEachCell(this.workruft, cellX, cellZ, this.workruft.editingLatSize, this.workruft.editingLongSize,
-            function(forEachObject) {
-                this.editorSquares.push(new ColoredSquare({
-                    workruft: this.workruft,
-                    x: cellX + forEachObject.xOffset + HalfCellSize,
-                    z: cellZ + forEachObject.zOffset + HalfCellSize,
-                    color: BlackColor
-                }));
-            }.bind(this)
-        );
+        switch (this.workruft.terrainEditingMode) {
+            case Enums.TerrainEditingModes.LongRamp:
+                ForEachLongBorderCell(
+                    this.workruft.editingLatSize, this.workruft.editingLongSize,
+                    function(forEachObject) {
+                        this.editorSquares.push(new ColoredSquare({
+                            workruft: this.workruft,
+                            x: cellX + forEachObject.xOffset + HalfCellSize,
+                            z: cellZ + forEachObject.zOffset + HalfCellSize,
+                            color: BlackColor
+                        }));
+                    }.bind(this)
+                );
+                break;
+            case Enums.TerrainEditingModes.LatRamp:
+                ForEachLatBorderCell(
+                    this.workruft.editingLatSize, this.workruft.editingLongSize,
+                    function(forEachObject) {
+                        this.editorSquares.push(new ColoredSquare({
+                            workruft: this.workruft,
+                            x: cellX + forEachObject.xOffset + HalfCellSize,
+                            z: cellZ + forEachObject.zOffset + HalfCellSize,
+                            color: BlackColor
+                        }));
+                    }.bind(this)
+                );
+                break;
+            default:
+                ForEachCell(this.workruft.editingLatSize, this.workruft.editingLongSize,
+                    function(forEachObject) {
+                        this.editorSquares.push(new ColoredSquare({
+                            workruft: this.workruft,
+                            x: cellX + forEachObject.xOffset + HalfCellSize,
+                            z: cellZ + forEachObject.zOffset + HalfCellSize,
+                            color: BlackColor
+                        }));
+                    }.bind(this)
+                );
+                break;
+        }
     }
 }
 

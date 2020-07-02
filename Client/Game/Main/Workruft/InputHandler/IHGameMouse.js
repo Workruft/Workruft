@@ -80,154 +80,238 @@ module.exports = {
             case this.inputBindings.TerrainActivityButton: {
                 let pickedMapObjectArray = this.workruft.world.pickMap(
                     this.workruft.world.getNormalizedCanvasMouse(event));
-                if (pickedMapObjectArray.length > 0) {
-                    let clickCoordinates = pickedMapObjectArray[0].point;
-                    let cellX = FloorToCell(clickCoordinates.x);
-                    let cellZ = FloorToCell(clickCoordinates.z);
-                    let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
-                    if (clickedCell != null) {
-                        let forEachObject;
-                        switch (this.workruft.terrainEditingMode) {
-                            case Enums.TerrainEditingModes.DecreaseHeight:
-                            case Enums.TerrainEditingModes.IncreaseHeight:
-                                let raiseLowerOffset =
-                                    (this.workruft.terrainEditingMode == Enums.TerrainEditingModes.IncreaseHeight ?
-                                        CellSize : -CellSize);
-                                let currentCell;
-                                forEachObject = ForEachCell(this.workruft, cellX, cellZ,
-                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
-                                    function(forEachObject) {
-                                        currentCell = this.workruft.world.map.getCell({
-                                            x: cellX + forEachObject.xOffset,
-                                            z: cellZ + forEachObject.zOffset
-                                        });
-                                        if (currentCell != null) {
-                                            this.workruft.world.map.addHeightToCell({
-                                                cell: currentCell,
-                                                height: raiseLowerOffset
-                                            });
-                                        }
-                                    }.bind(this)
-                                );
-                                break;
-                            case Enums.TerrainEditingModes.FlattenHeight:
-                                let lowestHeight = Infinity;
-                                ForEachCell(this.workruft, cellX, cellZ,
-                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
-                                    function(forEachObject) {
-                                        currentCell = this.workruft.world.map.getCell({
-                                            x: cellX + forEachObject.xOffset,
-                                            z: cellZ + forEachObject.zOffset
-                                        });
-                                        if (currentCell != null) {
-                                            lowestHeight = Math.min(lowestHeight,
-                                                this.workruft.world.map.getMinHeight({ cell: currentCell }));
-                                        }
-                                    }.bind(this)
-                                );
-                                forEachObject = ForEachCell(this.workruft, cellX, cellZ,
-                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
-                                    function(forEachObject) {
-                                        currentCell = this.workruft.world.map.getCell({
-                                            x: cellX + forEachObject.xOffset,
-                                            z: cellZ + forEachObject.zOffset
-                                        });
-                                        if (currentCell != null) {
-                                            this.workruft.world.map.setCellFlatHeight({
-                                                cell: currentCell,
-                                                height: lowestHeight
-                                            });
-                                        }
-                                    }.bind(this)
-                                );
-                                break;
-                            case Enums.TerrainEditingModes.RaiseHeight:
-                                let highestHeight = -Infinity;
-                                ForEachCell(this.workruft, cellX, cellZ,
-                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
-                                    function(forEachObject) {
-                                        currentCell = this.workruft.world.map.getCell({
-                                            x: cellX + forEachObject.xOffset,
-                                            z: cellZ + forEachObject.zOffset
-                                        });
-                                        if (currentCell != null) {
-                                            highestHeight = Math.max(highestHeight,
-                                                this.workruft.world.map.getMaxHeight({ cell: currentCell }));
-                                        }
-                                    }.bind(this)
-                                );
-                                forEachObject = ForEachCell(this.workruft, cellX, cellZ,
-                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
-                                    function(forEachObject) {
-                                        currentCell = this.workruft.world.map.getCell({
-                                            x: cellX + forEachObject.xOffset,
-                                            z: cellZ + forEachObject.zOffset
-                                        });
-                                        if (currentCell != null) {
-                                            this.workruft.world.map.setCellFlatHeight({
-                                                cell: currentCell,
-                                                height: highestHeight
-                                            });
-                                        }
-                                    }.bind(this)
-                                );
-                                break;
-                            case Enums.TerrainEditingModes.LevelHeight:
-                                let totalAverageHeights = 0.0;
-                                let cellCount = 0;
-                                forEachObject = ForEachCell(this.workruft, cellX, cellZ,
-                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
-                                    function(forEachObject) {
-                                        currentCell = this.workruft.world.map.getCell({
-                                            x: cellX + forEachObject.xOffset,
-                                            z: cellZ + forEachObject.zOffset
-                                        });
-                                        if (currentCell != null) {
-                                            ++cellCount;
-                                            totalAverageHeights +=
-                                                this.workruft.world.map.getAverageHeight({ cell: currentCell });
-                                        }
-                                    }.bind(this)
-                                );
-                                totalAverageHeights /= Math.max(1.0, cellCount);
-                                forEachObject = ForEachCell(this.workruft, cellX, cellZ,
-                                    this.workruft.editingLatSize, this.workruft.editingLongSize,
-                                    function(forEachObject) {
-                                        currentCell = this.workruft.world.map.getCell({
-                                            x: cellX + forEachObject.xOffset,
-                                            z: cellZ + forEachObject.zOffset
-                                        });
-                                        if (currentCell != null) {
-                                            this.workruft.world.map.setCellFlatHeight({
-                                                cell: currentCell,
-                                                height: totalAverageHeights
-                                            });
-                                        }
-                                    }.bind(this)
-                                );
-                                break;
-                            case Enums.TerrainEditingModes.CloneHeight:
-
-                                break;
-                            case Enums.TerrainEditingModes.LongRamp:
-
-                                break;
-                            case Enums.TerrainEditingModes.LatRamp:
-
-                                break;
-                            default:
-                                alert('Unhandled terrain editing mode button!');
-                                break;
+                if (pickedMapObjectArray.length == 0) {
+                    break;
+                }
+                let clickCoordinates = pickedMapObjectArray[0].point;
+                let cellX = FloorToCell(clickCoordinates.x);
+                let cellZ = FloorToCell(clickCoordinates.z);
+                let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
+                if (clickedCell == null) {
+                    break;
+                }
+                let forEachObject = null;
+                switch (this.workruft.terrainEditingMode) {
+                    case Enums.TerrainEditingModes.DecreaseHeight:
+                    case Enums.TerrainEditingModes.IncreaseHeight: {
+                        let raiseLowerOffset =
+                            (this.workruft.terrainEditingMode == Enums.TerrainEditingModes.IncreaseHeight ?
+                                CellSize : -CellSize);
+                        let currentCell;
+                        forEachObject = ForEachCell(
+                            this.workruft.editingLatSize, this.workruft.editingLongSize,
+                            function(forEachObject) {
+                                currentCell = this.workruft.world.map.getCell({
+                                    x: cellX + forEachObject.xOffset,
+                                    z: cellZ + forEachObject.zOffset
+                                });
+                                if (currentCell != null) {
+                                    this.workruft.world.map.addHeightToCell({
+                                        cell: currentCell,
+                                        height: raiseLowerOffset
+                                    });
+                                }
+                            }.bind(this)
+                        );
+                        break;
+                    }
+                    case Enums.TerrainEditingModes.FlattenHeight: {
+                        let lowestHeight = Infinity;
+                        ForEachCell(
+                            this.workruft.editingLatSize, this.workruft.editingLongSize,
+                            function(forEachObject) {
+                                currentCell = this.workruft.world.map.getCell({
+                                    x: cellX + forEachObject.xOffset,
+                                    z: cellZ + forEachObject.zOffset
+                                });
+                                if (currentCell != null) {
+                                    lowestHeight = Math.min(lowestHeight,
+                                        this.workruft.world.map.getMinHeight({ cell: currentCell }));
+                                }
+                            }.bind(this)
+                        );
+                        forEachObject = ForEachCell(
+                            this.workruft.editingLatSize, this.workruft.editingLongSize,
+                            function(forEachObject) {
+                                currentCell = this.workruft.world.map.getCell({
+                                    x: cellX + forEachObject.xOffset,
+                                    z: cellZ + forEachObject.zOffset
+                                });
+                                if (currentCell != null) {
+                                    this.workruft.world.map.setCellFlatHeight({
+                                        cell: currentCell,
+                                        height: lowestHeight
+                                    });
+                                }
+                            }.bind(this)
+                        );
+                        break;
+                    }
+                    case Enums.TerrainEditingModes.RaiseHeight: {
+                        let highestHeight = -Infinity;
+                        ForEachCell(
+                            this.workruft.editingLatSize, this.workruft.editingLongSize,
+                            function(forEachObject) {
+                                currentCell = this.workruft.world.map.getCell({
+                                    x: cellX + forEachObject.xOffset,
+                                    z: cellZ + forEachObject.zOffset
+                                });
+                                if (currentCell != null) {
+                                    highestHeight = Math.max(highestHeight,
+                                        this.workruft.world.map.getMaxHeight({ cell: currentCell }));
+                                }
+                            }.bind(this)
+                        );
+                        forEachObject = ForEachCell(
+                            this.workruft.editingLatSize, this.workruft.editingLongSize,
+                            function(forEachObject) {
+                                currentCell = this.workruft.world.map.getCell({
+                                    x: cellX + forEachObject.xOffset,
+                                    z: cellZ + forEachObject.zOffset
+                                });
+                                if (currentCell != null) {
+                                    this.workruft.world.map.setCellFlatHeight({
+                                        cell: currentCell,
+                                        height: highestHeight
+                                    });
+                                }
+                            }.bind(this)
+                        );
+                        break;
+                    }
+                    case Enums.TerrainEditingModes.LevelHeight: {
+                        let totalAverageHeights = 0.0;
+                        let cellCount = 0;
+                        forEachObject = ForEachCell(
+                            this.workruft.editingLatSize, this.workruft.editingLongSize,
+                            function(forEachObject) {
+                                currentCell = this.workruft.world.map.getCell({
+                                    x: cellX + forEachObject.xOffset,
+                                    z: cellZ + forEachObject.zOffset
+                                });
+                                if (currentCell != null) {
+                                    ++cellCount;
+                                    totalAverageHeights +=
+                                        this.workruft.world.map.getAverageHeight({ cell: currentCell });
+                                }
+                            }.bind(this)
+                        );
+                        totalAverageHeights /= Math.max(1.0, cellCount);
+                        forEachObject = ForEachCell(
+                            this.workruft.editingLatSize, this.workruft.editingLongSize,
+                            function(forEachObject) {
+                                currentCell = this.workruft.world.map.getCell({
+                                    x: cellX + forEachObject.xOffset,
+                                    z: cellZ + forEachObject.zOffset
+                                });
+                                if (currentCell != null) {
+                                    this.workruft.world.map.setCellFlatHeight({
+                                        cell: currentCell,
+                                        height: totalAverageHeights
+                                    });
+                                }
+                            }.bind(this)
+                        );
+                        break;
+                    }
+                    case Enums.TerrainEditingModes.CloneHeight: {
+                        if (event.ctrlKey) {
+                            //Set template.
+                            this.workruft.terrainEditingCells = [];
+                            this.workruft.terrainEditingCenterCell = clickedCell;
+                            forEachObject = ForEachCell(
+                                this.workruft.editingLatSize, this.workruft.editingLongSize,
+                                function(forEachObject) {
+                                    this.workruft.terrainEditingCells.push(this.workruft.world.map.getCell({
+                                        x: cellX + forEachObject.xOffset,
+                                        z: cellZ + forEachObject.zOffset
+                                    }));
+                                }.bind(this)
+                            );
+                            this.workruft.terrainEditingLatSize = this.workruft.editingLatSize;
+                            this.workruft.terrainEditingLongSize = this.workruft.editingLongSize;
+                            this.workruft.updateStatusBox();
+                            break;
+                        } else if (this.workruft.terrainEditingCells.length == 0) {
+                            break;
                         }
-                        this.workruft.world.map.updateCells({
-                            lowX: cellX - forEachObject.floorHalfLatSize - CellSize,
-                            lowZ: cellZ - forEachObject.floorHalfLongSize - CellSize,
-                            highX: cellX + forEachObject.ceilHalfLatSize + CellSize,
-                            highZ: cellZ + forEachObject.ceilHalfLongSize + CellSize
-                        });
-                        this.updateMapEditorMouseCells({ cellX, cellZ });
+                        //Clone to.
+                        let currentXOffset;
+                        let currentZOffset;
+                        for (let terrainEditingCell of this.workruft.terrainEditingCells) {
+                            currentXOffset = terrainEditingCell.x - this.workruft.terrainEditingCenterCell.x;
+                            currentZOffset = terrainEditingCell.z - this.workruft.terrainEditingCenterCell.z;
+                            currentCell = this.workruft.world.map.getCell({
+                                x: clickedCell.x + currentXOffset,
+                                z: clickedCell.z + currentZOffset
+                            });
+                            if (currentCell != null) {
+                                this.workruft.world.map.copyCellHeights({
+                                    copyToCell: currentCell,
+                                    copyFromCell: terrainEditingCell
+                                });
+                            }
+                        }
+                        forEachObject = CreateCellForEachObject(
+                            this.workruft.terrainEditingLatSize, this.workruft.terrainEditingLongSize);
+                        break;
+                    }
+                    case Enums.TerrainEditingModes.LatRamp: {
+                        this.workruft.terrainEditingCells = [];
+                        this.workruft.terrainEditingCenterCell = clickedCell;
+                        forEachObject = ForEachLatBorderCell(
+                            this.workruft.editingLatSize, this.workruft.editingLongSize,
+                            function(forEachObject) {
+                                this.workruft.terrainEditingCells.push(this.workruft.world.map.getCell({
+                                    x: cellX + forEachObject.xOffset,
+                                    z: cellZ + forEachObject.zOffset
+                                }));
+                            }.bind(this)
+                        );
+                        if (this.workruft.terrainEditingCells.length == 0) {
+                            break;
+                        }
+                        //Latitudinal ramp.
+
+                        //Reset terrain editing data.
+                        this.workruft.resetTerrainEditing();
+                        break;
+                    }
+                    case Enums.TerrainEditingModes.LongRamp: {
+                        this.workruft.terrainEditingCells = [];
+                        this.workruft.terrainEditingCenterCell = clickedCell;
+                        forEachObject = ForEachLongBorderCell(
+                            this.workruft.editingLatSize, this.workruft.editingLongSize,
+                            function(forEachObject) {
+                                this.workruft.terrainEditingCells.push(this.workruft.world.map.getCell({
+                                    x: cellX + forEachObject.xOffset,
+                                    z: cellZ + forEachObject.zOffset
+                                }));
+                            }.bind(this)
+                        );
+                        if (this.workruft.terrainEditingCells.length == 0) {
+                            break;
+                        }
+                        //Longitudinal ramp.
+
+                        //Reset terrain editing data.
+                        this.workruft.resetTerrainEditing();
+                        break;
+                    }
+                    default: {
+                        alert('Unhandled terrain editing mode button!');
+                        break;
                     }
                 }
+                if (forEachObject != null) {
+                    this.workruft.world.map.updateCells({
+                        lowX: cellX - forEachObject.floorHalfLatSize - CellSize,
+                        lowZ: cellZ - forEachObject.floorHalfLongSize - CellSize,
+                        highX: cellX + forEachObject.ceilHalfLatSize + CellSize,
+                        highZ: cellZ + forEachObject.ceilHalfLongSize + CellSize
+                    });
+                }
+                this.updateMapEditorMouseCells({ cellX, cellZ });
                 break;
             }
             case this.inputBindings.MiscellaneousButton: {
@@ -261,6 +345,8 @@ module.exports = {
                 this.workruft.editingLongSize = Math.max(1, this.workruft.editingLongSize - 1);
                 this.workruft.editingLatSize = Math.max(1, this.workruft.editingLatSize - 1);
             }
+            //Reset terrain editing data.
+            this.workruft.resetTerrainEditing();
             let pickedMapObjectArray = this.workruft.world.pickMap(
                 this.workruft.world.getNormalizedCanvasMouse(event));
             if (pickedMapObjectArray.length > 0) {

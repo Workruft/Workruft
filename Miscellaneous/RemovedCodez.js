@@ -191,3 +191,48 @@ function GetOrCreateTraversalOffsets({ unitRadius }) {
 
 
 /* cursor: url('Icons/icons8-ramp-32.png'), default; */
+
+
+
+
+window.ForEachBorderCell = function(workruft, cellX, cellZ, latSize, longSize, callback) {
+    let forEachObject = {
+        halfLatSize: latSize * 0.5,
+        halfLongSize: longSize * 0.5
+    };
+    forEachObject.floorHalfLatSize = FloorToCell(forEachObject.halfLatSize);
+    forEachObject.ceilHalfLatSize = CeilToCell(forEachObject.halfLatSize);
+    forEachObject.floorHalfLongSize = FloorToCell(forEachObject.halfLongSize);
+    forEachObject.ceilHalfLongSize = CeilToCell(forEachObject.halfLongSize);
+    //Border rows (except corners).
+    for (forEachObject.xOffset = -forEachObject.floorHalfLatSize + CellSize;
+        forEachObject.xOffset < forEachObject.ceilHalfLatSize;
+        forEachObject.xOffset += CellSize) {
+        for (forEachObject.zOffset = -forEachObject.floorHalfLongSize;
+            forEachObject.zOffset < forEachObject.ceilHalfLongSize;
+            forEachObject.zOffset += longSize - CellSize) {
+            callback(forEachObject);
+        }
+    }
+    //Border columns (except corners).
+    for (forEachObject.zOffset = -forEachObject.floorHalfLongSize + CellSize;
+        forEachObject.zOffset < forEachObject.ceilHalfLongSize;
+        forEachObject.zOffset += CellSize) {
+        for (forEachObject.xOffset = -forEachObject.floorHalfLatSize;
+            forEachObject.xOffset < forEachObject.ceilHalfLatSize;
+            forEachObject.xOffset += latSize - CellSize) {
+            callback(forEachObject);
+        }
+    }
+    //Corners.
+    for (forEachObject.xOffset = -forEachObject.floorHalfLatSize;
+        forEachObject.xOffset < forEachObject.ceilHalfLatSize;
+        forEachObject.xOffset += latSize) {
+        for (forEachObject.zOffset = -forEachObject.floorHalfLongSize;
+            forEachObject.zOffset < forEachObject.ceilHalfLongSize;
+            forEachObject.zOffset += longSize - CellSize) {
+            callback(forEachObject);
+        }
+    }
+    return forEachObject;
+};

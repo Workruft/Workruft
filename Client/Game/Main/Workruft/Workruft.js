@@ -41,6 +41,7 @@ class Workruft {
         this.network = new Network(this.chat);
 
         this.terrainEditingMode = Enums.TerrainEditingModes.IncreaseHeight;
+        this.resetTerrainEditing();
         this.editingLatSize = 4;
         this.editingLongSize = 4;
 
@@ -118,6 +119,13 @@ class Workruft {
         }
     }
 
+    resetTerrainEditing() {
+        this.terrainEditingCells = [];
+        this.terrainEditingCenterCell = null;
+        this.terrainEditingLatSize = 0;
+        this.terrainEditingLongSize = 0;
+    }
+
     onChatEntry(text) {
         this.chat.print({ message: 'You: ' + text });
     }
@@ -131,6 +139,9 @@ class Workruft {
         if (this.gameState == Enums.GameStates.MapEditing) {
             HTML.statusBox.innerHTML +=  '<br/>Editing Mode: ' + Enums.TerrainEditingModes[this.terrainEditingMode];
             HTML.statusBox.innerHTML +=  '<br/>Editing Size: ' + this.editingLatSize + 'x' + this.editingLongSize;
+            HTML.statusBox.innerHTML +=  '<br/>Has Cloning Data: ' +
+                (this.terrainEditingCells.length > 0 ? 'yes (' + this.terrainEditingLatSize + ', ' +
+                this.terrainEditingLongSize + ')' : 'no');
         }
     }
 }

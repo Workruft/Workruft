@@ -35,6 +35,8 @@ module.exports = {
                             break;
                     }
                     this.onDocumentMouseMove();
+                    //Reset terrain editing data.
+                    this.workruft.resetTerrainEditing();
                     this.workruft.updateStatusBox();
                 }.bind(this);
             }.bind(this)
@@ -45,6 +47,7 @@ module.exports = {
             function (terrainModeButton) {
                 terrainModeButton.onclick = function(event) {
                     this.workruft.terrainEditingMode = terrainEditingIDs[terrainModeButton.id];
+                    this.onDocumentMouseMove();
                     this.workruft.updateStatusBox();
                 }.bind(this);
             }.bind(this)

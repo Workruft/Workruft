@@ -22,7 +22,7 @@ window.CeilToCell = function(alignMe) {
     return Math.ceil(alignMe / CellSize) * CellSize;
 };
 
-window.ForEachCell = function(workruft, cellX, cellZ, latSize, longSize, callback) {
+window.CreateCellForEachObject = function(latSize, longSize) {
     let forEachObject = {
         halfLatSize: latSize * 0.5,
         halfLongSize: longSize * 0.5
@@ -31,12 +31,47 @@ window.ForEachCell = function(workruft, cellX, cellZ, latSize, longSize, callbac
     forEachObject.ceilHalfLatSize = CeilToCell(forEachObject.halfLatSize);
     forEachObject.floorHalfLongSize = FloorToCell(forEachObject.halfLongSize);
     forEachObject.ceilHalfLongSize = CeilToCell(forEachObject.halfLongSize);
+    return forEachObject;
+}
+
+window.ForEachCell = function(latSize, longSize, callback) {
+    let forEachObject = CreateCellForEachObject(latSize, longSize);
     for (forEachObject.xOffset = -forEachObject.floorHalfLatSize;
         forEachObject.xOffset < forEachObject.ceilHalfLatSize;
         forEachObject.xOffset += CellSize) {
         for (forEachObject.zOffset = -forEachObject.floorHalfLongSize;
             forEachObject.zOffset < forEachObject.ceilHalfLongSize;
             forEachObject.zOffset += CellSize) {
+            callback(forEachObject);
+        }
+    }
+    return forEachObject;
+};
+
+window.ForEachLatBorderCell = function(latSize, longSize, callback) {
+    let forEachObject = CreateCellForEachObject(latSize, longSize);
+    //Border columns.
+    for (forEachObject.zOffset = -forEachObject.floorHalfLongSize;
+        forEachObject.zOffset < forEachObject.ceilHalfLongSize;
+        forEachObject.zOffset += CellSize) {
+        for (forEachObject.xOffset = -forEachObject.floorHalfLatSize;
+            forEachObject.xOffset < forEachObject.ceilHalfLatSize;
+            forEachObject.xOffset += latSize - CellSize) {
+            callback(forEachObject);
+        }
+    }
+    return forEachObject;
+};
+
+window.ForEachLongBorderCell = function(latSize, longSize, callback) {
+    let forEachObject = CreateCellForEachObject(latSize, longSize);
+    //Border rows.
+    for (forEachObject.xOffset = -forEachObject.floorHalfLatSize;
+        forEachObject.xOffset < forEachObject.ceilHalfLatSize;
+        forEachObject.xOffset += CellSize) {
+        for (forEachObject.zOffset = -forEachObject.floorHalfLongSize;
+            forEachObject.zOffset < forEachObject.ceilHalfLongSize;
+            forEachObject.zOffset += longSize - CellSize) {
             callback(forEachObject);
         }
     }

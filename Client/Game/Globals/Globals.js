@@ -36,6 +36,8 @@ window.BlueColor = new THREE.Color('#001080');
 window.LightGreenColor = new THREE.Color('#188026');
 window.YellowColor = new THREE.Color('#FFFF00');
 window.BlackColor = new THREE.Color('#000000');
+window.DarkGrayColor = new THREE.Color('#080808');
+window.WhiteColor = new THREE.Color('#FFFFFF');
 window.ColoredMeshPhongMaterialsMap = new Map();
 
 window.HalfPI = Math.PI * 0.5;
