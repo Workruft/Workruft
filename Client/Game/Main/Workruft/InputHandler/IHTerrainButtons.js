@@ -43,10 +43,17 @@ module.exports = {
         );
 
         //Terrain height handlers.
+        let selectedButtonClass = 'selectedButton';
+        this.selectedTerrainModeButton = null;
         Array.from(document.getElementsByClassName('terrainModeButtons')).forEach(
             function (terrainModeButton) {
                 terrainModeButton.onclick = function(event) {
                     this.workruft.terrainEditingMode = terrainEditingIDs[terrainModeButton.id];
+                    if (this.selectedTerrainModeButton != null) {
+                        this.selectedTerrainModeButton.classList.remove(selectedButtonClass);
+                    }
+                    this.selectedTerrainModeButton = terrainModeButton;
+                    this.selectedTerrainModeButton.classList.add(selectedButtonClass);
                     this.onDocumentMouseMove();
                     this.workruft.updateStatusBox();
                 }.bind(this);

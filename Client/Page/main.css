@@ -108,6 +108,10 @@ canvas {
     border-color: #A0A0A0;
 }
 
+.iconButton.selectedButton {
+    border-color: #FFFFA0;
+}
+
 button::-moz-focus-inner {
     border: 0px;
 }
