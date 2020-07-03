@@ -15,6 +15,7 @@ tippy('#mapEditToolPanel>button', {
     theme: 'material'
 });
 
+require('../../Common/Version');
 require('../../Common/StatusCodes');
 
 require('../Game/Globals/Globals');

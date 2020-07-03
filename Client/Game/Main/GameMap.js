@@ -1,12 +1,15 @@
+let MSGPackLite = require('msgpack-lite');
+
 //Directions:
 //  -Z    /\+Y
 //-X  +X  ||
 //  +Z    \/-Y
 
 class GameMap {
-    constructor(sizeX, sizeZ) {
+    constructor(sizeX, sizeZ, defaultY) {
         this.sizeX = sizeX;
         this.sizeZ = sizeZ;
+        this.defaultY = defaultY;
         let halfSizeX = this.sizeX * 0.5;
         let halfSizeZ = this.sizeZ * 0.5;
         this.minX = Math.ceil(-halfSizeX);
@@ -56,6 +59,10 @@ class GameMap {
                 //    3-----2
                 //    Front
                 this.geometry.vertices.push(
+                    new THREE.Vector3(x,            this.defaultY, z),
+                    new THREE.Vector3(x + CellSize, this.defaultY, z),
+                    new THREE.Vector3(x + CellSize, this.defaultY, z + CellSize),
+                    new THREE.Vector3(x,            this.defaultY, z + CellSize)
                 );
                 this.geometry.faces.push(...column[z].faces.top);
                 //Corners in UV coordinates:
@@ -100,7 +107,6 @@ class GameMap {
         this.updateCells({ lowX: this.minX, lowZ: this.minZ, highX: this.maxX, highZ: this.maxZ });
 
         this.mesh = new THREE.Mesh(this.geometry, MapMaterials);
-        this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
     }
 
@@ -429,6 +435,94 @@ class GameMap {
             x: Math.random() * (this.sizeX) + this.minX,
             z: Math.random() * (this.sizeZ) + this.minZ
         };
+    }
+
+    toArray() {
+        let mapJSON = {};
+        mapJSON.gameVersion = gameVersion;
+        mapJSON.sizeX = this.sizeX;
+        mapJSON.sizeZ = this.sizeZ;
+        mapJSON.defaultY = this.defaultY;
+        mapJSON.cellHeights = {};
+        let currentCell;
+        let currentHeights = [ mapJSON.defaultY, mapJSON.defaultY, mapJSON.defaultY, mapJSON.defaultY ];
+        for (let x = this.minX; x <= this.maxX; x += CellSize) {
+            for (let z = this.minZ; z <= this.maxZ; z += CellSize) {
+                currentCell = this.getCell({ x, z });
+                if (currentCell == null) {
+                    continue;
+                }
+                currentHeights[0] = this.getBackLeftHeight({ cell: currentCell });
+                currentHeights[1] = this.getBackRightHeight({ cell: currentCell });
+                currentHeights[2] = this.getFrontRightHeight({ cell: currentCell });
+                currentHeights[3] = this.getFrontLeftHeight({ cell: currentCell });
+                if (currentHeights[0] == mapJSON.defaultY && currentHeights[1] == mapJSON.defaultY &&
+                    currentHeights[2] == mapJSON.defaultY && currentHeights[3] == mapJSON.defaultY) {
+                    continue;
+                }
+                if (currentHeights[0] == mapJSON.defaultY) {
+                    currentHeights[0] = null;
+                }
+                if (currentHeights[1] == mapJSON.defaultY) {
+                    currentHeights[1] = null;
+                }
+                if (currentHeights[2] == mapJSON.defaultY) {
+                    currentHeights[2] = null;
+                }
+                if (currentHeights[3] == mapJSON.defaultY) {
+                    currentHeights[3] = null;
+                }
+                mapJSON.cellHeights[[ x, z ]] = [...currentHeights];
+            }
+        }
+        return MSGPackLite.encode(mapJSON);
+    }
+
+    static fromArray(mapArray) {
+        let mapJSON = MSGPackLite.decode(mapArray);
+        if (mapJSON == null) {
+            throw 'Map is null!';
+        }
+        if (mapJSON.gameVersion == null) {
+            throw 'Map version is null!';
+        }
+        //TODO: Validate most everything else here: sizeX, sizeZ, bounds of sizes, defaultY, etc...
+        //
+        if (JSON.stringify(mapJSON.gameVersion) != JSON.stringify(gameVersion)) {
+            throw 'Mismatched game version! Map is v' + mapJSON.gameVersion.join('.')
+                + ', but game is v' + gameVersion.join('.') + '!';
+        }
+        let gameMap = new GameMap(mapJSON.sizeX, mapJSON.sizeZ, mapJSON.defaultY);
+        let currentCell;
+        for (let [ xzArray, currentHeights ] of Object.entries(mapJSON.cellHeights)) {
+            xzArray = JSON.parse('[' + xzArray + ']');
+            if (!Array.isArray(xzArray) || xzArray.length != 2) {
+                throw 'Invalid cell XZ array: ' + xzArray + ' (' + currentHeights + ')!';
+            }
+            currentCell = gameMap.getCell({ x: xzArray[0], z: xzArray[1] });
+            if (currentCell == null) {
+                throw 'Invalid cell XZ values: ' + xzArray + ' (' + currentHeights + ')!';
+            }
+            if (!Array.isArray(currentHeights) || currentHeights.length != 4) {
+                throw 'Invalid cell heights array: ' + xzArray + ' (' + currentHeights + ')!';
+            }
+            //TODO: Validate cellHeights values here.
+            //
+            if (currentHeights[0] != null) {
+                gameMap.setBackLeftHeight({ cell: currentCell, height: currentHeights[0] });
+            }
+            if (currentHeights[1] != null) {
+                gameMap.setBackRightHeight({ cell: currentCell, height: currentHeights[1] });
+            }
+            if (currentHeights[2] != null) {
+                gameMap.setFrontRightHeight({ cell: currentCell, height: currentHeights[2] });
+            }
+            if (currentHeights[3] != null) {
+                gameMap.setFrontLeftHeight({ cell: currentCell, height: currentHeights[3] });
+            }
+        }
+        gameMap.updateCells({ lowX: gameMap.minX, lowZ: gameMap.minZ, highX: gameMap.maxX, highZ: gameMap.maxZ });
+        return gameMap;
     }
 }
 
