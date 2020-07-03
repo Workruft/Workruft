@@ -94,41 +94,40 @@ class World {
 
         //Action.
         //Map.
-        this.map = new GameMap(100, 100);
+        let newMap = new GameMap(100, 100, MapBottomY);
         let currentCell;
         //Rampsnstuff.
         let rampIncline = 0.5;
-        for (let wholeRampXOffset = -8; wholeRampXOffset <= 8; wholeRampXOffset += 4) {
-            this.map.setBackLeftHeight({ cell: this.map.getCell({ x: wholeRampXOffset - 1, z: -4 }), height: rampIncline });
-            this.map.setBackRightHeight({ cell: this.map.getCell({ x: wholeRampXOffset - 1, z: -4 }), height: rampIncline });
-            this.map.setBackLeftHeight({ cell: this.map.getCell({ x: wholeRampXOffset, z: -4 }), height: rampIncline });
-            this.map.setBackRightHeight({ cell: this.map.getCell({ x: wholeRampXOffset, z: -4 }), height: rampIncline });
-            for (let rampXOffset = 0; rampXOffset <= 1; ++rampXOffset) {
-                for (let rampZOffset = 1; rampZOffset <= 5; ++rampZOffset) {
-                    let currentCell = this.map.getCell({ x: wholeRampXOffset - rampXOffset, z: -4 - rampZOffset });
-                    this.map.setFrontLeftHeight({ cell: currentCell, height: rampZOffset * rampIncline });
-                    this.map.setFrontRightHeight({ cell: currentCell, height: rampZOffset * rampIncline });
-                    this.map.setBackLeftHeight({ cell: currentCell, height: (rampZOffset + 1) * rampIncline });
-                    this.map.setBackRightHeight({ cell: currentCell, height: (rampZOffset + 1) * rampIncline });
-                }
-            }
-            for (let rampXOffset = 0; rampXOffset <= 1; ++rampXOffset) {
-                for (let rampZOffset = 1; rampZOffset <= 5; ++rampZOffset) {
-                    let currentCell = this.map.getCell({ x: wholeRampXOffset - rampXOffset, z: -9 - rampZOffset });
-                    this.map.setFrontLeftHeight({ cell: currentCell, height: (rampIncline * 7.0) - rampZOffset * rampIncline });
-                    this.map.setFrontRightHeight({ cell: currentCell, height: (rampIncline * 7.0) - rampZOffset * rampIncline });
-                    this.map.setBackLeftHeight({ cell: currentCell, height: (rampIncline * 7.0) - (rampZOffset + 1) * rampIncline });
-                    this.map.setBackRightHeight({ cell: currentCell, height: (rampIncline * 7.0) - (rampZOffset + 1) * rampIncline });
-                }
-            }
-            this.map.setFrontLeftHeight({ cell: this.map.getCell({ x: wholeRampXOffset - 1, z: -15 }), height: rampIncline });
-            this.map.setFrontRightHeight({ cell: this.map.getCell({ x: wholeRampXOffset - 1, z: -15 }), height: rampIncline });
-            this.map.setFrontLeftHeight({ cell: this.map.getCell({ x: wholeRampXOffset, z: -15 }), height: rampIncline });
-            this.map.setFrontRightHeight({ cell: this.map.getCell({ x: wholeRampXOffset, z: -15 }), height: rampIncline });
-        }
-        this.map.updateCells({ lowX: this.map.minX, lowZ: this.map.minZ, highX: this.map.maxX, highZ: this.map.maxZ });
-        this.scene.add(this.map.topMesh);
-        this.scene.add(this.map.sideMesh);
+        //for (let wholeRampXOffset = -8; wholeRampXOffset <= 8; wholeRampXOffset += 4) {
+        //    newMap.setBackLeftHeight({ cell: newMap.getCell({ x: wholeRampXOffset - 1, z: -4 }), height: rampIncline });
+        //    newMap.setBackRightHeight({ cell: newMap.getCell({ x: wholeRampXOffset - 1, z: -4 }), height: rampIncline });
+        //    newMap.setBackLeftHeight({ cell: newMap.getCell({ x: wholeRampXOffset, z: -4 }), height: rampIncline });
+        //    newMap.setBackRightHeight({ cell: newMap.getCell({ x: wholeRampXOffset, z: -4 }), height: rampIncline });
+        //    for (let rampXOffset = 0; rampXOffset <= 1; ++rampXOffset) {
+        //        for (let rampZOffset = 1; rampZOffset <= 5; ++rampZOffset) {
+        //            let currentCell = newMap.getCell({ x: wholeRampXOffset - rampXOffset, z: -4 - rampZOffset });
+        //            newMap.setFrontLeftHeight({ cell: currentCell, height: rampZOffset * rampIncline });
+        //            newMap.setFrontRightHeight({ cell: currentCell, height: rampZOffset * rampIncline });
+        //            newMap.setBackLeftHeight({ cell: currentCell, height: (rampZOffset + 1) * rampIncline });
+        //            newMap.setBackRightHeight({ cell: currentCell, height: (rampZOffset + 1) * rampIncline });
+        //        }
+        //    }
+        //    for (let rampXOffset = 0; rampXOffset <= 1; ++rampXOffset) {
+        //        for (let rampZOffset = 1; rampZOffset <= 5; ++rampZOffset) {
+        //            let currentCell = newMap.getCell({ x: wholeRampXOffset - rampXOffset, z: -9 - rampZOffset });
+        //            newMap.setFrontLeftHeight({ cell: currentCell, height: (rampIncline * 7.0) - rampZOffset * rampIncline });
+        //            newMap.setFrontRightHeight({ cell: currentCell, height: (rampIncline * 7.0) - rampZOffset * rampIncline });
+        //            newMap.setBackLeftHeight({ cell: currentCell, height: (rampIncline * 7.0) - (rampZOffset + 1) * rampIncline });
+        //            newMap.setBackRightHeight({ cell: currentCell, height: (rampIncline * 7.0) - (rampZOffset + 1) * rampIncline });
+        //        }
+        //    }
+        //    newMap.setFrontLeftHeight({ cell: newMap.getCell({ x: wholeRampXOffset - 1, z: -15 }), height: rampIncline });
+        //    newMap.setFrontRightHeight({ cell: newMap.getCell({ x: wholeRampXOffset - 1, z: -15 }), height: rampIncline });
+        //    newMap.setFrontLeftHeight({ cell: newMap.getCell({ x: wholeRampXOffset, z: -15 }), height: rampIncline });
+        //    newMap.setFrontRightHeight({ cell: newMap.getCell({ x: wholeRampXOffset, z: -15 }), height: rampIncline });
+        //}
+        //newMap.updateCells({ lowX: newMap.minX, lowZ: newMap.minZ, highX: newMap.maxX, highZ: newMap.maxZ });
+        this.changeMap(newMap);
         //Game models.
         this.setupGameModels();
         //Game objects.
@@ -242,6 +241,15 @@ class World {
         });
     }
 
+    changeMap(newMap) {
+        if (this.map != null) {
+            this.scene.remove(this.map.mesh);
+            this.map.deconstruct();
+        }
+        this.map = newMap;
+        this.scene.add(this.map.mesh);
+    }
+
     graphicsLoop() {
         if (this.isDeconstructing) {
             return;
@@ -268,7 +276,7 @@ class World {
     pickMap(mousePositionVector) {
         this.mapRaycaster.setFromCamera(mousePositionVector, this.camera);
         //TODO: If this yields nothing, use this.mapRaycaster.ray.intersectPlane() and bound the point to the map.
-        return this.mapRaycaster.intersectObjects([ this.map.topMesh, this.map.sideMesh ], true);
+        return this.mapRaycaster.intersectObjects([ this.map.mesh ], true);
     }
     //From the docs: {
         //distance – distance between the origin of the ray and the intersection

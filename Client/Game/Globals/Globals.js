@@ -267,11 +267,11 @@ window.CreateCanvasTexture = function({ width, height, color, borderColor, color
     let canvasTexture = new THREE.CanvasTexture(context.canvas);
     return canvasTexture;
 };
-window.GrassMaterials = [];
+window.MapMaterials = [];
 {
     let grassBorderColor = GrassColor.clone().multiplyScalar(0.4);
     for (let borderFlags = 0; borderFlags < 16; ++borderFlags) {
-        GrassMaterials.push(new THREE.MeshPhongMaterial({
+        MapMaterials.push(new THREE.MeshPhongMaterial({
             map: CreateCanvasTexture({
                 width: 256, height: 256,
                 color: GrassColor,
@@ -292,4 +292,8 @@ window.GrassMaterials = [];
             shininess: 10
         }));
     }
+    MapMaterials.push(new THREE.MeshBasicMaterial({
+        color: DirtColor,
+        side: THREE.DoubleSide
+    }));
 }
