@@ -67,6 +67,7 @@ class InputHandler {
         this.mapEditorSquares = [];
         for (let verticalLine of this.mapEditorVerticalLines) {
             this.workruft.world.scene.remove(verticalLine);
+            DisposeThreeObject(verticalLine);
         }
         this.mapEditorVerticalLines = [];
     }

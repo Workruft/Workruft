@@ -2,8 +2,8 @@ window.PostProcessing = true;
 
 window.PathTestingLeniency = 0.2;
 window.PathFindingGreediness = 2.0;
-window.PathFindingMaxPoints = 5000;
-window.PathFindingMaxPointsWithoutImprovement = 1000;
+window.PathFindingMaxPoints = 10000;
+window.PathFindingMaxPointsWithoutImprovement = 10000;
 
 window.CellSize = 1.0;
 window.HalfCellSize = CellSize * 0.5;

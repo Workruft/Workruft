@@ -25,10 +25,10 @@ class ColoredRectangle {
     }
 
     deconstruct() {
+        this.workruft.world.indicatorObjects.remove(this.mesh);
         if (!ColoredMeshPhongMaterialsMap.has(this.mesh.material)) {
             DisposeThreeObject(this.mesh.material);
         }
-        this.workruft.world.indicatorObjects.remove(this.mesh);
     }
 
     get position() {

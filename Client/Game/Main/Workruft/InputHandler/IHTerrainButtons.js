@@ -92,6 +92,7 @@ module.exports = {
         try {
             let newMap = GameMap.fromArray(mapArray);
             this.workruft.world.changeMap(newMap);
+            this.workruft.updateStatusBox();
         } catch (e) {
             alert('Error attempting to reconstruct map from file: ' + e);
             throw e;

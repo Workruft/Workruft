@@ -100,6 +100,7 @@ module.exports = {
                         this.workruft.world.changeMap(
                             new GameMap(newWidth, newHeight, MapBottomY));
                         this.workruft.setDefaultCamera();
+                        this.workruft.updateStatusBox();
                         break;
                     }
                     case this.inputBindings.ToggleGridLines: {
@@ -127,6 +128,7 @@ module.exports = {
                             //Remove grid lines.
                             for (let gridLine of this.workruft.gridLines) {
                                 this.workruft.world.scene.remove(gridLine);
+                                DisposeThreeObject(gridLine);
                             }
                             this.workruft.gridLines = [];
                         }
@@ -152,6 +154,7 @@ module.exports = {
                             //Remove vertical grid lines.
                             for (let verticalGridLine of this.workruft.verticalGridLines) {
                                 this.workruft.world.scene.remove(verticalGridLine);
+                                DisposeThreeObject(verticalGridLine);
                             }
                             this.workruft.verticalGridLines = [];
                         }
