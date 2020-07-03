@@ -72,9 +72,9 @@ class ColoredRectangle {
         }
         if (heights.length > 0) {
             heights.sort();
-            this.mesh.position.y = (heights[Math.floor(heights.length * 0.5)]) + 0.01;
+            this.mesh.position.y = (heights[Math.floor(heights.length * 0.5)]) + EditorExtraHeightOffset;
         } else {
-            this.mesh.position.y = 0.01;
+            this.mesh.position.y = EditorExtraHeightOffset;
         }
     }
 }

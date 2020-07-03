@@ -46,15 +46,16 @@ window.DarkGrayColor = new THREE.Color('#080808');
 window.WhiteColor = new THREE.Color('#FFFFFF');
 window.ColoredMeshPhongMaterialsMap = new Map();
 
+window.EditorExtraHeightOffset = 0.1;
 window.GridLinesMaterial = new THREE.LineBasicMaterial({
     color: BlueColor, transparent: true, opacity: 0.15
 });
-window.EditingVerticalLinesMaterial = new THREE.LineBasicMaterial({
+window.EditorVerticalLinesMaterial = new THREE.LineBasicMaterial({
     color: DarkGrayColor, transparent: true, opacity: 0.5
 });
 window.GridLinesSeparation = QuadrupleCellSize;
 window.VerticalGridLinesSeparation = QuadrupleCellSize;
-window.VerticalGridLinesHeight = CellSize * 25.0 + 0.01;
+window.VerticalGridLinesHeight = CellSize * 25.0 + EditorExtraHeightOffset;
 
 window.HalfPI = Math.PI * 0.5;
 window.DoublePI = Math.PI * 2.0;

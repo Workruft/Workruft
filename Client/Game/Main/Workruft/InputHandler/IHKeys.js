@@ -33,12 +33,18 @@ module.exports = {
                 switch (upperKey) {
                     case this.inputBindings.ToggleMapEditor: {
                         if (this.workruft.gameState == Enums.GameStates.Playing) {
-                            this.workruft.world.deselectAll();
                             HTML.mapEditToolPanel.hidden = false;
                             this.workruft.gameState = Enums.GameStates.MapEditing;
+                            this.workruft.isPathTesting = false;
+                            this.onPathTestingChange();
+                            this.workruft.playerUnit.cancelAllOrders();
+                            this.workruft.playerUnit.position.y = -100.0;
+                            this.workruft.playerUnit.clearColoredRectangles();
                         } else if (this.workruft.gameState == Enums.GameStates.MapEditing) {
+                            this.workruft.world.deselectAll();
                             HTML.mapEditToolPanel.hidden = true;
                             this.workruft.gameState = Enums.GameStates.Playing;
+                            this.workruft.playerUnit.autoSetHeight();
                         }
                         this.workruft.updateStatusBox();
                         this.updateMapEditorMouseCells();
@@ -46,21 +52,8 @@ module.exports = {
                     }
                     case this.inputBindings.TogglePathTesting: {
                         this.workruft.isPathTesting = !this.workruft.isPathTesting;
-                        if (this.workruft.isPathTesting) {
-                            for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
-                                this.workruft.randoUnits[n].cancelAllOrders();
-                                this.workruft.randoUnits[n].position.x = this.workruft.playerUnit.position.x;
-                                this.workruft.randoUnits[n].position.z = this.workruft.playerUnit.position.z;
-                                this.workruft.randoUnits[n].autoSetHeight();
-                            }
-                        } else {
-                            for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
-                                this.workruft.randoUnits[n].cancelAllOrders();
-                                this.workruft.randoUnits[n].clearColoredRectangles();
-                                this.workruft.randoUnits[n].position.y = -100.0;
-                            }
-                            this.workruft.playerUnit.clearColoredRectangles();
-                        }
+                        this.onPathTestingChange();
+                        this.workruft.playerUnit.clearColoredRectangles();
                         this.workruft.updateStatusBox();
                         break;
                     }
@@ -116,16 +109,16 @@ module.exports = {
                             let newGridLine;
                             for (let x = this.map.gridMinX; x <= this.map.gridMaxX; x += GridLinesSeparation) {
                                 newGridLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-                                    new THREE.Vector3(x, 0.01, this.map.gridMinZ),
-                                    new THREE.Vector3(x, 0.01, this.map.gridMaxZ)
+                                    new THREE.Vector3(x, EditorExtraHeightOffset, this.map.gridMinZ),
+                                    new THREE.Vector3(x, EditorExtraHeightOffset, this.map.gridMaxZ)
                                 ]), GridLinesMaterial);
                                 this.workruft.gridLines.push(newGridLine);
                                 this.workruft.world.scene.add(newGridLine);
                             }
                             for (let z = this.map.gridMinZ; z <= this.map.gridMaxZ; z += GridLinesSeparation) {
                                 newGridLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-                                    new THREE.Vector3(this.map.gridMinX, 0.01, z),
-                                    new THREE.Vector3(this.map.gridMaxX, 0.01, z)
+                                    new THREE.Vector3(this.map.gridMinX, EditorExtraHeightOffset, z),
+                                    new THREE.Vector3(this.map.gridMaxX, EditorExtraHeightOffset, z)
                                 ]), GridLinesMaterial);
                                 this.workruft.gridLines.push(newGridLine);
                                 this.workruft.world.scene.add(newGridLine);
@@ -200,5 +193,21 @@ module.exports = {
         this.keysDown.delete(upperKey);
         // switch (upperKey) {
         // }
+    },
+
+    onPathTestingChange() {
+        if (this.workruft.isPathTesting) {
+            for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
+                this.workruft.randoUnits[n].position.x = this.workruft.playerUnit.position.x;
+                this.workruft.randoUnits[n].position.z = this.workruft.playerUnit.position.z;
+                this.workruft.randoUnits[n].autoSetHeight();
+            }
+        } else {
+            for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
+                this.workruft.randoUnits[n].cancelAllOrders();
+                this.workruft.randoUnits[n].clearColoredRectangles();
+                this.workruft.randoUnits[n].position.y = -100.0;
+            }
+        }
     }
 };

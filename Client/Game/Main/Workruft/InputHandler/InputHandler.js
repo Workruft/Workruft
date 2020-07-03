@@ -115,7 +115,7 @@ class InputHandler {
                             this.mapEditorVerticalLines.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
                                 new THREE.Vector3(x, MapBottomY, z),
                                 new THREE.Vector3(x, VerticalGridLinesHeight, z)
-                            ]), EditingVerticalLinesMaterial));
+                            ]), EditorVerticalLinesMaterial));
                         }
                         for (let x = this.lastMouseCellX + iterationBounds.ceilHalfLatSize - CellSize;
                             x <= this.lastMouseCellX + iterationBounds.ceilHalfLatSize;
@@ -123,7 +123,7 @@ class InputHandler {
                             this.mapEditorVerticalLines.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
                                 new THREE.Vector3(x, MapBottomY, z),
                                 new THREE.Vector3(x, VerticalGridLinesHeight, z)
-                            ]), EditingVerticalLinesMaterial));
+                            ]), EditorVerticalLinesMaterial));
                         }
                     }
                 }
@@ -160,7 +160,7 @@ class InputHandler {
                             this.mapEditorVerticalLines.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
                                 new THREE.Vector3(x, MapBottomY, z),
                                 new THREE.Vector3(x, VerticalGridLinesHeight, z)
-                            ]), EditingVerticalLinesMaterial));
+                            ]), EditorVerticalLinesMaterial));
                         }
                         for (let z = this.lastMouseCellZ + iterationBounds.ceilHalfLongSize - CellSize;
                             z <= this.lastMouseCellZ + iterationBounds.ceilHalfLongSize;
@@ -168,7 +168,7 @@ class InputHandler {
                             this.mapEditorVerticalLines.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
                                 new THREE.Vector3(x, MapBottomY, z),
                                 new THREE.Vector3(x, VerticalGridLinesHeight, z)
-                            ]), EditingVerticalLinesMaterial));
+                            ]), EditorVerticalLinesMaterial));
                         }
                     }
                 }
@@ -197,7 +197,7 @@ class InputHandler {
                             this.mapEditorVerticalLines.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
                                 new THREE.Vector3(x, MapBottomY, z),
                                 new THREE.Vector3(x, VerticalGridLinesHeight, z)
-                            ]), EditingVerticalLinesMaterial));
+                            ]), EditorVerticalLinesMaterial));
                         }
                     }
                 }
