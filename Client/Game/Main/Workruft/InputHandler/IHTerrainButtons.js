@@ -1,3 +1,5 @@
+let GameMap = require('../../GameMap');
+
 let terrainEditingIDs = Enums.create({
     items: [
         'decreaseHeightButton', 'increaseHeightButton',
@@ -9,6 +11,28 @@ let terrainEditingIDs = Enums.create({
 
 module.exports = {
     setupTerrainButtons: function() {
+        //Load and Save handlers.
+        let mapFileReader = new FileReader();
+        mapFileReader.onabort = function(event) {
+            alert('Reading map file was aborted: ' + mapFileReader.error);
+        };
+        mapFileReader.onerror = function(event) {
+            alert('Error reading map file: ' + mapFileReader.error);
+        };
+        mapFileReader.onload = function(event) {
+            try {
+                let mapArray = JSON.parse(mapFileReader.result);
+                this.loadMapFile(mapArray.data);
+            } catch (e) {
+                alert('Error parsing map file: ' + e);
+                throw e;
+            }
+        }.bind(this);
+        HTML.loadMapFromFileButton.onchange = function(event) {
+            mapFileReader.readAsText(event.target.files[0]);
+        };
+        HTML.saveMapToFileButton.onclick = this.saveMapFile;
+
         //Increase/Decrease Long/Lat handlers.
         Array.from(document.getElementsByClassName('terrainEditSizeButtons')).forEach(
             function (terrainEditSizeButton) {
@@ -59,5 +83,29 @@ module.exports = {
                 }.bind(this);
             }.bind(this)
         );
+    },
+
+    loadMapFile(mapArray) {
+        try {
+            let newMap = GameMap.fromArray(mapArray);
+            this.workruft.world.changeMap(newMap);
+        } catch (e) {
+            alert('Error attempting to reconstruct map from file: ' + e);
+            throw e;
+        }
+    },
+
+    saveMapFile() {
+        let mapArray = this.workruft.world.map.toArray();
+        let mapFileBlob = new Blob([ JSON.stringify(mapArray) ], { type: 'application/json' });
+        let downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(mapFileBlob);
+        downloadLink.download = 'WorkruftMap.json';
+        document.body.append(downloadLink);
+        downloadLink.click();
+        setTimeout(function() {
+            document.body.removeChild(downloadLink);
+            window.URL.revokeObjectURL(downloadLink.href);
+        }, 0);
     }
 };

@@ -91,6 +91,11 @@ canvas {
     outline: none;
 }
 
+label.iconButton {
+    width: 34px;
+    height: 34px;
+}
+
 .centerIcons {
     background-position: center;
 }

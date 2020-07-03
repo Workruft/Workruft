@@ -13,6 +13,19 @@
         <input id="chatEntryBox" type="text" style="display: none;"/>
         <div id="statusBox"></div>
         <div id="mapEditToolPanel" hidden>
+            <label data-tippy-title="Load Map from File"
+                class="iconButton centerIcons"
+                style="background-image: url('Icons/icons8-open-document-32.png');">
+                <input id="loadMapFromFileButton" type="file" hidden/>
+            </label>
+            <button id="saveMapToFileButton"
+                data-tippy-title="Save Map to File"
+                class="iconButton centerIcons"
+                style="background-image: url('Icons/icons8-save-32.png');">
+            </button>
+
+            <hr style="width: 100%;"/>
+
             <button id="increaseLatButton"
                 data-tippy-title="Increase Latitude"
                 class="iconButton cornerCenterIcons terrainEditSizeButtons"

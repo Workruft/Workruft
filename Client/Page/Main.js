@@ -4,7 +4,7 @@ window.Enums = require('../Game/Globals/Enums');
 
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
-tippy('#mapEditToolPanel>button', {
+tippy('#mapEditToolPanel>button,label', {
     content: function(element) {
         return `<p class='tooltip'>${element.getAttribute('data-tippy-title')}</p>`
     },
