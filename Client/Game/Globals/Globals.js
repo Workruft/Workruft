@@ -30,7 +30,7 @@ window.MinCameraHeight = 3.0;
 window.MaxCameraHeight = 500.0;
 
 window.GrassColor = new THREE.Color('#0c4013');
-window.DirtColor = new THREE.Color('#2b3c1f');
+window.DirtColor = new THREE.Color('#1A1A0D');
 window.RedColor = new THREE.Color('#A02000');
 window.BlueColor = new THREE.Color('#001080');
 window.LightGreenColor = new THREE.Color('#188026');

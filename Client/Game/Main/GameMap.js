@@ -416,7 +416,6 @@ class GameMap {
         }
         if (newFaces.length > 0) {
             for (let newFace of newFaces) {
-                newFace.color = DirtColor;
                 newFace.materialIndex = 16;
                 currentCell.faces[direction].push(newFace);
                 this.geometry.faces.push(newFace);
