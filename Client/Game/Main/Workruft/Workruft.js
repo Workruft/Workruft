@@ -26,11 +26,15 @@ class Workruft {
         this.chat.print({ message: '  Right click: order unit' });
         this.chat.print({ message: '  Middle click: alert coordinates of mouse' });
         this.chat.print({ message: '  Mouse scroll: zoom in/out' });
+        this.chat.print({ message: '  Ctrl/Shift + Mouse scroll: change map editing size' });
         this.chat.print({ message: '  ' + this.inputBindings.ToggleMapEditor + ': toggle map editing mode' });
         this.chat.print({ message: '  Shift + ' + this.inputBindings.NewMap + ': create a new map' });
         this.chat.print({ message: '  ' + this.inputBindings.ToggleGridLines + ': toggle grid lines' });
         this.chat.print({
             message: '  ' + this.inputBindings.ToggleVerticalGridLines + ': toggle vertical grid lines'
+        });
+        this.chat.print({
+            message: '  ' + this.inputBindings.ToggleEditorVerticalLines + ': toggle map editor vertical lines'
         });
         this.chat.print({ message: '  ' + this.inputBindings.TogglePathTesting + ': toggle map path testing' });
         this.world = new World(this.chat, this.onUpdate.bind(this));

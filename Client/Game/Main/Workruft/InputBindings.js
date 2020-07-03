@@ -9,8 +9,8 @@ class InputBindings {
         this.RotateCameraCounterclockwise = 'E';
 
         //Key presses.
-        this.ToggleChat = 'Enter';
-        this.CancelChat = 'Escape';
+        this.ToggleChat = 'ENTER';
+        this.CancelChat = 'ESCAPE';
         this.ToggleMapEditor = 'M';
         this.NewMap = 'N';
         this.ToggleGridLines = 'G';

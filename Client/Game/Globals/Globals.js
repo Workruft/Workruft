@@ -32,8 +32,8 @@ window.MaxCameraHeight = 500.0;
 
 window.MinEditingLatSize = 1;
 window.MinEditingLongSize = 1;
-window.MaxEditingLatSize = 64;
-window.MaxEditingLongSize = 64;
+window.MaxEditingLatSize = 640;
+window.MaxEditingLongSize = 640;
 
 window.GrassColor = new THREE.Color('#0c4013');
 window.DirtColor = new THREE.Color('#1A1A0D');

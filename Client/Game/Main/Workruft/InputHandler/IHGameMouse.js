@@ -75,6 +75,10 @@ module.exports = {
                 if (!this.tryUpdateMouseCell(event)) {
                     break;
                 }
+                if (event.ctrlKey && this.workruft.terrainEditingMode != Enums.TerrainEditingModes.CloneHeight) {
+                    //Noob probably forgot to switch back to the clone tool!
+                    break;
+                }
                 let clickedCell = this.map.getCell({ x: this.lastMouseCellX, z: this.lastMouseCellZ });
                 if (clickedCell == null) {
                     break;
@@ -499,15 +503,27 @@ module.exports = {
 
     onWheel(event) {
         let scrollDirection = Math.sign(event.deltaY);
-        if (this.workruft.gameState == Enums.GameStates.MapEditing && event.ctrlKey) {
+        if (this.workruft.gameState == Enums.GameStates.MapEditing && (event.ctrlKey || event.shiftKey)) {
             if (scrollDirection < 0) {
                 //Negative scroll: up/forward/in. Increase editing size.
-                this.workruft.editingLatSize = Math.min(MaxEditingLatSize, this.workruft.editingLatSize + 1);
-                this.workruft.editingLongSize = Math.min(MaxEditingLongSize, this.workruft.editingLongSize + 1);
+                if (event.ctrlKey) {
+                    this.workruft.editingLatSize =
+                        Math.min(MaxEditingLatSize, this.workruft.editingLatSize + CellSize);
+                }
+                if (event.shiftKey) {
+                    this.workruft.editingLongSize =
+                        Math.min(MaxEditingLongSize, this.workruft.editingLongSize + CellSize);
+                }
             } else if (scrollDirection > 0) {
                 //Positive scroll: down/backward/out. Decrease editing size.
-                this.workruft.editingLatSize = Math.max(MinEditingLatSize, this.workruft.editingLatSize - 1);
-                this.workruft.editingLongSize = Math.max(MinEditingLongSize, this.workruft.editingLongSize - 1);
+                if (event.ctrlKey) {
+                    this.workruft.editingLatSize =
+                        Math.max(MinEditingLatSize, this.workruft.editingLatSize - CellSize);
+                }
+                if (event.shiftKey) {
+                    this.workruft.editingLongSize =
+                        Math.max(MinEditingLongSize, this.workruft.editingLongSize - CellSize);
+                }
             }
             //Reset terrain editing data.
             this.workruft.resetTerrainEditing();

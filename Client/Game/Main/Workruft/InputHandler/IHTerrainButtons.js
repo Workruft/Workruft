@@ -37,22 +37,23 @@ module.exports = {
         Array.from(document.getElementsByClassName('terrainEditSizeButtons')).forEach(
             function (terrainEditSizeButton) {
                 terrainEditSizeButton.onclick = function(event) {
+                    let multiplier = 1.0 * (event.ctrlKey ? 4.0 : 1.0) * (event.shiftKey ? 8.0 : 1.0);
                     switch (terrainEditSizeButton.id) {
                         case 'increaseLatButton':
                             this.workruft.editingLatSize =
-                                Math.min(MaxEditingLatSize, this.workruft.editingLatSize + 1);
+                                Math.min(MaxEditingLatSize, this.workruft.editingLatSize + CellSize * multiplier);
                             break;
                         case 'increaseLongButton':
                             this.workruft.editingLongSize =
-                                Math.min(MaxEditingLongSize, this.workruft.editingLongSize + 1);
+                                Math.min(MaxEditingLongSize, this.workruft.editingLongSize + CellSize * multiplier);
                             break;
                         case 'decreaseLatButton':
                             this.workruft.editingLatSize =
-                                Math.max(MinEditingLatSize, this.workruft.editingLatSize - 1);
+                                Math.max(MinEditingLatSize, this.workruft.editingLatSize - CellSize * multiplier);
                             break;
                         case 'decreaseLongButton':
                             this.workruft.editingLongSize =
-                                Math.max(MinEditingLongSize, this.workruft.editingLongSize - 1);
+                                Math.max(MinEditingLongSize, this.workruft.editingLongSize - CellSize * multiplier);
                             break;
                         default:
                             alert('Unhandled terrain editing size button!');

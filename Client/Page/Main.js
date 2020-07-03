@@ -12,6 +12,7 @@ tippy('#mapEditToolPanel>button,label', {
     placement: 'left',
     duration: 0,
     delay: 0,
+    hideOnClick: false,
     theme: 'material'
 });
 
