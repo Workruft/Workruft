@@ -150,6 +150,9 @@ window.RateLimitRecall = function({ callingFunction, minimumInterval, thisToBind
         return true;
     }
 
+    //Update paramsToPass.
+    currentGuard.paramsToPass = paramsToPass;
+
     //Check to ensure that the minimum interval has passed since the last execution time.
     if (currentGuard.lastTicks + minimumInterval <= currentTicks) {
         currentGuard.lastTicks = currentTicks;

@@ -554,12 +554,19 @@ module.exports = {
     },
 
     onMouseMove(event) {
+        if (!RateLimitRecall({
+            callingFunction: this.onMouseMove,
+            minimumInterval: 1000.0 / 30.0,
+            thisToBind: this,
+            paramsToPass: event
+        })) {
+            return;
+        }
         switch (this.workruft.gameState) {
             // case Enums.GameStates.Playing: {
                 // break;
             // }
             case Enums.GameStates.MapEditing: {
-                //TODO: Rate-limit this function.
                 //TODO: Click + hold + drag editing as well.
                 let pickedMapObjectArray = this.workruft.world.pickMap(
                     this.workruft.world.getNormalizedCanvasMouse(event));

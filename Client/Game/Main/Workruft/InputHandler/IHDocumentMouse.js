@@ -41,6 +41,14 @@ module.exports = {
         if (event && event.target == HTML.gameCanvas) {
             return;
         }
+        if (!RateLimitRecall({
+            callingFunction: this.onDocumentMouseMove,
+            minimumInterval: 1000.0 / 30.0,
+            thisToBind: this,
+            paramsToPass: event
+        })) {
+            return;
+        }
         let newEvent;
         if (event && event.target.classList != null && event.target.classList.contains('maintainCanvasMouse')) {
             newEvent = new MouseEvent('mousemove', event);
