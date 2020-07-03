@@ -86,8 +86,8 @@ class GameUnit {
                                     zOffset < this.gameModel.halfXZSize; zOffset += CellSize) {
                                     this.ColoredRectangles.push(new ColoredRectangle({
                                         workruft: this.workruft,
-                                        x: point.x + xOffset + HalfCellSize,
-                                        z: point.z + zOffset + HalfCellSize,
+                                        x: point.x + xOffset,
+                                        z: point.z + zOffset,
                                         color: isFirstPoint ? LightGreenColor : BlueColor,
                                         opacity: isFirstPoint ? 0.5 : 0.5
                                     }));

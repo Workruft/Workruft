@@ -63,6 +63,8 @@ class PathFinder {
             this.gameUnit.gameModel.cellAlignmentOffset;
         this.endZ = AlignToCell(pointZ - this.gameUnit.gameModel.cellAlignmentOffset) +
             this.gameUnit.gameModel.cellAlignmentOffset;
+        this.actualEndX = pointX;
+        this.actualEndZ = pointZ;
     }
 
     findBestPath({ range }) {
@@ -165,6 +167,8 @@ class PathFinder {
             solutionPath.push(currentPoint);
             currentPoint = currentPoint.fromPoint;
         } while (true);
+        //Make sure the actual end points are where the unit ends up.
+        solutionPath.splice(0, 0, { x: this.actualEndX, z: this.actualEndZ });
         let optimizedSolutionPath = [];
         optimizedSolutionPath.push(solutionPath[0]);
         for (let pointIndex = 1; pointIndex < solutionPath.length; ++pointIndex) {
@@ -229,16 +233,16 @@ class PathFinder {
             this.heapedPoints.push(newPoint);
             // this.gameUnit.ColoredRectangles.push(new ColoredRectangle({
             //     workruft: this.workruft,
-            //     x: newX - HalfCellSize,
-            //     z: newZ - HalfCellSize,
+            //     x: newX,
+            //     z: newZ,
             //     color: BlackColor,
             //     opacity: 0.1
             // }));
         } else {
             this.gameUnit.ColoredRectangles.push(new ColoredRectangle({
                 workruft: this.workruft,
-                x: newX - HalfCellSize,
-                z: newZ - HalfCellSize,
+                x: newX,
+                z: newZ,
                 color: RedColor,
                 opacity: 0.1
             }));
