@@ -22,7 +22,7 @@ class Chat {
 
     print({ message }) {
         let chatPre = document.createElement('pre');
-        chatPre.classList = [ 'chatMessage' ];
+        chatPre.classList.add('chatMessage'); //'maintainCanvasMouse'
         chatPre.innerHTML = message;
         this.chatBox.prepend(chatPre);
     }

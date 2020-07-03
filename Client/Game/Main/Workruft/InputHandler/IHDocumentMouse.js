@@ -59,7 +59,23 @@ module.exports = {
                 screenX: window.screenX + window.innerWidth * 0.5,
                 screenY: window.screenY + window.innerHeight * 0.5
             });
+            newEvent.isMouseOutEvent = true;
         }
         HTML.gameCanvas.dispatchEvent(newEvent);
+        //this.onMouseMove(newEvent);
+    },
+
+    onDocumentMouseOut(event) {
+        HTML.gameCanvas.dispatchEvent(new MouseEvent('mouseout', event));
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
+    },
+
+    onDocumentMouseOver(event) {
+        HTML.gameCanvas.dispatchEvent(new MouseEvent('mouseover', event));
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
     }
 };

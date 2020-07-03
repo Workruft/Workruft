@@ -528,8 +528,8 @@ module.exports = {
                 let clickCoordinates = pickedMapObjectArray[0].point;
                 let cellX = AlignToCell(clickCoordinates.x);
                 let cellZ = AlignToCell(clickCoordinates.z);
-                let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
-                if (clickedCell != null) {
+                let currentCell = this.map.getCell({ x: cellX, z: cellZ });
+                if (currentCell != null) {
                     this.updateMapEditorMouseCells({ cellX, cellZ });
                 }
             }
@@ -561,6 +561,9 @@ module.exports = {
         })) {
             return;
         }
+        if (this.isMouseOut && !event.isMouseOutEvent) {
+            return;
+        }
         switch (this.workruft.gameState) {
             // case Enums.GameStates.Playing: {
                 // break;
@@ -573,8 +576,8 @@ module.exports = {
                     let clickCoordinates = pickedMapObjectArray[0].point;
                     let cellX = AlignToCell(clickCoordinates.x);
                     let cellZ = AlignToCell(clickCoordinates.z);
-                    let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
-                    if (clickedCell != null) {
+                    let currentCell = this.map.getCell({ x: cellX, z: cellZ });
+                    if (currentCell != null) {
                         this.updateMapEditorMouseCells({ cellX, cellZ });
                     }
                 }
@@ -584,21 +587,28 @@ module.exports = {
     },
 
     onMouseOut(event) {
-        if (event.relatedTarget == null) {
-            return;
-        }
-        if (event.relatedTarget.classList == null || !event.relatedTarget.classList.contains('maintainCanvasMouse')) {
+        if (event.relatedTarget == null ||
+            event.relatedTarget.classList == null || !event.relatedTarget.classList.contains('maintainCanvasMouse')) {
+            this.isMouseOut = true;
             let newEvent = new MouseEvent('mousemove', {
                 clientX: window.innerWidth * 0.5,
                 clientY: window.innerHeight * 0.5,
                 screenX: window.screenX + window.innerWidth * 0.5,
                 screenY: window.screenY + window.innerHeight * 0.5
             });
+            newEvent.isMouseOutEvent = true;
             HTML.gameCanvas.dispatchEvent(newEvent);
+            //this.onMouseMove(newEvent);
         }
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
     },
 
     onMouseOver(event) {
-
+        this.isMouseOut = false;
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
     }
 };

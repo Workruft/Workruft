@@ -26,6 +26,7 @@ class InputHandler {
 
         this.keysDown = new Set();
         this.mouseButtonsDown = new Set();
+        this.isMouseOut = false;
 
         //Disable right click.
         document.addEventListener('contextmenu', function(event) {
@@ -46,6 +47,8 @@ class InputHandler {
         document.addEventListener('mouseup', this.onDocumentMouseUp.bind(this));
         document.addEventListener('wheel', this.onDocumentWheel.bind(this));
         document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this));
+        document.addEventListener('mouseout', this.onDocumentMouseOut.bind(this));
+        document.addEventListener('mouseover', this.onDocumentMouseOver.bind(this));
 
         this.setupTerrainButtons();
     }
