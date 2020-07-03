@@ -50,13 +50,14 @@ window.ForEachCell = function(latSize, longSize, callback) {
 
 window.ForEachLatBorderCell = function(latSize, longSize, callback) {
     let forEachObject = CreateCellForEachObject(latSize, longSize);
+    let latIncrement = Math.max(CellSize, latSize - CellSize);
     //Border columns.
     for (forEachObject.zOffset = -forEachObject.floorHalfLongSize;
         forEachObject.zOffset < forEachObject.ceilHalfLongSize;
         forEachObject.zOffset += CellSize) {
         for (forEachObject.xOffset = -forEachObject.floorHalfLatSize;
             forEachObject.xOffset < forEachObject.ceilHalfLatSize;
-            forEachObject.xOffset += latSize - CellSize) {
+            forEachObject.xOffset += latIncrement) {
             callback(forEachObject);
         }
     }
@@ -65,13 +66,14 @@ window.ForEachLatBorderCell = function(latSize, longSize, callback) {
 
 window.ForEachLongBorderCell = function(latSize, longSize, callback) {
     let forEachObject = CreateCellForEachObject(latSize, longSize);
+    let longIncrement = Math.max(CellSize, longSize - CellSize);
     //Border rows.
     for (forEachObject.xOffset = -forEachObject.floorHalfLatSize;
         forEachObject.xOffset < forEachObject.ceilHalfLatSize;
         forEachObject.xOffset += CellSize) {
         for (forEachObject.zOffset = -forEachObject.floorHalfLongSize;
             forEachObject.zOffset < forEachObject.ceilHalfLongSize;
-            forEachObject.zOffset += longSize - CellSize) {
+            forEachObject.zOffset += longIncrement) {
             callback(forEachObject);
         }
     }
