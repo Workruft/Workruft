@@ -76,7 +76,7 @@ class InputHandler {
                             workruft: this.workruft,
                             x: cellX + forEachObject.xOffset + HalfCellSize,
                             z: cellZ + forEachObject.zOffset + HalfCellSize,
-                            color: BlackColor
+                            color: DarkGrayColor
                         }));
                     }.bind(this)
                 );
@@ -89,7 +89,7 @@ class InputHandler {
                             workruft: this.workruft,
                             x: cellX + forEachObject.xOffset + HalfCellSize,
                             z: cellZ + forEachObject.zOffset + HalfCellSize,
-                            color: BlackColor
+                            color: DarkGrayColor
                         }));
                     }.bind(this)
                 );
@@ -101,7 +101,7 @@ class InputHandler {
                             workruft: this.workruft,
                             x: cellX + forEachObject.xOffset + HalfCellSize,
                             z: cellZ + forEachObject.zOffset + HalfCellSize,
-                            color: BlackColor
+                            color: DarkGrayColor
                         }));
                     }.bind(this)
                 );

@@ -104,7 +104,8 @@ class GameMap {
             }
         }
 
-        this.updateCells({ lowX: this.minX, lowZ: this.minZ, highX: this.maxX, highZ: this.maxZ });
+        this.geometry.elementsNeedUpdate = true;
+        this.geometry.computeFaceNormals();
 
         this.mesh = new THREE.Mesh(this.geometry, MapMaterials);
         this.mesh.receiveShadow = true;
@@ -520,7 +521,8 @@ class GameMap {
                 gameMap.setFrontLeftHeight({ cell: currentCell, height: currentHeights[3] });
             }
         }
-        gameMap.updateCells({ lowX: gameMap.minX, lowZ: gameMap.minZ, highX: gameMap.maxX, highZ: gameMap.maxZ });
+        gameMap.geometry.elementsNeedUpdate = true;
+        gameMap.geometry.computeFaceNormals();
         return gameMap;
     }
 }

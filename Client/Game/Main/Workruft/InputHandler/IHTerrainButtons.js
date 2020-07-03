@@ -83,6 +83,7 @@ module.exports = {
                 }.bind(this);
             }.bind(this)
         );
+        HTML.increaseHeightButton.classList.add(selectedButtonClass);
     },
 
     loadMapFile(mapArray) {
