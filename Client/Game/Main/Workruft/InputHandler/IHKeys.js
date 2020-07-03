@@ -49,10 +49,8 @@ module.exports = {
                         if (this.workruft.isPathTesting) {
                             for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
                                 this.workruft.randoUnits[n].cancelAllOrders();
-                                this.workruft.randoUnits[n].position.x = this.workruft.playerUnit.position.x +
-                                    this.workruft.playerUnit.gameModel.xzSize;
-                                this.workruft.randoUnits[n].position.z = this.workruft.playerUnit.position.z +
-                                    this.workruft.playerUnit.gameModel.xzSize;
+                                this.workruft.randoUnits[n].position.x = this.workruft.playerUnit.position.x;
+                                this.workruft.randoUnits[n].position.z = this.workruft.playerUnit.position.z;
                                 this.workruft.randoUnits[n].autoSetHeight();
                             }
                         } else {

@@ -521,8 +521,7 @@ class GameMap {
                 gameMap.setFrontLeftHeight({ cell: currentCell, height: currentHeights[3] });
             }
         }
-        gameMap.geometry.elementsNeedUpdate = true;
-        gameMap.geometry.computeFaceNormals();
+        gameMap.updateCells({ lowX: gameMap.minX, lowZ: gameMap.minZ, highX: gameMap.maxX, highZ: gameMap.maxZ });
         return gameMap;
     }
 }

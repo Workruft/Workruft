@@ -236,7 +236,15 @@ module.exports = {
                                     if (currentCell == null) {
                                         return;
                                     }
-                                    this.workruft.terrainEditingCells.push(currentCell);
+                                    this.workruft.terrainEditingCells.push({
+                                        x: currentCell.x, z: currentCell.z,
+                                        heights: [
+                                            this.workruft.world.map.getBackLeftHeight({ cell: currentCell }),
+                                            this.workruft.world.map.getBackRightHeight({ cell: currentCell }),
+                                            this.workruft.world.map.getFrontRightHeight({ cell: currentCell }),
+                                            this.workruft.world.map.getFrontLeftHeight({ cell: currentCell })
+                                        ]
+                                    });
                                 }.bind(this)
                             );
                             this.workruft.terrainEditingLatSize = this.workruft.editingLatSize;
@@ -259,9 +267,21 @@ module.exports = {
                             if (currentCell == null) {
                                 continue;
                             }
-                            this.workruft.world.map.copyCellHeights({
-                                copyToCell: currentCell,
-                                copyFromCell: terrainEditingCell
+                            this.workruft.world.map.setBackLeftHeight({
+                                cell: currentCell,
+                                height: terrainEditingCell.heights[0]
+                            });
+                            this.workruft.world.map.setBackRightHeight({
+                                cell: currentCell,
+                                height: terrainEditingCell.heights[1]
+                            });
+                            this.workruft.world.map.setFrontRightHeight({
+                                cell: currentCell,
+                                height: terrainEditingCell.heights[2]
+                            });
+                            this.workruft.world.map.setFrontLeftHeight({
+                                cell: currentCell,
+                                height: terrainEditingCell.heights[3]
                             });
                         }
                         forEachObject = CreateCellForEachObject(
@@ -281,7 +301,15 @@ module.exports = {
                                 if (currentCell == null) {
                                     return;
                                 }
-                                this.workruft.terrainEditingCells.push(currentCell);
+                                this.workruft.terrainEditingCells.push({
+                                    x: currentCell.x, z: currentCell.z,
+                                    heights: [
+                                        this.workruft.world.map.getBackLeftHeight({ cell: currentCell }),
+                                        this.workruft.world.map.getBackRightHeight({ cell: currentCell }),
+                                        this.workruft.world.map.getFrontRightHeight({ cell: currentCell }),
+                                        this.workruft.world.map.getFrontLeftHeight({ cell: currentCell })
+                                    ]
+                                });
                             }.bind(this)
                         );
                         if (this.workruft.terrainEditingCells.length == 0) {
@@ -292,11 +320,7 @@ module.exports = {
                         let higherIndex;
                         let inBetweenX;
                         let lowerCell;
-                        let lowerBackHeight;
-                        let lowerFrontHeight;
                         let higherCell;
-                        let higherBackHeight;
-                        let higherFrontHeight;
                         let inBetweenCell;
                         let lowerHighX;
                         let beforeAfterRatio;
@@ -313,10 +337,6 @@ module.exports = {
                                     continue;
                                 }
                                 lowerHighX = lowerCell.x + CellSize;
-                                lowerBackHeight = this.workruft.world.map.getBackRightHeight({ cell: lowerCell });
-                                lowerFrontHeight = this.workruft.world.map.getFrontRightHeight({ cell: lowerCell });
-                                higherBackHeight = this.workruft.world.map.getBackLeftHeight({ cell: higherCell });
-                                higherFrontHeight = this.workruft.world.map.getFrontLeftHeight({ cell: higherCell });
                                 for (inBetweenX = lowerHighX; inBetweenX < higherCell.x; inBetweenX += CellSize) {
                                     inBetweenCell = this.workruft.world.map.getCell({
                                         x: inBetweenX,
@@ -329,28 +349,28 @@ module.exports = {
                                     //Back left.
                                     this.workruft.world.map.setBackLeftHeight({
                                         cell: inBetweenCell,
-                                        height: (1.0 - beforeAfterRatio) * lowerBackHeight +
-                                            beforeAfterRatio * higherBackHeight
+                                        height: (1.0 - beforeAfterRatio) * lowerCell.heights[1] +
+                                            beforeAfterRatio * higherCell.heights[0]
                                     });
                                     //Front left.
                                     this.workruft.world.map.setFrontLeftHeight({
                                         cell: inBetweenCell,
-                                        height: (1.0 - beforeAfterRatio) * lowerFrontHeight +
-                                            beforeAfterRatio * higherFrontHeight
+                                        height: (1.0 - beforeAfterRatio) * lowerCell.heights[2] +
+                                            beforeAfterRatio * higherCell.heights[3]
                                     });
                                     beforeAfterRatio = (inBetweenX + CellSize - lowerHighX) /
                                         (higherCell.x - lowerHighX);
                                     //Back right.
                                     this.workruft.world.map.setBackRightHeight({
                                         cell: inBetweenCell,
-                                        height: (1.0 - beforeAfterRatio) * lowerBackHeight +
-                                            beforeAfterRatio * higherBackHeight
+                                        height: (1.0 - beforeAfterRatio) * lowerCell.heights[1] +
+                                            beforeAfterRatio * higherCell.heights[0]
                                     });
                                     //Front right.
                                     this.workruft.world.map.setFrontRightHeight({
                                         cell: inBetweenCell,
-                                        height: (1.0 - beforeAfterRatio) * lowerFrontHeight +
-                                            beforeAfterRatio * higherFrontHeight
+                                        height: (1.0 - beforeAfterRatio) * lowerCell.heights[2] +
+                                            beforeAfterRatio * higherCell.heights[3]
                                     });
                                 }
                                 //Onto the next pair.
@@ -374,7 +394,15 @@ module.exports = {
                                 if (currentCell == null) {
                                     return;
                                 }
-                                this.workruft.terrainEditingCells.push(currentCell);
+                                this.workruft.terrainEditingCells.push({
+                                    x: currentCell.x, z: currentCell.z,
+                                    heights: [
+                                        this.workruft.world.map.getBackLeftHeight({ cell: currentCell }),
+                                        this.workruft.world.map.getBackRightHeight({ cell: currentCell }),
+                                        this.workruft.world.map.getFrontRightHeight({ cell: currentCell }),
+                                        this.workruft.world.map.getFrontLeftHeight({ cell: currentCell })
+                                    ]
+                                });
                             }.bind(this)
                         );
                         if (this.workruft.terrainEditingCells.length == 0) {
@@ -385,11 +413,7 @@ module.exports = {
                         let higherIndex;
                         let inBetweenZ;
                         let lowerCell;
-                        let lowerLeftHeight;
-                        let lowerRightHeight;
                         let higherCell;
-                        let higherLeftHeight;
-                        let higherRightHeight;
                         let inBetweenCell;
                         let lowerHighZ;
                         let beforeAfterRatio;
@@ -406,10 +430,6 @@ module.exports = {
                                     continue;
                                 }
                                 lowerHighZ = lowerCell.z + CellSize;
-                                lowerLeftHeight = this.workruft.world.map.getFrontLeftHeight({ cell: lowerCell });
-                                lowerRightHeight = this.workruft.world.map.getFrontRightHeight({ cell: lowerCell });
-                                higherLeftHeight = this.workruft.world.map.getBackLeftHeight({ cell: higherCell });
-                                higherRightHeight = this.workruft.world.map.getBackRightHeight({ cell: higherCell });
                                 for (inBetweenZ = lowerHighZ; inBetweenZ < higherCell.z; inBetweenZ += CellSize) {
                                     inBetweenCell = this.workruft.world.map.getCell({
                                         x: lowerCell.x,
@@ -422,28 +442,28 @@ module.exports = {
                                     //Back left.
                                     this.workruft.world.map.setBackLeftHeight({
                                         cell: inBetweenCell,
-                                        height: (1.0 - beforeAfterRatio) * lowerLeftHeight +
-                                            beforeAfterRatio * higherLeftHeight
+                                        height: (1.0 - beforeAfterRatio) * lowerCell.heights[3] +
+                                            beforeAfterRatio * higherCell.heights[0]
                                     });
                                     //Back right.
                                     this.workruft.world.map.setBackRightHeight({
                                         cell: inBetweenCell,
-                                        height: (1.0 - beforeAfterRatio) * lowerRightHeight +
-                                            beforeAfterRatio * higherRightHeight
+                                        height: (1.0 - beforeAfterRatio) * lowerCell.heights[2] +
+                                            beforeAfterRatio * higherCell.heights[1]
                                     });
                                     beforeAfterRatio = (inBetweenZ + CellSize - lowerHighZ) /
                                         (higherCell.z - lowerHighZ);
                                     //Front left.
                                     this.workruft.world.map.setFrontLeftHeight({
                                         cell: inBetweenCell,
-                                        height: (1.0 - beforeAfterRatio) * lowerLeftHeight +
-                                            beforeAfterRatio * higherLeftHeight
+                                        height: (1.0 - beforeAfterRatio) * lowerCell.heights[3] +
+                                            beforeAfterRatio * higherCell.heights[0]
                                     });
                                     //Front right.
                                     this.workruft.world.map.setFrontRightHeight({
                                         cell: inBetweenCell,
-                                        height: (1.0 - beforeAfterRatio) * lowerRightHeight +
-                                            beforeAfterRatio * higherRightHeight
+                                        height: (1.0 - beforeAfterRatio) * lowerCell.heights[2] +
+                                            beforeAfterRatio * higherCell.heights[1]
                                     });
                                 }
                                 //Onto the next pair.

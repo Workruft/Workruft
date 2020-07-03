@@ -83,6 +83,7 @@ module.exports = {
                 }.bind(this);
             }.bind(this)
         );
+        this.selectedTerrainModeButton = HTML.increaseHeightButton;
         HTML.increaseHeightButton.classList.add(selectedButtonClass);
     },
 
