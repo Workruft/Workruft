@@ -15,6 +15,7 @@ class InputBindings {
         this.NewMap = 'N';
         this.ToggleGridLines = 'G';
         this.ToggleVerticalGridLines = 'V';
+        this.ToggleEditorVerticalLines = 'B';
         this.TogglePathTesting = 'P';
 
         //Mouse button down's. Left: 0, Middle: 1, Right: 2.

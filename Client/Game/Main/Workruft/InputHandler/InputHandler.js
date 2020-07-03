@@ -31,6 +31,10 @@ class InputHandler {
         this.lastMouseCellZ = 0.0;
         this.isMouseOut = false;
 
+        this.mapEditorSquares = [];
+        this.mapEditorDrawVerticalLines = false;
+        this.mapEditorVerticalLines = [];
+
         //Disable right click.
         document.addEventListener('contextmenu', function(event) {
             event.preventDefault();
@@ -56,13 +60,15 @@ class InputHandler {
         this.setupTerrainButtons();
     }
 
-    clearEditorSquares() {
-        if (IsDefined(this.editorSquares)) {
-            for (let editorSquare of this.editorSquares) {
-                editorSquare.deconstruct();
-            }
+    clearMapEditorHelpers() {
+        for (let editorSquare of this.mapEditorSquares) {
+            editorSquare.deconstruct();
         }
-        this.editorSquares = [];
+        this.mapEditorSquares = [];
+        for (let verticalLine of this.mapEditorVerticalLines) {
+            this.workruft.world.scene.remove(verticalLine);
+        }
+        this.mapEditorVerticalLines = [];
     }
 
     updateMapEditorMouseCells() {
@@ -73,14 +79,14 @@ class InputHandler {
         })) {
             return;
         }
-        this.clearEditorSquares();
+        this.clearMapEditorHelpers();
         if (this.workruft.gameState != Enums.GameStates.MapEditing) {
             return;
         }
         switch (this.workruft.terrainEditingMode) {
             case Enums.TerrainEditingModes.LatRamp: {
                 let iterationBounds = GetIterationBounds(this.workruft.editingLatSize, this.workruft.editingLongSize);
-                this.editorSquares.push(new ColoredRectangle({
+                this.mapEditorSquares.push(new ColoredRectangle({
                     workruft: this.workruft,
                     x: this.lastMouseCellX - iterationBounds.floorHalfLatSize,
                     z: this.lastMouseCellZ,
@@ -89,7 +95,7 @@ class InputHandler {
                     color: DarkGrayColor,
                     opacity: 0.5
                 }));
-                this.editorSquares.push(new ColoredRectangle({
+                this.mapEditorSquares.push(new ColoredRectangle({
                     workruft: this.workruft,
                     x: this.lastMouseCellX + iterationBounds.ceilHalfLatSize - CellSize,
                     z: this.lastMouseCellZ,
@@ -98,11 +104,34 @@ class InputHandler {
                     color: DarkGrayColor,
                     opacity: 0.5
                 }));
+                if (this.mapEditorDrawVerticalLines) {
+                    let longIncrement = Math.max(CellSize, this.workruft.editingLongSize);
+                    for (let z = this.lastMouseCellZ - iterationBounds.floorHalfLongSize;
+                        z <= this.lastMouseCellZ + iterationBounds.ceilHalfLongSize;
+                        z += longIncrement) {
+                        for (let x = this.lastMouseCellX - iterationBounds.floorHalfLatSize;
+                            x <= this.lastMouseCellX - iterationBounds.floorHalfLatSize + CellSize;
+                            x += CellSize) {
+                            this.mapEditorVerticalLines.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+                                new THREE.Vector3(x, MapBottomY, z),
+                                new THREE.Vector3(x, VerticalGridLinesHeight, z)
+                            ]), EditingVerticalLinesMaterial));
+                        }
+                        for (let x = this.lastMouseCellX + iterationBounds.ceilHalfLatSize - CellSize;
+                            x <= this.lastMouseCellX + iterationBounds.ceilHalfLatSize;
+                            x += CellSize) {
+                            this.mapEditorVerticalLines.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+                                new THREE.Vector3(x, MapBottomY, z),
+                                new THREE.Vector3(x, VerticalGridLinesHeight, z)
+                            ]), EditingVerticalLinesMaterial));
+                        }
+                    }
+                }
                 break;
             }
             case Enums.TerrainEditingModes.LongRamp: {
                 let iterationBounds = GetIterationBounds(this.workruft.editingLatSize, this.workruft.editingLongSize);
-                this.editorSquares.push(new ColoredRectangle({
+                this.mapEditorSquares.push(new ColoredRectangle({
                     workruft: this.workruft,
                     x: this.lastMouseCellX,
                     z: this.lastMouseCellZ - iterationBounds.floorHalfLongSize,
@@ -111,7 +140,7 @@ class InputHandler {
                     color: DarkGrayColor,
                     opacity: 0.5
                 }));
-                this.editorSquares.push(new ColoredRectangle({
+                this.mapEditorSquares.push(new ColoredRectangle({
                     workruft: this.workruft,
                     x: this.lastMouseCellX,
                     z: this.lastMouseCellZ + iterationBounds.ceilHalfLongSize - CellSize,
@@ -120,11 +149,34 @@ class InputHandler {
                     color: DarkGrayColor,
                     opacity: 0.5
                 }));
+                if (this.mapEditorDrawVerticalLines) {
+                    let latIncrement = Math.max(CellSize, this.workruft.editingLatSize);
+                    for (let x = this.lastMouseCellX - iterationBounds.floorHalfLatSize;
+                        x <= this.lastMouseCellX + iterationBounds.ceilHalfLatSize;
+                        x += latIncrement) {
+                        for (let z = this.lastMouseCellZ - iterationBounds.floorHalfLongSize;
+                            z <= this.lastMouseCellZ - iterationBounds.floorHalfLongSize + CellSize;
+                            z += CellSize) {
+                            this.mapEditorVerticalLines.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+                                new THREE.Vector3(x, MapBottomY, z),
+                                new THREE.Vector3(x, VerticalGridLinesHeight, z)
+                            ]), EditingVerticalLinesMaterial));
+                        }
+                        for (let z = this.lastMouseCellZ + iterationBounds.ceilHalfLongSize - CellSize;
+                            z <= this.lastMouseCellZ + iterationBounds.ceilHalfLongSize;
+                            z += CellSize) {
+                            this.mapEditorVerticalLines.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+                                new THREE.Vector3(x, MapBottomY, z),
+                                new THREE.Vector3(x, VerticalGridLinesHeight, z)
+                            ]), EditingVerticalLinesMaterial));
+                        }
+                    }
+                }
                 break;
             }
             default: {
                 let iterationBounds = GetIterationBounds(this.workruft.editingLatSize, this.workruft.editingLongSize);
-                this.editorSquares.push(new ColoredRectangle({
+                this.mapEditorSquares.push(new ColoredRectangle({
                     workruft: this.workruft,
                     x: this.lastMouseCellX,
                     z: this.lastMouseCellZ,
@@ -133,8 +185,27 @@ class InputHandler {
                     color: DarkGrayColor,
                     opacity: 0.5
                 }));
+                if (this.mapEditorDrawVerticalLines) {
+                    let latIncrement = Math.max(CellSize, this.workruft.editingLatSize);
+                    let longIncrement = Math.max(CellSize, this.workruft.editingLongSize);
+                    for (let x = this.lastMouseCellX - iterationBounds.floorHalfLatSize;
+                        x <= this.lastMouseCellX + iterationBounds.ceilHalfLatSize;
+                        x += latIncrement) {
+                        for (let z = this.lastMouseCellZ - iterationBounds.floorHalfLongSize;
+                            z <= this.lastMouseCellZ + iterationBounds.ceilHalfLongSize;
+                            z += longIncrement) {
+                            this.mapEditorVerticalLines.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+                                new THREE.Vector3(x, MapBottomY, z),
+                                new THREE.Vector3(x, VerticalGridLinesHeight, z)
+                            ]), EditingVerticalLinesMaterial));
+                        }
+                    }
+                }
                 break;
             }
+        }
+        for (let verticalLine of this.mapEditorVerticalLines) {
+            this.workruft.world.scene.add(verticalLine);
         }
     }
 

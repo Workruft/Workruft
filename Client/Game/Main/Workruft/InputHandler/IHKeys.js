@@ -37,7 +37,6 @@ module.exports = {
                             HTML.mapEditToolPanel.hidden = false;
                             this.workruft.gameState = Enums.GameStates.MapEditing;
                         } else if (this.workruft.gameState == Enums.GameStates.MapEditing) {
-                            this.clearEditorSquares();
                             HTML.mapEditToolPanel.hidden = true;
                             this.workruft.gameState = Enums.GameStates.Playing;
                         }
@@ -163,6 +162,11 @@ module.exports = {
                             }
                             this.workruft.verticalGridLines = [];
                         }
+                        break;
+                    }
+                    case this.inputBindings.ToggleEditorVerticalLines: {
+                        this.mapEditorDrawVerticalLines = !this.mapEditorDrawVerticalLines;
+                        this.updateMapEditorMouseCells();
                         break;
                     }
                     case this.inputBindings.RotateCameraClockwise: {

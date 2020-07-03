@@ -47,7 +47,10 @@ window.WhiteColor = new THREE.Color('#FFFFFF');
 window.ColoredMeshPhongMaterialsMap = new Map();
 
 window.GridLinesMaterial = new THREE.LineBasicMaterial({
-    color: new THREE.Color('#001080'), transparent: true, opacity: 0.15
+    color: BlueColor, transparent: true, opacity: 0.15
+});
+window.EditingVerticalLinesMaterial = new THREE.LineBasicMaterial({
+    color: DarkGrayColor, transparent: true, opacity: 0.5
 });
 window.GridLinesSeparation = QuadrupleCellSize;
 window.VerticalGridLinesSeparation = QuadrupleCellSize;
