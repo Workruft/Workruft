@@ -94,40 +94,7 @@ class World {
 
         //Action.
         //Map.
-        let newMap = new GameMap(100, 100, MapBottomY);
-        let currentCell;
-        //Rampsnstuff.
-        let rampIncline = 0.5;
-        for (let wholeRampXOffset = -8; wholeRampXOffset <= 8; wholeRampXOffset += 4) {
-            newMap.setBackLeftHeight({ cell: newMap.getCell({ x: wholeRampXOffset - 1, z: -4 }), height: rampIncline });
-            newMap.setBackRightHeight({ cell: newMap.getCell({ x: wholeRampXOffset - 1, z: -4 }), height: rampIncline });
-            newMap.setBackLeftHeight({ cell: newMap.getCell({ x: wholeRampXOffset, z: -4 }), height: rampIncline });
-            newMap.setBackRightHeight({ cell: newMap.getCell({ x: wholeRampXOffset, z: -4 }), height: rampIncline });
-            for (let rampXOffset = 0; rampXOffset <= 1; ++rampXOffset) {
-                for (let rampZOffset = 1; rampZOffset <= 5; ++rampZOffset) {
-                    let currentCell = newMap.getCell({ x: wholeRampXOffset - rampXOffset, z: -4 - rampZOffset });
-                    newMap.setFrontLeftHeight({ cell: currentCell, height: rampZOffset * rampIncline });
-                    newMap.setFrontRightHeight({ cell: currentCell, height: rampZOffset * rampIncline });
-                    newMap.setBackLeftHeight({ cell: currentCell, height: (rampZOffset + 1) * rampIncline });
-                    newMap.setBackRightHeight({ cell: currentCell, height: (rampZOffset + 1) * rampIncline });
-                }
-            }
-            for (let rampXOffset = 0; rampXOffset <= 1; ++rampXOffset) {
-                for (let rampZOffset = 1; rampZOffset <= 5; ++rampZOffset) {
-                    let currentCell = newMap.getCell({ x: wholeRampXOffset - rampXOffset, z: -9 - rampZOffset });
-                    newMap.setFrontLeftHeight({ cell: currentCell, height: (rampIncline * 7.0) - rampZOffset * rampIncline });
-                    newMap.setFrontRightHeight({ cell: currentCell, height: (rampIncline * 7.0) - rampZOffset * rampIncline });
-                    newMap.setBackLeftHeight({ cell: currentCell, height: (rampIncline * 7.0) - (rampZOffset + 1) * rampIncline });
-                    newMap.setBackRightHeight({ cell: currentCell, height: (rampIncline * 7.0) - (rampZOffset + 1) * rampIncline });
-                }
-            }
-            newMap.setFrontLeftHeight({ cell: newMap.getCell({ x: wholeRampXOffset - 1, z: -15 }), height: rampIncline });
-            newMap.setFrontRightHeight({ cell: newMap.getCell({ x: wholeRampXOffset - 1, z: -15 }), height: rampIncline });
-            newMap.setFrontLeftHeight({ cell: newMap.getCell({ x: wholeRampXOffset, z: -15 }), height: rampIncline });
-            newMap.setFrontRightHeight({ cell: newMap.getCell({ x: wholeRampXOffset, z: -15 }), height: rampIncline });
-        }
-        newMap.updateCells({ lowX: newMap.minX, lowZ: newMap.minZ, highX: newMap.maxX, highZ: newMap.maxZ });
-        this.changeMap(newMap);
+        this.changeMap(new GameMap(200, 200, MapBottomY));
         //Game models.
         this.setupGameModels();
         //Game objects.

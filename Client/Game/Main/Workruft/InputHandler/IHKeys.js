@@ -1,3 +1,5 @@
+let GameMap = require('../../GameMap');
+
 module.exports = {
     onKeyDown(event) {
         let upperKey = event.key.toUpperCase();
@@ -64,6 +66,51 @@ module.exports = {
                         this.workruft.updateStatusBox();
                         break;
                     }
+                    case this.inputBindings.NewMap: {
+                        if (!event.shiftKey) {
+                            break;
+                        }
+                        let newWidth = this.workruft.world.map.sizeX;
+                        do {
+                            newWidth = window.prompt('New map width (integer, 20-250):', newWidth);
+                            if (newWidth == null) {
+                                break;
+                            }
+                            newWidth = Math.floor(newWidth);
+                            if (!Number.isInteger(newWidth) || newWidth < 20 || newWidth > 250) {
+                                alert('Invalid width!');
+                                continue;
+                            }
+                            break;
+                        } while (true);
+                        if (!newWidth) {
+                            break;
+                        }
+                        let newHeight = this.workruft.world.map.sizeZ;
+                        do {
+                            newHeight = window.prompt('New map height (integer, 20-250):', newHeight);
+                            if (newHeight == null) {
+                                break;
+                            }
+                            newHeight = Math.floor(newHeight);
+                            if (!Number.isInteger(newHeight) ||newHeight < 20 || newHeight > 250) {
+                                alert('Invalid height!');
+                                continue;
+                            }
+                            break;
+                        } while (true);
+                        if (!newHeight) {
+                            break;
+                        }
+                        if (!window.confirm(
+                            'Warning: This will destroy your current map! Are you sure you want to proceed?')) {
+                            break;
+                        }
+                        this.workruft.world.changeMap(
+                            new GameMap(newWidth, newHeight, MapBottomY));
+                        this.workruft.setDefaultCamera();
+                        break;
+                    };
                     case this.inputBindings.RotateCameraClockwise: {
                         //TODO: Screws with camera movement; also, repositioning will need to handle zoom.
                         // this.workruft.world.camera.rotation.z -= HalfPI;

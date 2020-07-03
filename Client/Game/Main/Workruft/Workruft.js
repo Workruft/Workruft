@@ -32,11 +32,13 @@ class Workruft {
             message: '  ' + this.inputBindings.ToggleMapEditor + ': toggle map editing mode'
         });
         this.chat.print({
+            message: '  Shift + ' + this.inputBindings.NewMap + ': create a new map'
+        });
+        this.chat.print({
             message: '  ' + this.inputBindings.TogglePathTesting + ': toggle map path testing'
         });
         this.world = new World(this.chat, this.onUpdate.bind(this));
-        this.world.camera.position.set(0, 75, 10);
-        this.world.camera.lookAt(0, 0, this.world.camera.position.z - 10);
+        this.setDefaultCamera();
         this.world.graphicsLoop();
         this.network = new Network(this.chat);
 
@@ -94,6 +96,11 @@ class Workruft {
         this.world.deconstruct();
         this.network.deconstruct();
         //TODO: Units! Here or in World.
+    }
+
+    setDefaultCamera() {
+        this.world.camera.position.set(0, 75, 10);
+        this.world.camera.lookAt(0, 0, this.world.camera.position.z - 10);
     }
 
     onUpdate() {

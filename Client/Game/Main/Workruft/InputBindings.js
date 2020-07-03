@@ -8,10 +8,11 @@ class InputBindings {
         this.RotateCameraClockwise = 'Q';
         this.RotateCameraCounterclockwise = 'E';
 
-        //Key press's.
+        //Key presses.
         this.ToggleChat = 'Enter';
         this.CancelChat = 'Escape';
         this.ToggleMapEditor = 'M';
+        this.NewMap = 'N';
         this.TogglePathTesting = 'P';
 
         //Mouse button down's. Left: 0, Middle: 1, Right: 2.
