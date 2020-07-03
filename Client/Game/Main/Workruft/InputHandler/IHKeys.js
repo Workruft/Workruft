@@ -42,6 +42,7 @@ module.exports = {
                             this.workruft.gameState = Enums.GameStates.Playing;
                         }
                         this.workruft.updateStatusBox();
+                        this.updateMapEditorMouseCells();
                         break;
                     }
                     case this.inputBindings.TogglePathTesting: {

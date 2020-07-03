@@ -26,6 +26,9 @@ class InputHandler {
 
         this.keysDown = new Set();
         this.mouseButtonsDown = new Set();
+        this.lastMouseCoordinates = new THREE.Vector3();
+        this.lastMouseCellX = 0.0;
+        this.lastMouseCellZ = 0.0;
         this.isMouseOut = false;
 
         //Disable right click.
@@ -62,12 +65,11 @@ class InputHandler {
         this.editorSquares = [];
     }
 
-    updateMapEditorMouseCells({ cellX, cellZ }) {
+    updateMapEditorMouseCells() {
         if (!RateLimitRecall({
             callingFunction: this.updateMapEditorMouseCells,
             minimumInterval: 1000.0 / 30.0,
-            thisToBind: this,
-            paramsToPass: { cellX, cellZ }
+            thisToBind: this
         })) {
             return;
         }
@@ -80,8 +82,8 @@ class InputHandler {
                 let iterationBounds = GetIterationBounds(this.workruft.editingLatSize, this.workruft.editingLongSize);
                 this.editorSquares.push(new ColoredRectangle({
                     workruft: this.workruft,
-                    x: cellX - iterationBounds.floorHalfLatSize,
-                    z: cellZ,
+                    x: this.lastMouseCellX - iterationBounds.floorHalfLatSize,
+                    z: this.lastMouseCellZ,
                     sizeX: CellSize,
                     sizeZ: this.workruft.editingLongSize,
                     color: DarkGrayColor,
@@ -89,8 +91,8 @@ class InputHandler {
                 }));
                 this.editorSquares.push(new ColoredRectangle({
                     workruft: this.workruft,
-                    x: cellX + iterationBounds.ceilHalfLatSize - CellSize,
-                    z: cellZ,
+                    x: this.lastMouseCellX + iterationBounds.ceilHalfLatSize - CellSize,
+                    z: this.lastMouseCellZ,
                     sizeX: CellSize,
                     sizeZ: this.workruft.editingLongSize,
                     color: DarkGrayColor,
@@ -102,8 +104,8 @@ class InputHandler {
                 let iterationBounds = GetIterationBounds(this.workruft.editingLatSize, this.workruft.editingLongSize);
                 this.editorSquares.push(new ColoredRectangle({
                     workruft: this.workruft,
-                    x: cellX,
-                    z: cellZ - iterationBounds.floorHalfLongSize,
+                    x: this.lastMouseCellX,
+                    z: this.lastMouseCellZ - iterationBounds.floorHalfLongSize,
                     sizeX: this.workruft.editingLatSize,
                     sizeZ: CellSize,
                     color: DarkGrayColor,
@@ -111,8 +113,8 @@ class InputHandler {
                 }));
                 this.editorSquares.push(new ColoredRectangle({
                     workruft: this.workruft,
-                    x: cellX,
-                    z: cellZ + iterationBounds.ceilHalfLongSize - CellSize,
+                    x: this.lastMouseCellX,
+                    z: this.lastMouseCellZ + iterationBounds.ceilHalfLongSize - CellSize,
                     sizeX: this.workruft.editingLatSize,
                     sizeZ: CellSize,
                     color: DarkGrayColor,
@@ -124,8 +126,8 @@ class InputHandler {
                 let iterationBounds = GetIterationBounds(this.workruft.editingLatSize, this.workruft.editingLongSize);
                 this.editorSquares.push(new ColoredRectangle({
                     workruft: this.workruft,
-                    x: cellX,
-                    z: cellZ,
+                    x: this.lastMouseCellX,
+                    z: this.lastMouseCellZ,
                     sizeX: this.workruft.editingLatSize,
                     sizeZ: this.workruft.editingLongSize,
                     color: DarkGrayColor,

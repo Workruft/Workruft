@@ -5,8 +5,7 @@ module.exports = {
             return;
         }
         if (event.target.classList != null && event.target.classList.contains('maintainCanvasMouse')) {
-            let newEvent = new MouseEvent('mousedown', event);
-            HTML.gameCanvas.dispatchEvent(newEvent);
+            this.onMouseDown(new MouseEvent('mousedown', event));
             event.preventDefault();
             event.stopPropagation();
             return false;
@@ -18,8 +17,7 @@ module.exports = {
             return;
         }
         if (event.target.classList != null && event.target.classList.contains('maintainCanvasMouse')) {
-            let newEvent = new MouseEvent('mouseup', event);
-            HTML.gameCanvas.dispatchEvent(newEvent);
+            this.onMouseUp(new MouseEvent('mouseup', event));
             event.preventDefault();
             event.stopPropagation();
             return false;
@@ -30,8 +28,7 @@ module.exports = {
         if (event.target == HTML.gameCanvas) {
             return;
         }
-        let newEvent = new WheelEvent('wheel', event);
-        HTML.gameCanvas.dispatchEvent(newEvent);
+        this.onWheel(new WheelEvent('wheel', event));
         event.preventDefault();
         event.stopPropagation();
         return false;
@@ -51,7 +48,7 @@ module.exports = {
         }
         let newEvent;
         if (event && event.target.classList != null && event.target.classList.contains('maintainCanvasMouse')) {
-            newEvent = new MouseEvent('mousemove', event);
+            this.onMouseMove(new MouseEvent('mousemove', event));
         } else {
             newEvent = new MouseEvent('mousemove', {
                 clientX: window.innerWidth * 0.5,
@@ -60,20 +57,19 @@ module.exports = {
                 screenY: window.screenY + window.innerHeight * 0.5
             });
             newEvent.isMouseOutEvent = true;
+            this.onMouseMove(newEvent);
         }
-        HTML.gameCanvas.dispatchEvent(newEvent);
-        //this.onMouseMove(newEvent);
     },
 
     onDocumentMouseOut(event) {
-        HTML.gameCanvas.dispatchEvent(new MouseEvent('mouseout', event));
+        this.onMouseOut(new MouseEvent('mouseout', event));
         event.preventDefault();
         event.stopPropagation();
         return false;
     },
 
     onDocumentMouseOver(event) {
-        HTML.gameCanvas.dispatchEvent(new MouseEvent('mouseover', event));
+        this.onMouseOver(new MouseEvent('mouseover', event));
         event.preventDefault();
         event.stopPropagation();
         return false;

@@ -36,38 +36,32 @@ module.exports = {
                 break;
             }
             case this.inputBindings.MiscellaneousButton: {
-                let pickedMapObjectArray = this.workruft.world.pickMap(
-                    this.workruft.world.getNormalizedCanvasMouse(event));
-                if (pickedMapObjectArray.length > 0) {
-                    let clickCoordinates = pickedMapObjectArray[0].point;
-                    let cellX = AlignToCell(clickCoordinates.x);
-                    let cellZ = AlignToCell(clickCoordinates.z);
-                    alert(clickCoordinates.x + ', ' + clickCoordinates.z + '\n' + cellX + ', ' + cellZ);
+                if (!this.tryUpdateMouseCell(event)) {
+                    break;
                 }
+                alert(this.lastMouseCellX + ', ' + this.lastMouseCellZ + '\n' +
+                    this.lastMouseCoordinates.x + ', ' + this.lastMouseCoordinates.z);
                 break;
             }
             case this.inputBindings.OrderUnitButton: {
-                let pickedMapObjectArray = this.workruft.world.pickMap(
-                    this.workruft.world.getNormalizedCanvasMouse(event));
-                if (pickedMapObjectArray.length > 0) {
-                    let clickCoordinates = pickedMapObjectArray[0].point;
-                    let cellX = AlignToCell(clickCoordinates.x);
-                    let cellZ = AlignToCell(clickCoordinates.z);
-                    let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
-                    if (clickedCell != null) {
-                        for (let selectedObject of this.workruft.world.selectedObjects) {
-                            let newOrderObject = {
-                                order: new Order({
-                                    type: Enums.OrderTypes.Move,
-                                    data: { x: clickCoordinates.x, z: clickCoordinates.z }
-                                })
-                            };
-                            if (this.keysDown.has('Control')) {
-                                selectedObject.issueAdditionalOrder(newOrderObject);
-                            } else {
-                                selectedObject.issueReplacementOrder(newOrderObject);
-                            }
-                        }
+                if (!this.tryUpdateMouseCell(event)) {
+                    break;
+                }
+                let clickedCell = this.map.getCell({ x: this.lastMouseCellX, z: this.lastMouseCellZ });
+                if (clickedCell == null) {
+                    break;
+                }
+                for (let selectedObject of this.workruft.world.selectedObjects) {
+                    let newOrderObject = {
+                        order: new Order({
+                            type: Enums.OrderTypes.Move,
+                            data: { x: this.lastMouseCoordinates.x, z: this.lastMouseCoordinates.z }
+                        })
+                    };
+                    if (this.keysDown.has('Control')) {
+                        selectedObject.issueAdditionalOrder(newOrderObject);
+                    } else {
+                        selectedObject.issueReplacementOrder(newOrderObject);
                     }
                 }
                 break;
@@ -78,15 +72,10 @@ module.exports = {
     onMouseDownMapEditing(event) {
         switch (event.button) {
             case this.inputBindings.TerrainActivityButton: {
-                let pickedMapObjectArray = this.workruft.world.pickMap(
-                    this.workruft.world.getNormalizedCanvasMouse(event));
-                if (pickedMapObjectArray.length == 0) {
+                if (!this.tryUpdateMouseCell(event)) {
                     break;
                 }
-                let clickCoordinates = pickedMapObjectArray[0].point;
-                let cellX = AlignToCell(clickCoordinates.x);
-                let cellZ = AlignToCell(clickCoordinates.z);
-                let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
+                let clickedCell = this.map.getCell({ x: this.lastMouseCellX, z: this.lastMouseCellZ });
                 if (clickedCell == null) {
                     break;
                 }
@@ -102,8 +91,8 @@ module.exports = {
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
                                 currentCell = this.map.getCell({
-                                    x: cellX + forEachObject.xOffset,
-                                    z: cellZ + forEachObject.zOffset
+                                    x: this.lastMouseCellX + forEachObject.xOffset,
+                                    z: this.lastMouseCellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
@@ -122,8 +111,8 @@ module.exports = {
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
                                 currentCell = this.map.getCell({
-                                    x: cellX + forEachObject.xOffset,
-                                    z: cellZ + forEachObject.zOffset
+                                    x: this.lastMouseCellX + forEachObject.xOffset,
+                                    z: this.lastMouseCellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
@@ -136,8 +125,8 @@ module.exports = {
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
                                 currentCell = this.map.getCell({
-                                    x: cellX + forEachObject.xOffset,
-                                    z: cellZ + forEachObject.zOffset
+                                    x: this.lastMouseCellX + forEachObject.xOffset,
+                                    z: this.lastMouseCellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
@@ -156,8 +145,8 @@ module.exports = {
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
                                 currentCell = this.map.getCell({
-                                    x: cellX + forEachObject.xOffset,
-                                    z: cellZ + forEachObject.zOffset
+                                    x: this.lastMouseCellX + forEachObject.xOffset,
+                                    z: this.lastMouseCellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
@@ -170,8 +159,8 @@ module.exports = {
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
                                 currentCell = this.map.getCell({
-                                    x: cellX + forEachObject.xOffset,
-                                    z: cellZ + forEachObject.zOffset
+                                    x: this.lastMouseCellX + forEachObject.xOffset,
+                                    z: this.lastMouseCellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
@@ -191,8 +180,8 @@ module.exports = {
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
                                 currentCell = this.map.getCell({
-                                    x: cellX + forEachObject.xOffset,
-                                    z: cellZ + forEachObject.zOffset
+                                    x: this.lastMouseCellX + forEachObject.xOffset,
+                                    z: this.lastMouseCellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
@@ -207,8 +196,8 @@ module.exports = {
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
                                 currentCell = this.map.getCell({
-                                    x: cellX + forEachObject.xOffset,
-                                    z: cellZ + forEachObject.zOffset
+                                    x: this.lastMouseCellX + forEachObject.xOffset,
+                                    z: this.lastMouseCellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
@@ -230,8 +219,8 @@ module.exports = {
                                 this.workruft.editingLatSize, this.workruft.editingLongSize,
                                 function(forEachObject) {
                                     currentCell = this.map.getCell({
-                                        x: cellX + forEachObject.xOffset,
-                                        z: cellZ + forEachObject.zOffset
+                                        x: this.lastMouseCellX + forEachObject.xOffset,
+                                        z: this.lastMouseCellZ + forEachObject.zOffset
                                     });
                                     if (currentCell == null) {
                                         return;
@@ -295,8 +284,8 @@ module.exports = {
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
                                 currentCell = this.map.getCell({
-                                    x: cellX + forEachObject.xOffset,
-                                    z: cellZ + forEachObject.zOffset
+                                    x: this.lastMouseCellX + forEachObject.xOffset,
+                                    z: this.lastMouseCellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
@@ -388,8 +377,8 @@ module.exports = {
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
                                 currentCell = this.map.getCell({
-                                    x: cellX + forEachObject.xOffset,
-                                    z: cellZ + forEachObject.zOffset
+                                    x: this.lastMouseCellX + forEachObject.xOffset,
+                                    z: this.lastMouseCellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
@@ -481,24 +470,24 @@ module.exports = {
                 }
                 if (forEachObject != null) {
                     this.map.updateCells({
-                        lowX: cellX - forEachObject.floorHalfLatSize - CellSize,
-                        lowZ: cellZ - forEachObject.floorHalfLongSize - CellSize,
-                        highX: cellX + forEachObject.ceilHalfLatSize + CellSize,
-                        highZ: cellZ + forEachObject.ceilHalfLongSize + CellSize
+                        lowX: this.lastMouseCellX - forEachObject.floorHalfLatSize - CellSize,
+                        lowZ: this.lastMouseCellZ - forEachObject.floorHalfLongSize - CellSize,
+                        highX: this.lastMouseCellX + forEachObject.ceilHalfLatSize + CellSize,
+                        highZ: this.lastMouseCellZ + forEachObject.ceilHalfLongSize + CellSize
                     });
                 }
-                this.updateMapEditorMouseCells({ cellX, cellZ });
+                //The terrain was modified; need to make sure the map editor mouse cells are in the right spot
+                //afterwards.
+                this.tryUpdateMouseCell(event);
+                this.updateMapEditorMouseCells();
                 break;
             }
             case this.inputBindings.MiscellaneousButton: {
-                let pickedMapObjectArray = this.workruft.world.pickMap(
-                    this.workruft.world.getNormalizedCanvasMouse(event));
-                if (pickedMapObjectArray.length > 0) {
-                    let clickCoordinates = pickedMapObjectArray[0].point;
-                    let cellX = AlignToCell(clickCoordinates.x);
-                    let cellZ = AlignToCell(clickCoordinates.z);
-                    alert(clickCoordinates.x + ', ' + clickCoordinates.z + '\n' + cellX + ', ' + cellZ);
+                if (!this.tryUpdateMouseCell(event)) {
+                    break;
                 }
+                alert(this.lastMouseCellX + ', ' + this.lastMouseCellZ + '\n' +
+                    this.lastMouseCoordinates.x + ', ' + this.lastMouseCoordinates.z);
                 break;
             }
         }
@@ -522,18 +511,12 @@ module.exports = {
             }
             //Reset terrain editing data.
             this.workruft.resetTerrainEditing();
-            let pickedMapObjectArray = this.workruft.world.pickMap(
-                this.workruft.world.getNormalizedCanvasMouse(event));
-            if (pickedMapObjectArray.length > 0) {
-                let clickCoordinates = pickedMapObjectArray[0].point;
-                let cellX = AlignToCell(clickCoordinates.x);
-                let cellZ = AlignToCell(clickCoordinates.z);
-                let currentCell = this.map.getCell({ x: cellX, z: cellZ });
-                if (currentCell != null) {
-                    this.updateMapEditorMouseCells({ cellX, cellZ });
-                }
-            }
             this.workruft.updateStatusBox();
+            if (event.relatedTarget != null && (event.relatedTarget.classList == null ||
+                !event.relatedTarget.classList.contains('maintainCanvasMouse'))) {
+                this.tryUpdateMouseCell(event);
+            }
+            this.updateMapEditorMouseCells();
         } else {
             if (scrollDirection < 0) {
                 //Negative scroll: up/forward/in. Zoom in.
@@ -562,6 +545,7 @@ module.exports = {
             return;
         }
         if (this.isMouseOut && !event.isMouseOutEvent) {
+            this.tryUpdateMouseCell(event);
             return;
         }
         switch (this.workruft.gameState) {
@@ -570,36 +554,30 @@ module.exports = {
             // }
             case Enums.GameStates.MapEditing: {
                 //TODO: Click + hold + drag editing as well.
-                let pickedMapObjectArray = this.workruft.world.pickMap(
-                    this.workruft.world.getNormalizedCanvasMouse(event));
-                if (pickedMapObjectArray.length > 0) {
-                    let clickCoordinates = pickedMapObjectArray[0].point;
-                    let cellX = AlignToCell(clickCoordinates.x);
-                    let cellZ = AlignToCell(clickCoordinates.z);
-                    let currentCell = this.map.getCell({ x: cellX, z: cellZ });
-                    if (currentCell != null) {
-                        this.updateMapEditorMouseCells({ cellX, cellZ });
-                    }
+                if (!this.tryUpdateMouseCell(event)) {
+                    break;
                 }
+                this.updateMapEditorMouseCells();
+                break;
+            }
+            default: {
+                //Make sure to always call this.
+                this.tryUpdateMouseCell(event);
                 break;
             }
         }
     },
 
     onMouseOut(event) {
-        if (event.relatedTarget == null ||
-            event.relatedTarget.classList == null || !event.relatedTarget.classList.contains('maintainCanvasMouse')) {
-            this.isMouseOut = true;
-            let newEvent = new MouseEvent('mousemove', {
-                clientX: window.innerWidth * 0.5,
-                clientY: window.innerHeight * 0.5,
-                screenX: window.screenX + window.innerWidth * 0.5,
-                screenY: window.screenY + window.innerHeight * 0.5
-            });
-            newEvent.isMouseOutEvent = true;
-            HTML.gameCanvas.dispatchEvent(newEvent);
-            //this.onMouseMove(newEvent);
-        }
+        this.isMouseOut = true;
+        let newEvent = new MouseEvent('mousemove', {
+            clientX: window.innerWidth * 0.5,
+            clientY: window.innerHeight * 0.5,
+            screenX: window.screenX + window.innerWidth * 0.5,
+            screenY: window.screenY + window.innerHeight * 0.5
+        });
+        newEvent.isMouseOutEvent = true;
+        this.onMouseMove(newEvent);
         event.preventDefault();
         event.stopPropagation();
         return false;
@@ -610,5 +588,17 @@ module.exports = {
         event.preventDefault();
         event.stopPropagation();
         return false;
+    },
+
+    tryUpdateMouseCell(event) {
+        let pickedMapObjectArray = this.workruft.world.pickMap(
+            this.workruft.world.getNormalizedCanvasMouse(event));
+        if (pickedMapObjectArray.length == 0) {
+            return false;
+        }
+        this.lastMouseCoordinates = pickedMapObjectArray[0].point;
+        this.lastMouseCellX = AlignToCell(this.lastMouseCoordinates.x);
+        this.lastMouseCellZ = AlignToCell(this.lastMouseCoordinates.z);
+        return true;
     }
 };
