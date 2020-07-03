@@ -40,8 +40,8 @@ module.exports = {
                     this.workruft.world.getNormalizedCanvasMouse(event));
                 if (pickedMapObjectArray.length > 0) {
                     let clickCoordinates = pickedMapObjectArray[0].point;
-                    let cellX = FloorToCell(clickCoordinates.x);
-                    let cellZ = FloorToCell(clickCoordinates.z);
+                    let cellX = AlignToCell(clickCoordinates.x);
+                    let cellZ = AlignToCell(clickCoordinates.z);
                     alert(clickCoordinates.x + ', ' + clickCoordinates.z + '\n' + cellX + ', ' + cellZ);
                 }
                 break;
@@ -51,8 +51,8 @@ module.exports = {
                     this.workruft.world.getNormalizedCanvasMouse(event));
                 if (pickedMapObjectArray.length > 0) {
                     let clickCoordinates = pickedMapObjectArray[0].point;
-                    let cellX = FloorToCell(clickCoordinates.x);
-                    let cellZ = FloorToCell(clickCoordinates.z);
+                    let cellX = AlignToCell(clickCoordinates.x);
+                    let cellZ = AlignToCell(clickCoordinates.z);
                     let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
                     if (clickedCell != null) {
                         for (let selectedObject of this.workruft.world.selectedObjects) {
@@ -84,8 +84,8 @@ module.exports = {
                     break;
                 }
                 let clickCoordinates = pickedMapObjectArray[0].point;
-                let cellX = FloorToCell(clickCoordinates.x);
-                let cellZ = FloorToCell(clickCoordinates.z);
+                let cellX = AlignToCell(clickCoordinates.x);
+                let cellZ = AlignToCell(clickCoordinates.z);
                 let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
                 if (clickedCell == null) {
                     break;
@@ -495,8 +495,8 @@ module.exports = {
                     this.workruft.world.getNormalizedCanvasMouse(event));
                 if (pickedMapObjectArray.length > 0) {
                     let clickCoordinates = pickedMapObjectArray[0].point;
-                    let cellX = FloorToCell(clickCoordinates.x);
-                    let cellZ = FloorToCell(clickCoordinates.z);
+                    let cellX = AlignToCell(clickCoordinates.x);
+                    let cellZ = AlignToCell(clickCoordinates.z);
                     alert(clickCoordinates.x + ', ' + clickCoordinates.z + '\n' + cellX + ', ' + cellZ);
                 }
                 break;
@@ -527,8 +527,8 @@ module.exports = {
                 this.workruft.world.getNormalizedCanvasMouse(event));
             if (pickedMapObjectArray.length > 0) {
                 let clickCoordinates = pickedMapObjectArray[0].point;
-                let cellX = FloorToCell(clickCoordinates.x);
-                let cellZ = FloorToCell(clickCoordinates.z);
+                let cellX = AlignToCell(clickCoordinates.x);
+                let cellZ = AlignToCell(clickCoordinates.z);
                 let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
                 if (clickedCell != null) {
                     this.updateMapEditorMouseCells({ cellX, cellZ });
@@ -572,8 +572,8 @@ module.exports = {
                     this.workruft.world.getNormalizedCanvasMouse(event));
                 if (pickedMapObjectArray.length > 0) {
                     let clickCoordinates = pickedMapObjectArray[0].point;
-                    let cellX = FloorToCell(clickCoordinates.x);
-                    let cellZ = FloorToCell(clickCoordinates.z);
+                    let cellX = AlignToCell(clickCoordinates.x);
+                    let cellZ = AlignToCell(clickCoordinates.z);
                     let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
                     if (clickedCell != null) {
                         this.updateMapEditorMouseCells({ cellX, cellZ });

@@ -1,7 +1,5 @@
 # TODO
 
-- Map editor
-
 - Add in buildings and other units...
 
 - Give PathFinder class so many "attempts"/calculations per X time period.
