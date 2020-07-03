@@ -1,6 +1,6 @@
 let PathingTester = require('./PathingTester');
 let BinaryHeap = require('../Helpers/BinaryHeap');
-let ColoredSquare = require('../Helpers/ColoredSquare');
+let ColoredRectangle = require('../Helpers/ColoredRectangle');
 
 function CalculateScore({ point }) {
     point.score = point.manhattanTraveled + point.distance * PathFindingGreediness;
@@ -227,7 +227,7 @@ class PathFinder {
             CalculateScore({ point: newPoint });
             this.mappedPoints[newX][newZ] = newPoint;
             this.heapedPoints.push(newPoint);
-            // this.gameUnit.coloredSquares.push(new ColoredSquare({
+            // this.gameUnit.ColoredRectangles.push(new ColoredRectangle({
             //     workruft: this.workruft,
             //     x: newX - HalfCellSize,
             //     z: newZ - HalfCellSize,
@@ -235,7 +235,7 @@ class PathFinder {
             //     opacity: 0.1
             // }));
         } else {
-            this.gameUnit.coloredSquares.push(new ColoredSquare({
+            this.gameUnit.ColoredRectangles.push(new ColoredRectangle({
                 workruft: this.workruft,
                 x: newX - HalfCellSize,
                 z: newZ - HalfCellSize,

@@ -56,10 +56,10 @@ module.exports = {
                         } else {
                             for (let n = 0; n < this.workruft.randoUnits.length; ++n) {
                                 this.workruft.randoUnits[n].cancelAllOrders();
-                                this.workruft.randoUnits[n].clearColoredSquares();
+                                this.workruft.randoUnits[n].clearColoredRectangles();
                                 this.workruft.randoUnits[n].position.y = -100.0;
                             }
-                            this.workruft.playerUnit.clearColoredSquares();
+                            this.workruft.playerUnit.clearColoredRectangles();
                         }
                         this.workruft.updateStatusBox();
                         break;

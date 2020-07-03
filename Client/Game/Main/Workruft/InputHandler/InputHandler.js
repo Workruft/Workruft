@@ -1,4 +1,4 @@
-let ColoredSquare = require('../../../Helpers/ColoredSquare');
+let ColoredRectangle = require('../../../Helpers/ColoredRectangle');
 let IHKeys = require('./IHKeys');
 let IHGameMouse = require('./IHGameMouse');
 let IHDocumentMouse = require('./IHDocumentMouse');
@@ -60,55 +60,76 @@ class InputHandler {
     }
 
     updateMapEditorMouseCells({ cellX, cellZ }) {
-        if (!RateLimit({
+        if (!RateLimitRecall({
             callingFunction: this.updateMapEditorMouseCells,
-            minimumInterval: 1000.0 / 30.0
+            minimumInterval: 1000.0 / 30.0,
+            thisToBind: this,
+            paramsToPass: { cellX, cellZ }
         })) {
             return;
         }
         this.clearEditorSquares();
+        if (this.workruft.gameState != Enums.GameStates.MapEditing) {
+            return;
+        }
         switch (this.workruft.terrainEditingMode) {
-            case Enums.TerrainEditingModes.LongRamp:
-                ForEachLongBorderCell(
-                    this.workruft.editingLatSize, this.workruft.editingLongSize,
-                    function(forEachObject) {
-                        this.editorSquares.push(new ColoredSquare({
-                            workruft: this.workruft,
-                            x: cellX + forEachObject.xOffset + HalfCellSize,
-                            z: cellZ + forEachObject.zOffset + HalfCellSize,
-                            color: DarkGrayColor,
-                            opacity: 0.5
-                        }));
-                    }.bind(this)
-                );
+            case Enums.TerrainEditingModes.LatRamp: {
+                let iterationBounds = GetIterationBounds(this.workruft.editingLatSize, this.workruft.editingLongSize);
+                this.editorSquares.push(new ColoredRectangle({
+                    workruft: this.workruft,
+                    x: cellX - iterationBounds.floorHalfLatSize,
+                    z: cellZ,
+                    sizeX: CellSize,
+                    sizeZ: this.workruft.editingLongSize,
+                    color: DarkGrayColor,
+                    opacity: 0.5
+                }));
+                this.editorSquares.push(new ColoredRectangle({
+                    workruft: this.workruft,
+                    x: cellX + iterationBounds.ceilHalfLatSize - CellSize,
+                    z: cellZ,
+                    sizeX: CellSize,
+                    sizeZ: this.workruft.editingLongSize,
+                    color: DarkGrayColor,
+                    opacity: 0.5
+                }));
                 break;
-            case Enums.TerrainEditingModes.LatRamp:
-                ForEachLatBorderCell(
-                    this.workruft.editingLatSize, this.workruft.editingLongSize,
-                    function(forEachObject) {
-                        this.editorSquares.push(new ColoredSquare({
-                            workruft: this.workruft,
-                            x: cellX + forEachObject.xOffset + HalfCellSize,
-                            z: cellZ + forEachObject.zOffset + HalfCellSize,
-                            color: DarkGrayColor,
-                            opacity: 0.5
-                        }));
-                    }.bind(this)
-                );
+            }
+            case Enums.TerrainEditingModes.LongRamp: {
+                let iterationBounds = GetIterationBounds(this.workruft.editingLatSize, this.workruft.editingLongSize);
+                this.editorSquares.push(new ColoredRectangle({
+                    workruft: this.workruft,
+                    x: cellX,
+                    z: cellZ - iterationBounds.floorHalfLongSize,
+                    sizeX: this.workruft.editingLatSize,
+                    sizeZ: CellSize,
+                    color: DarkGrayColor,
+                    opacity: 0.5
+                }));
+                this.editorSquares.push(new ColoredRectangle({
+                    workruft: this.workruft,
+                    x: cellX,
+                    z: cellZ + iterationBounds.ceilHalfLongSize - CellSize,
+                    sizeX: this.workruft.editingLatSize,
+                    sizeZ: CellSize,
+                    color: DarkGrayColor,
+                    opacity: 0.5
+                }));
                 break;
-            default:
-                ForEachCell(this.workruft.editingLatSize, this.workruft.editingLongSize,
-                    function(forEachObject) {
-                        this.editorSquares.push(new ColoredSquare({
-                            workruft: this.workruft,
-                            x: cellX + forEachObject.xOffset + HalfCellSize,
-                            z: cellZ + forEachObject.zOffset + HalfCellSize,
-                            color: DarkGrayColor,
-                            opacity: 0.5
-                        }));
-                    }.bind(this)
-                );
+            }
+            default: {
+                let iterationBounds = GetIterationBounds(this.workruft.editingLatSize, this.workruft.editingLongSize);
+                this.editorSquares.push(new ColoredRectangle({
+                    workruft: this.workruft,
+                    x: cellX,
+                    z: cellZ,
+                    sizeX: this.workruft.editingLatSize,
+                    sizeZ: this.workruft.editingLongSize,
+                    color: DarkGrayColor,
+                    opacity: 0.5
+                }));
                 break;
+            }
         }
     }
 

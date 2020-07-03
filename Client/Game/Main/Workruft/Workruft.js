@@ -76,7 +76,7 @@ class Workruft {
             if (!this.isPathTesting) {
                 return;
             }
-            this.playerUnit.clearColoredSquares();
+            this.playerUnit.clearColoredRectangles();
             for (let n = 0; n < this.randoUnits.length; ++n) {
                 let newOrderObject = {
                     order: new Order({

@@ -1,6 +1,6 @@
 let PathFinder = require('../Pathing/PathFinder');
 let PathingTester = require('../Pathing/PathingTester');
-let ColoredSquare = require('../Helpers/ColoredSquare');
+let ColoredRectangle = require('../Helpers/ColoredRectangle');
 
 class GameUnit {
     constructor({ workruft, gameModel, x, z }) {
@@ -50,13 +50,13 @@ class GameUnit {
         this.workruft.objectsToUpdate.add(this);
     }
 
-    clearColoredSquares() {
-        if (IsDefined(this.coloredSquares)) {
-            for (let coloredSquare of this.coloredSquares) {
-                coloredSquare.deconstruct();
+    clearColoredRectangles() {
+        if (IsDefined(this.ColoredRectangles)) {
+            for (let ColoredRectangle of this.ColoredRectangles) {
+                ColoredRectangle.deconstruct();
             }
         }
-        this.coloredSquares = [];
+        this.ColoredRectangles = [];
     }
 
     update({ deltaTimeMS }) {
@@ -75,7 +75,7 @@ class GameUnit {
                     if (IsUndefined(currentOrder.data.path)) {
                         this.pathFinder.setStartPoint({ pointX: this.position.x, pointZ: this.position.z });
                         this.pathFinder.setEndPoint({ pointX: currentOrder.data.x, pointZ: currentOrder.data.z });
-                        this.clearColoredSquares();
+                        this.clearColoredRectangles();
                         [ currentOrder.data.path, currentOrder.data.unoptimizedPath ] =
                             this.pathFinder.findBestPath({ range: 0.1 });
                         let isFirstPoint = true;
@@ -84,7 +84,7 @@ class GameUnit {
                                 xOffset < this.gameModel.halfXZSize; xOffset += CellSize) {
                                 for (let zOffset = -this.gameModel.halfXZSize;
                                     zOffset < this.gameModel.halfXZSize; zOffset += CellSize) {
-                                    this.coloredSquares.push(new ColoredSquare({
+                                    this.ColoredRectangles.push(new ColoredRectangle({
                                         workruft: this.workruft,
                                         x: point.x + xOffset + HalfCellSize,
                                         z: point.z + zOffset + HalfCellSize,

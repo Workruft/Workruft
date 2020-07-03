@@ -22,20 +22,20 @@ window.CeilToCell = function(alignMe) {
     return Math.ceil(alignMe / CellSize) * CellSize;
 };
 
-window.CreateCellForEachObject = function(latSize, longSize) {
-    let forEachObject = {
+window.GetIterationBounds = function(latSize, longSize) {
+    let iterationBounds = {
         halfLatSize: latSize * 0.5,
         halfLongSize: longSize * 0.5
     };
-    forEachObject.floorHalfLatSize = FloorToCell(forEachObject.halfLatSize);
-    forEachObject.ceilHalfLatSize = CeilToCell(forEachObject.halfLatSize);
-    forEachObject.floorHalfLongSize = FloorToCell(forEachObject.halfLongSize);
-    forEachObject.ceilHalfLongSize = CeilToCell(forEachObject.halfLongSize);
-    return forEachObject;
+    iterationBounds.floorHalfLatSize = FloorToCell(iterationBounds.halfLatSize);
+    iterationBounds.ceilHalfLatSize = CeilToCell(iterationBounds.halfLatSize);
+    iterationBounds.floorHalfLongSize = FloorToCell(iterationBounds.halfLongSize);
+    iterationBounds.ceilHalfLongSize = CeilToCell(iterationBounds.halfLongSize);
+    return iterationBounds;
 }
 
 window.ForEachCell = function(latSize, longSize, callback) {
-    let forEachObject = CreateCellForEachObject(latSize, longSize);
+    let forEachObject = GetIterationBounds(latSize, longSize);
     for (forEachObject.xOffset = -forEachObject.floorHalfLatSize;
         forEachObject.xOffset < forEachObject.ceilHalfLatSize;
         forEachObject.xOffset += CellSize) {
@@ -49,7 +49,7 @@ window.ForEachCell = function(latSize, longSize, callback) {
 };
 
 window.ForEachLatBorderCell = function(latSize, longSize, callback) {
-    let forEachObject = CreateCellForEachObject(latSize, longSize);
+    let forEachObject = GetIterationBounds(latSize, longSize);
     let latIncrement = Math.max(CellSize, latSize - CellSize);
     //Border columns.
     for (forEachObject.zOffset = -forEachObject.floorHalfLongSize;
@@ -65,7 +65,7 @@ window.ForEachLatBorderCell = function(latSize, longSize, callback) {
 };
 
 window.ForEachLongBorderCell = function(latSize, longSize, callback) {
-    let forEachObject = CreateCellForEachObject(latSize, longSize);
+    let forEachObject = GetIterationBounds(latSize, longSize);
     let longIncrement = Math.max(CellSize, longSize - CellSize);
     //Border rows.
     for (forEachObject.xOffset = -forEachObject.floorHalfLatSize;

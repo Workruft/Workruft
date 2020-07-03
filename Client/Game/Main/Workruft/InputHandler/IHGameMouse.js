@@ -284,7 +284,7 @@ module.exports = {
                                 height: terrainEditingCell.heights[3]
                             });
                         }
-                        forEachObject = CreateCellForEachObject(
+                        forEachObject = GetIterationBounds(
                             this.workruft.terrainEditingLatSize, this.workruft.terrainEditingLongSize);
                         break;
                     }
@@ -513,13 +513,12 @@ module.exports = {
         if (this.workruft.gameState == Enums.GameStates.MapEditing && event.ctrlKey) {
             if (scrollDirection < 0) {
                 //Negative scroll: up/forward/in. Increase editing size.
-                //Note: Increasing this is no problem, except that that's a lot of ColoredSquares to draw lol...
-                this.workruft.editingLongSize = Math.min(32, this.workruft.editingLongSize + 1);
-                this.workruft.editingLatSize = Math.min(32, this.workruft.editingLatSize + 1);
+                this.workruft.editingLatSize = Math.min(MaxEditingLatSize, this.workruft.editingLatSize + 1);
+                this.workruft.editingLongSize = Math.min(MaxEditingLongSize, this.workruft.editingLongSize + 1);
             } else if (scrollDirection > 0) {
                 //Positive scroll: down/backward/out. Decrease editing size.
-                this.workruft.editingLongSize = Math.max(1, this.workruft.editingLongSize - 1);
-                this.workruft.editingLatSize = Math.max(1, this.workruft.editingLatSize - 1);
+                this.workruft.editingLatSize = Math.max(MinEditingLatSize, this.workruft.editingLatSize - 1);
+                this.workruft.editingLongSize = Math.max(MinEditingLongSize, this.workruft.editingLongSize - 1);
             }
             //Reset terrain editing data.
             this.workruft.resetTerrainEditing();
