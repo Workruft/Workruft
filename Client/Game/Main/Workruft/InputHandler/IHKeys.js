@@ -91,7 +91,7 @@ module.exports = {
                                 break;
                             }
                             newHeight = Math.floor(newHeight);
-                            if (!Number.isInteger(newHeight) ||newHeight < 20 || newHeight > 250) {
+                            if (!Number.isInteger(newHeight) || newHeight < 20 || newHeight > 250) {
                                 alert('Invalid height!');
                                 continue;
                             }
@@ -114,18 +114,18 @@ module.exports = {
                         if (this.isDrawingGrid) {
                             //Add grid lines.
                             let newGridLine;
-                            for (let x = this.map.minX; x <= this.map.maxX; x += GridLinesSeparation) {
+                            for (let x = this.map.gridMinX; x <= this.map.gridMaxX; x += GridLinesSeparation) {
                                 newGridLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-                                    new THREE.Vector3(x, 0.01, this.map.minZ),
-                                    new THREE.Vector3(x, 0.01, this.map.maxZ)
+                                    new THREE.Vector3(x, 0.01, this.map.gridMinZ),
+                                    new THREE.Vector3(x, 0.01, this.map.gridMaxZ)
                                 ]), GridLinesMaterial);
                                 this.workruft.gridLines.push(newGridLine);
                                 this.workruft.world.scene.add(newGridLine);
                             }
-                            for (let z = this.map.minZ; z <= this.map.maxZ; z += GridLinesSeparation) {
+                            for (let z = this.map.gridMinZ; z <= this.map.gridMaxZ; z += GridLinesSeparation) {
                                 newGridLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-                                    new THREE.Vector3(this.map.minX, 0.01, z),
-                                    new THREE.Vector3(this.map.maxX, 0.01, z)
+                                    new THREE.Vector3(this.map.gridMinX, 0.01, z),
+                                    new THREE.Vector3(this.map.gridMaxX, 0.01, z)
                                 ]), GridLinesMaterial);
                                 this.workruft.gridLines.push(newGridLine);
                                 this.workruft.world.scene.add(newGridLine);
@@ -144,10 +144,11 @@ module.exports = {
                         if (this.isDrawingVerticalGrid) {
                             //Add vertical grid lines.
                             let newVerticalGridLine;
-                            for (let x = this.map.minX; x <= this.map.maxX; x += VerticalGridLinesSeparation) {
-                                for (let z = this.map.minZ; z <= this.map.maxZ; z += VerticalGridLinesSeparation) {
+                            for (let x = this.map.gridMinX; x <= this.map.gridMaxX; x += VerticalGridLinesSeparation) {
+                                for (let z = this.map.gridMinZ; z <= this.map.gridMaxZ;
+                                    z += VerticalGridLinesSeparation) {
                                     newVerticalGridLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-                                        new THREE.Vector3(x, 0.0, z),
+                                        new THREE.Vector3(x, MapBottomY, z),
                                         new THREE.Vector3(x, VerticalGridLinesHeight, z)
                                     ]), GridLinesMaterial);
                                     this.workruft.verticalGridLines.push(newVerticalGridLine);

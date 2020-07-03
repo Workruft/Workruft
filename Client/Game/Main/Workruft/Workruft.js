@@ -10,7 +10,6 @@ class Workruft {
     constructor() {
         this.gameState = Enums.GameStates.Playing;
         this.isPathTesting = false;
-        this.updateStatusBox();
 
         this.inputBindings = new InputBindings();
         this.inputHandler = new InputHandler({ workruft: this, inputBindings: this.inputBindings });
@@ -56,8 +55,8 @@ class Workruft {
             workruft: this,
             gameModel: this.world.sheepModel,
             // gameModel: this.world.wolfModel,
-            x: 0.0,
-            z: 0.0
+            x: -CellSize,
+            z: -CellSize
         });
         this.playerUnit.addToGroup({ objectGroup: this.world.playerObjects });
 
@@ -92,6 +91,7 @@ class Workruft {
         //this.network.connect();
 
         setInterval(this.onUpdate.bind(this), 30);
+        this.updateStatusBox();
     }
 
     deconstruct() {
@@ -145,6 +145,7 @@ class Workruft {
         if (this.isPathTesting) {
             HTML.statusBox.innerHTML += ' (Path Testing)';
         }
+        HTML.statusBox.innerHTML +=  '<br/>Map Size: ' + this.world.map.sizeX + 'x' + this.world.map.sizeZ;
         if (this.gameState == Enums.GameStates.MapEditing) {
             HTML.statusBox.innerHTML +=  '<br/>Editing Mode: ' + Enums.TerrainEditingModes[this.terrainEditingMode];
             HTML.statusBox.innerHTML +=  '<br/>Editing Size: ' + this.editingLatSize + 'x' + this.editingLongSize;

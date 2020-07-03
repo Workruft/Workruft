@@ -16,6 +16,10 @@ class GameMap {
         this.minZ = Math.ceil(-halfSizeZ);
         this.maxX = Math.ceil(halfSizeX);
         this.maxZ = Math.ceil(halfSizeZ);
+        this.gridMinX = this.minX;
+        this.gridMinZ = this.minZ;
+        this.gridMaxX = this.maxX + CellSize;
+        this.gridMaxZ = this.maxZ + CellSize;
 
         this.generate();
     }

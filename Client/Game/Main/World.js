@@ -94,7 +94,7 @@ class World {
 
         //Action.
         //Map.
-        this.changeMap(new GameMap(200, 200, MapBottomY));
+        this.changeMap(new GameMap(199, 199, MapBottomY));
         //Game models.
         this.setupGameModels();
         //Game objects.
