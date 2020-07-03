@@ -98,7 +98,7 @@ module.exports = {
     },
 
     saveMapFile() {
-        let mapArray = this.workruft.world.map.toArray();
+        let mapArray = this.map.toArray();
         let mapFileBlob = new Blob([ JSON.stringify(mapArray) ], { type: 'application/json' });
         let downloadLink = document.createElement('a');
         downloadLink.href = URL.createObjectURL(mapFileBlob);

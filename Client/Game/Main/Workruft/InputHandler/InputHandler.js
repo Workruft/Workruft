@@ -76,7 +76,8 @@ class InputHandler {
                             workruft: this.workruft,
                             x: cellX + forEachObject.xOffset + HalfCellSize,
                             z: cellZ + forEachObject.zOffset + HalfCellSize,
-                            color: DarkGrayColor
+                            color: DarkGrayColor,
+                            opacity: 0.5
                         }));
                     }.bind(this)
                 );
@@ -89,7 +90,8 @@ class InputHandler {
                             workruft: this.workruft,
                             x: cellX + forEachObject.xOffset + HalfCellSize,
                             z: cellZ + forEachObject.zOffset + HalfCellSize,
-                            color: DarkGrayColor
+                            color: DarkGrayColor,
+                            opacity: 0.5
                         }));
                     }.bind(this)
                 );
@@ -101,12 +103,17 @@ class InputHandler {
                             workruft: this.workruft,
                             x: cellX + forEachObject.xOffset + HalfCellSize,
                             z: cellZ + forEachObject.zOffset + HalfCellSize,
-                            color: DarkGrayColor
+                            color: DarkGrayColor,
+                            opacity: 0.5
                         }));
                     }.bind(this)
                 );
                 break;
         }
+    }
+
+    get map() {
+        return this.workruft.world.map;
     }
 }
 

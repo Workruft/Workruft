@@ -19,24 +19,21 @@ class Workruft {
         this.chat.print({ message: 'Workruft!' });
         this.chat.print({ message: 'Controls:' });
         this.chat.print({
-            message: '  '+ this.inputBindings.MoveCameraUp + this.inputBindings.MoveCameraLeft +
+            message: '  ' + this.inputBindings.MoveCameraUp + this.inputBindings.MoveCameraLeft +
                 this.inputBindings.MoveCameraDown + this.inputBindings.MoveCameraRight + ': pan the camera'
         });
-        this.chat.print({
-            message: '  ' + this.inputBindings.ToggleChat + ': toggle chat'
-        });
+        this.chat.print({ message: '  ' + this.inputBindings.ToggleChat + ': toggle chat' });
         this.chat.print({ message: '  Left click: select unit' });
         this.chat.print({ message: '  Right click: order unit' });
+        this.chat.print({ message: '  Middle click: alert coordinates of mouse' });
         this.chat.print({ message: '  Mouse scroll: zoom in/out' });
+        this.chat.print({ message: '  ' + this.inputBindings.ToggleMapEditor + ': toggle map editing mode' });
+        this.chat.print({ message: '  Shift + ' + this.inputBindings.NewMap + ': create a new map' });
+        this.chat.print({ message: '  ' + this.inputBindings.ToggleGridLines + ': toggle grid lines' });
         this.chat.print({
-            message: '  ' + this.inputBindings.ToggleMapEditor + ': toggle map editing mode'
+            message: '  ' + this.inputBindings.ToggleVerticalGridLines + ': toggle vertical grid lines'
         });
-        this.chat.print({
-            message: '  Shift + ' + this.inputBindings.NewMap + ': create a new map'
-        });
-        this.chat.print({
-            message: '  ' + this.inputBindings.TogglePathTesting + ': toggle map path testing'
-        });
+        this.chat.print({ message: '  ' + this.inputBindings.TogglePathTesting + ': toggle map path testing' });
         this.world = new World(this.chat, this.onUpdate.bind(this));
         this.setDefaultCamera();
         this.world.graphicsLoop();
@@ -47,6 +44,11 @@ class Workruft {
         this.editingLatSize = 4;
         this.editingLongSize = 4;
 
+        this.isDrawingGrid = false;
+        this.gridLines = [];
+        this.isDrawingVerticalGrid = false;
+        this.verticalGridLines = [];
+
         this.objectsToUpdate = new Set();
 
         //Game units etc.
@@ -54,8 +56,8 @@ class Workruft {
             workruft: this,
             gameModel: this.world.sheepModel,
             // gameModel: this.world.wolfModel,
-            x: HalfCellSize,
-            z: HalfCellSize
+            x: 0.0,
+            z: 0.0
         });
         this.playerUnit.addToGroup({ objectGroup: this.world.playerObjects });
 

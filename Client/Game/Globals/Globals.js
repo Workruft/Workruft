@@ -10,6 +10,7 @@ window.HalfCellSize = CellSize * 0.5;
 window.QuarterCellSize = HalfCellSize * 0.5;
 window.ThreeHalvesCellSize = CellSize * 1.5;
 window.DoubleCellSize = CellSize * 2.0;
+window.QuadrupleCellSize = DoubleCellSize * 2.0;
 
 window.HalfTinySize = CellSize;
 window.TinySize = DoubleCellSize;
@@ -39,6 +40,13 @@ window.BlackColor = new THREE.Color('#000000');
 window.DarkGrayColor = new THREE.Color('#080808');
 window.WhiteColor = new THREE.Color('#FFFFFF');
 window.ColoredMeshPhongMaterialsMap = new Map();
+
+window.GridLinesMaterial = new THREE.LineBasicMaterial({
+    color: new THREE.Color('#001080'), transparent: true, opacity: 0.15
+});
+window.GridLinesSeparation = QuadrupleCellSize;
+window.VerticalGridLinesSeparation = QuadrupleCellSize;
+window.VerticalGridLinesHeight = CellSize * 25.0 + 0.01;
 
 window.HalfPI = Math.PI * 0.5;
 window.DoublePI = Math.PI * 2.0;

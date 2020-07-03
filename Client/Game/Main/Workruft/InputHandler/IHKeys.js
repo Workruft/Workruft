@@ -68,7 +68,7 @@ module.exports = {
                         if (!event.shiftKey) {
                             break;
                         }
-                        let newWidth = this.workruft.world.map.sizeX;
+                        let newWidth = this.map.sizeX;
                         do {
                             newWidth = window.prompt('New map width (integer, 20-250):', newWidth);
                             if (newWidth == null) {
@@ -84,7 +84,7 @@ module.exports = {
                         if (!newWidth) {
                             break;
                         }
-                        let newHeight = this.workruft.world.map.sizeZ;
+                        let newHeight = this.map.sizeZ;
                         do {
                             newHeight = window.prompt('New map height (integer, 20-250):', newHeight);
                             if (newHeight == null) {
@@ -108,7 +108,61 @@ module.exports = {
                             new GameMap(newWidth, newHeight, MapBottomY));
                         this.workruft.setDefaultCamera();
                         break;
-                    };
+                    }
+                    case this.inputBindings.ToggleGridLines: {
+                        this.isDrawingGrid = !this.isDrawingGrid;
+                        if (this.isDrawingGrid) {
+                            //Add grid lines.
+                            let newGridLine;
+                            for (let x = this.map.minX; x <= this.map.maxX; x += GridLinesSeparation) {
+                                newGridLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+                                    new THREE.Vector3(x, 0.01, this.map.minZ),
+                                    new THREE.Vector3(x, 0.01, this.map.maxZ)
+                                ]), GridLinesMaterial);
+                                this.workruft.gridLines.push(newGridLine);
+                                this.workruft.world.scene.add(newGridLine);
+                            }
+                            for (let z = this.map.minZ; z <= this.map.maxZ; z += GridLinesSeparation) {
+                                newGridLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+                                    new THREE.Vector3(this.map.minX, 0.01, z),
+                                    new THREE.Vector3(this.map.maxX, 0.01, z)
+                                ]), GridLinesMaterial);
+                                this.workruft.gridLines.push(newGridLine);
+                                this.workruft.world.scene.add(newGridLine);
+                            }
+                        } else {
+                            //Remove grid lines.
+                            for (let gridLine of this.workruft.gridLines) {
+                                this.workruft.world.scene.remove(gridLine);
+                            }
+                            this.workruft.gridLines = [];
+                        }
+                        break;
+                    }
+                    case this.inputBindings.ToggleVerticalGridLines: {
+                        this.isDrawingVerticalGrid = !this.isDrawingVerticalGrid;
+                        if (this.isDrawingVerticalGrid) {
+                            //Add vertical grid lines.
+                            let newVerticalGridLine;
+                            for (let x = this.map.minX; x <= this.map.maxX; x += VerticalGridLinesSeparation) {
+                                for (let z = this.map.minZ; z <= this.map.maxZ; z += VerticalGridLinesSeparation) {
+                                    newVerticalGridLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+                                        new THREE.Vector3(x, 0.0, z),
+                                        new THREE.Vector3(x, VerticalGridLinesHeight, z)
+                                    ]), GridLinesMaterial);
+                                    this.workruft.verticalGridLines.push(newVerticalGridLine);
+                                    this.workruft.world.scene.add(newVerticalGridLine);
+                                }
+                            }
+                        } else {
+                            //Remove vertical grid lines.
+                            for (let verticalGridLine of this.workruft.verticalGridLines) {
+                                this.workruft.world.scene.remove(verticalGridLine);
+                            }
+                            this.workruft.verticalGridLines = [];
+                        }
+                        break;
+                    }
                     case this.inputBindings.RotateCameraClockwise: {
                         //TODO: Screws with camera movement; also, repositioning will need to handle zoom.
                         // this.workruft.world.camera.rotation.z -= HalfPI;

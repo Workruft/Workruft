@@ -53,7 +53,7 @@ module.exports = {
                     let clickCoordinates = pickedMapObjectArray[0].point;
                     let cellX = FloorToCell(clickCoordinates.x);
                     let cellZ = FloorToCell(clickCoordinates.z);
-                    let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
+                    let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
                     if (clickedCell != null) {
                         for (let selectedObject of this.workruft.world.selectedObjects) {
                             let newOrderObject = {
@@ -86,7 +86,7 @@ module.exports = {
                 let clickCoordinates = pickedMapObjectArray[0].point;
                 let cellX = FloorToCell(clickCoordinates.x);
                 let cellZ = FloorToCell(clickCoordinates.z);
-                let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
+                let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
                 if (clickedCell == null) {
                     break;
                 }
@@ -101,14 +101,14 @@ module.exports = {
                         forEachObject = ForEachCell(
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
-                                currentCell = this.workruft.world.map.getCell({
+                                currentCell = this.map.getCell({
                                     x: cellX + forEachObject.xOffset,
                                     z: cellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
                                 }
-                                this.workruft.world.map.addHeightToCell({
+                                this.map.addHeightToCell({
                                     cell: currentCell,
                                     height: raiseLowerOffset
                                 });
@@ -121,7 +121,7 @@ module.exports = {
                         ForEachCell(
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
-                                currentCell = this.workruft.world.map.getCell({
+                                currentCell = this.map.getCell({
                                     x: cellX + forEachObject.xOffset,
                                     z: cellZ + forEachObject.zOffset
                                 });
@@ -129,20 +129,20 @@ module.exports = {
                                     return;
                                 }
                                 lowestHeight = Math.min(lowestHeight,
-                                    this.workruft.world.map.getMinHeight({ cell: currentCell }));
+                                    this.map.getMinHeight({ cell: currentCell }));
                             }.bind(this)
                         );
                         forEachObject = ForEachCell(
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
-                                currentCell = this.workruft.world.map.getCell({
+                                currentCell = this.map.getCell({
                                     x: cellX + forEachObject.xOffset,
                                     z: cellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
                                 }
-                                this.workruft.world.map.setCellFlatHeight({
+                                this.map.setCellFlatHeight({
                                     cell: currentCell,
                                     height: lowestHeight
                                 });
@@ -155,7 +155,7 @@ module.exports = {
                         ForEachCell(
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
-                                currentCell = this.workruft.world.map.getCell({
+                                currentCell = this.map.getCell({
                                     x: cellX + forEachObject.xOffset,
                                     z: cellZ + forEachObject.zOffset
                                 });
@@ -163,20 +163,20 @@ module.exports = {
                                     return;
                                 }
                                 highestHeight = Math.max(highestHeight,
-                                    this.workruft.world.map.getMaxHeight({ cell: currentCell }));
+                                    this.map.getMaxHeight({ cell: currentCell }));
                             }.bind(this)
                         );
                         forEachObject = ForEachCell(
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
-                                currentCell = this.workruft.world.map.getCell({
+                                currentCell = this.map.getCell({
                                     x: cellX + forEachObject.xOffset,
                                     z: cellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
                                 }
-                                this.workruft.world.map.setCellFlatHeight({
+                                this.map.setCellFlatHeight({
                                     cell: currentCell,
                                     height: highestHeight
                                 });
@@ -190,7 +190,7 @@ module.exports = {
                         forEachObject = ForEachCell(
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
-                                currentCell = this.workruft.world.map.getCell({
+                                currentCell = this.map.getCell({
                                     x: cellX + forEachObject.xOffset,
                                     z: cellZ + forEachObject.zOffset
                                 });
@@ -199,21 +199,21 @@ module.exports = {
                                 }
                                 ++cellCount;
                                 totalAverageHeights +=
-                                    this.workruft.world.map.getAverageHeight({ cell: currentCell });
+                                    this.map.getAverageHeight({ cell: currentCell });
                             }.bind(this)
                         );
                         totalAverageHeights /= Math.max(1.0, cellCount);
                         forEachObject = ForEachCell(
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
-                                currentCell = this.workruft.world.map.getCell({
+                                currentCell = this.map.getCell({
                                     x: cellX + forEachObject.xOffset,
                                     z: cellZ + forEachObject.zOffset
                                 });
                                 if (currentCell == null) {
                                     return;
                                 }
-                                this.workruft.world.map.setCellFlatHeight({
+                                this.map.setCellFlatHeight({
                                     cell: currentCell,
                                     height: totalAverageHeights
                                 });
@@ -229,7 +229,7 @@ module.exports = {
                             forEachObject = ForEachCell(
                                 this.workruft.editingLatSize, this.workruft.editingLongSize,
                                 function(forEachObject) {
-                                    currentCell = this.workruft.world.map.getCell({
+                                    currentCell = this.map.getCell({
                                         x: cellX + forEachObject.xOffset,
                                         z: cellZ + forEachObject.zOffset
                                     });
@@ -239,10 +239,10 @@ module.exports = {
                                     this.workruft.terrainEditingCells.push({
                                         x: currentCell.x, z: currentCell.z,
                                         heights: [
-                                            this.workruft.world.map.getBackLeftHeight({ cell: currentCell }),
-                                            this.workruft.world.map.getBackRightHeight({ cell: currentCell }),
-                                            this.workruft.world.map.getFrontRightHeight({ cell: currentCell }),
-                                            this.workruft.world.map.getFrontLeftHeight({ cell: currentCell })
+                                            this.map.getBackLeftHeight({ cell: currentCell }),
+                                            this.map.getBackRightHeight({ cell: currentCell }),
+                                            this.map.getFrontRightHeight({ cell: currentCell }),
+                                            this.map.getFrontLeftHeight({ cell: currentCell })
                                         ]
                                     });
                                 }.bind(this)
@@ -260,26 +260,26 @@ module.exports = {
                         for (let terrainEditingCell of this.workruft.terrainEditingCells) {
                             currentXOffset = terrainEditingCell.x - this.workruft.terrainEditingCenterCell.x;
                             currentZOffset = terrainEditingCell.z - this.workruft.terrainEditingCenterCell.z;
-                            currentCell = this.workruft.world.map.getCell({
+                            currentCell = this.map.getCell({
                                 x: clickedCell.x + currentXOffset,
                                 z: clickedCell.z + currentZOffset
                             });
                             if (currentCell == null) {
                                 continue;
                             }
-                            this.workruft.world.map.setBackLeftHeight({
+                            this.map.setBackLeftHeight({
                                 cell: currentCell,
                                 height: terrainEditingCell.heights[0]
                             });
-                            this.workruft.world.map.setBackRightHeight({
+                            this.map.setBackRightHeight({
                                 cell: currentCell,
                                 height: terrainEditingCell.heights[1]
                             });
-                            this.workruft.world.map.setFrontRightHeight({
+                            this.map.setFrontRightHeight({
                                 cell: currentCell,
                                 height: terrainEditingCell.heights[2]
                             });
-                            this.workruft.world.map.setFrontLeftHeight({
+                            this.map.setFrontLeftHeight({
                                 cell: currentCell,
                                 height: terrainEditingCell.heights[3]
                             });
@@ -294,7 +294,7 @@ module.exports = {
                         forEachObject = ForEachLatBorderCell(
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
-                                currentCell = this.workruft.world.map.getCell({
+                                currentCell = this.map.getCell({
                                     x: cellX + forEachObject.xOffset,
                                     z: cellZ + forEachObject.zOffset
                                 });
@@ -304,10 +304,10 @@ module.exports = {
                                 this.workruft.terrainEditingCells.push({
                                     x: currentCell.x, z: currentCell.z,
                                     heights: [
-                                        this.workruft.world.map.getBackLeftHeight({ cell: currentCell }),
-                                        this.workruft.world.map.getBackRightHeight({ cell: currentCell }),
-                                        this.workruft.world.map.getFrontRightHeight({ cell: currentCell }),
-                                        this.workruft.world.map.getFrontLeftHeight({ cell: currentCell })
+                                        this.map.getBackLeftHeight({ cell: currentCell }),
+                                        this.map.getBackRightHeight({ cell: currentCell }),
+                                        this.map.getFrontRightHeight({ cell: currentCell }),
+                                        this.map.getFrontLeftHeight({ cell: currentCell })
                                     ]
                                 });
                             }.bind(this)
@@ -338,7 +338,7 @@ module.exports = {
                                 }
                                 lowerHighX = lowerCell.x + CellSize;
                                 for (inBetweenX = lowerHighX; inBetweenX < higherCell.x; inBetweenX += CellSize) {
-                                    inBetweenCell = this.workruft.world.map.getCell({
+                                    inBetweenCell = this.map.getCell({
                                         x: inBetweenX,
                                         z: lowerCell.z
                                     });
@@ -347,13 +347,13 @@ module.exports = {
                                     }
                                     beforeAfterRatio = (inBetweenX - lowerHighX) / (higherCell.x - lowerHighX);
                                     //Back left.
-                                    this.workruft.world.map.setBackLeftHeight({
+                                    this.map.setBackLeftHeight({
                                         cell: inBetweenCell,
                                         height: (1.0 - beforeAfterRatio) * lowerCell.heights[1] +
                                             beforeAfterRatio * higherCell.heights[0]
                                     });
                                     //Front left.
-                                    this.workruft.world.map.setFrontLeftHeight({
+                                    this.map.setFrontLeftHeight({
                                         cell: inBetweenCell,
                                         height: (1.0 - beforeAfterRatio) * lowerCell.heights[2] +
                                             beforeAfterRatio * higherCell.heights[3]
@@ -361,13 +361,13 @@ module.exports = {
                                     beforeAfterRatio = (inBetweenX + CellSize - lowerHighX) /
                                         (higherCell.x - lowerHighX);
                                     //Back right.
-                                    this.workruft.world.map.setBackRightHeight({
+                                    this.map.setBackRightHeight({
                                         cell: inBetweenCell,
                                         height: (1.0 - beforeAfterRatio) * lowerCell.heights[1] +
                                             beforeAfterRatio * higherCell.heights[0]
                                     });
                                     //Front right.
-                                    this.workruft.world.map.setFrontRightHeight({
+                                    this.map.setFrontRightHeight({
                                         cell: inBetweenCell,
                                         height: (1.0 - beforeAfterRatio) * lowerCell.heights[2] +
                                             beforeAfterRatio * higherCell.heights[3]
@@ -387,7 +387,7 @@ module.exports = {
                         forEachObject = ForEachLongBorderCell(
                             this.workruft.editingLatSize, this.workruft.editingLongSize,
                             function(forEachObject) {
-                                currentCell = this.workruft.world.map.getCell({
+                                currentCell = this.map.getCell({
                                     x: cellX + forEachObject.xOffset,
                                     z: cellZ + forEachObject.zOffset
                                 });
@@ -397,10 +397,10 @@ module.exports = {
                                 this.workruft.terrainEditingCells.push({
                                     x: currentCell.x, z: currentCell.z,
                                     heights: [
-                                        this.workruft.world.map.getBackLeftHeight({ cell: currentCell }),
-                                        this.workruft.world.map.getBackRightHeight({ cell: currentCell }),
-                                        this.workruft.world.map.getFrontRightHeight({ cell: currentCell }),
-                                        this.workruft.world.map.getFrontLeftHeight({ cell: currentCell })
+                                        this.map.getBackLeftHeight({ cell: currentCell }),
+                                        this.map.getBackRightHeight({ cell: currentCell }),
+                                        this.map.getFrontRightHeight({ cell: currentCell }),
+                                        this.map.getFrontLeftHeight({ cell: currentCell })
                                     ]
                                 });
                             }.bind(this)
@@ -431,7 +431,7 @@ module.exports = {
                                 }
                                 lowerHighZ = lowerCell.z + CellSize;
                                 for (inBetweenZ = lowerHighZ; inBetweenZ < higherCell.z; inBetweenZ += CellSize) {
-                                    inBetweenCell = this.workruft.world.map.getCell({
+                                    inBetweenCell = this.map.getCell({
                                         x: lowerCell.x,
                                         z: inBetweenZ
                                     });
@@ -440,13 +440,13 @@ module.exports = {
                                     }
                                     beforeAfterRatio = (inBetweenZ - lowerHighZ) / (higherCell.z - lowerHighZ);
                                     //Back left.
-                                    this.workruft.world.map.setBackLeftHeight({
+                                    this.map.setBackLeftHeight({
                                         cell: inBetweenCell,
                                         height: (1.0 - beforeAfterRatio) * lowerCell.heights[3] +
                                             beforeAfterRatio * higherCell.heights[0]
                                     });
                                     //Back right.
-                                    this.workruft.world.map.setBackRightHeight({
+                                    this.map.setBackRightHeight({
                                         cell: inBetweenCell,
                                         height: (1.0 - beforeAfterRatio) * lowerCell.heights[2] +
                                             beforeAfterRatio * higherCell.heights[1]
@@ -454,13 +454,13 @@ module.exports = {
                                     beforeAfterRatio = (inBetweenZ + CellSize - lowerHighZ) /
                                         (higherCell.z - lowerHighZ);
                                     //Front left.
-                                    this.workruft.world.map.setFrontLeftHeight({
+                                    this.map.setFrontLeftHeight({
                                         cell: inBetweenCell,
                                         height: (1.0 - beforeAfterRatio) * lowerCell.heights[3] +
                                             beforeAfterRatio * higherCell.heights[0]
                                     });
                                     //Front right.
-                                    this.workruft.world.map.setFrontRightHeight({
+                                    this.map.setFrontRightHeight({
                                         cell: inBetweenCell,
                                         height: (1.0 - beforeAfterRatio) * lowerCell.heights[2] +
                                             beforeAfterRatio * higherCell.heights[1]
@@ -480,7 +480,7 @@ module.exports = {
                     }
                 }
                 if (forEachObject != null) {
-                    this.workruft.world.map.updateCells({
+                    this.map.updateCells({
                         lowX: cellX - forEachObject.floorHalfLatSize - CellSize,
                         lowZ: cellZ - forEachObject.floorHalfLongSize - CellSize,
                         highX: cellX + forEachObject.ceilHalfLatSize + CellSize,
@@ -529,7 +529,7 @@ module.exports = {
                 let clickCoordinates = pickedMapObjectArray[0].point;
                 let cellX = FloorToCell(clickCoordinates.x);
                 let cellZ = FloorToCell(clickCoordinates.z);
-                let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
+                let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
                 if (clickedCell != null) {
                     this.updateMapEditorMouseCells({ cellX, cellZ });
                 }
@@ -567,7 +567,7 @@ module.exports = {
                     let clickCoordinates = pickedMapObjectArray[0].point;
                     let cellX = FloorToCell(clickCoordinates.x);
                     let cellZ = FloorToCell(clickCoordinates.z);
-                    let clickedCell = this.workruft.world.map.getCell({ x: cellX, z: cellZ });
+                    let clickedCell = this.map.getCell({ x: cellX, z: cellZ });
                     if (clickedCell != null) {
                         this.updateMapEditorMouseCells({ cellX, cellZ });
                     }
