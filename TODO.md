@@ -1,16 +1,10 @@
 # TODO
 
-- Add in buildings and other units...
-
-- Give PathFinder class so many "attempts"/calculations per X time period.
-
-- Ensure that path finding and traveling are perfectly synchronized for all clients.
+- Establish some kind of protocol for the messages. Put the common parts in /Common/ and the rest in /Client/ and
+  /Server/ individually.
 
 - Send and check for pings server<->client both, to ensure livelihood of connection in silent disconnection cases.
   (Check on both ends, but only send a ping on receiving a ping - except for the very first, of course.)
-
-- Establish some kind of protocol for the messages. Put the common parts in /Common/ and the rest in /Client/ and
-  /Server/ individually.
 
 - "A client WebSocket broadcasting to every other connected WebSocket clients, excluding itself":
 ```js
@@ -26,6 +20,12 @@
           });
         });
 ```
+
+- Ensure that path finding and traveling are perfectly synchronized for all clients.
+
+- Add in buildings and other units.
+
+- Give PathFinder class so many "attempts"/calculations per X time period.
 
 - More mouse and keyboard controls.
 
