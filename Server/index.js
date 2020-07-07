@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const publicIP = require('public-ip');
-require('../Common/StatusCodes');
+require('../Common/Globals');
+const GetStatusCodeString = require('../Common/StatusCodes');
 
 let serverPort = 1337;
 let messageOfTheDay = 'Hallo thar!';

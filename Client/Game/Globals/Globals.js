@@ -60,9 +60,16 @@ window.VerticalGridLinesHeight = CellSize * 25.0 + EditorExtraHeightOffset;
 window.HalfPI = Math.PI * 0.5;
 window.DoublePI = Math.PI * 2.0;
 
+//Yyyyyep...
+window.EscapeTextForHTML = function(escapeMe) {
+    let span = document.createElement('span');
+    span.innerText = escapeMe;
+    return span.innerHTML;
+};
+
 window.HasFlag = function({ borderFlags, testFlag }) {
     return !!(borderFlags & testFlag);
-}
+};
 
 Enums.create({
     name: 'GameStates',
@@ -80,14 +87,6 @@ window.DisposeThreeObject = function(disposeMe) {
     if (disposeMe.dispose) {
         disposeMe.dispose();
     }
-};
-
-window.IsUndefined = function(checkMe) {
-    return typeof checkMe == 'undefined';
-};
-
-window.IsDefined = function(checkMe) {
-    return typeof checkMe !== 'undefined';
 };
 
 window.GenericRound = function(roundMe) {

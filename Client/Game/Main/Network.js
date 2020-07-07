@@ -3,13 +3,13 @@ class Network {
         this.chat = chat;
     }
 
-    connect() {
+    connect(ipAddress) {
         this.disconnect();
 
-        this.socket = new WebSocket('ws://localhost:1337');
+        this.socket = new WebSocket('ws://' + ipAddress + ':1337');
 
         this.socket.onopen = function() {
-            this.chat.print({ message: 'Connected to server!' });
+            this.chat.print({ message: 'Connected to server! (' + ipAddress + ')' });
             //this.socket.send(Date.now());
         }.bind(this);
 
@@ -18,7 +18,7 @@ class Network {
         }.bind(this);
 
         this.socket.onclose = function() {
-            this.chat.print({ message: 'Disconnected from server!' });
+            this.chat.print({ message: 'Disconnected from server! (' + ipAddress + ')' });
         }.bind(this);
 
         this.socket.onerror = function() {
@@ -28,7 +28,7 @@ class Network {
 
     disconnect() {
         if (this.socket) {
-            this.socket.close(1001, "Bye bye now!");
+            this.socket.close(1000);
             delete this.socket;
         }
     }

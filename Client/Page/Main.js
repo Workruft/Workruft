@@ -5,6 +5,7 @@ window.Enums = require('../Game/Globals/Enums');
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 
+require('../../Common/Globals');
 require('../../Common/Version');
 require('../../Common/StatusCodes');
 

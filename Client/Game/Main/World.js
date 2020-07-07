@@ -12,8 +12,7 @@ let GameModel = require('../Helpers/GameModel');
 //  +Z    \/-Y
 
 class World {
-    constructor(chat) {
-        this.chat = chat;
+    constructor() {
         this.boundGraphicsLoop = this.graphicsLoop.bind(this);
 
         //WebGL.

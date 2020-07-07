@@ -37,7 +37,10 @@ class Workruft {
             message: '  ' + this.inputBindings.ToggleEditorVerticalLines + ': toggle map editor vertical lines'
         });
         this.chat.print({ message: '  ' + this.inputBindings.TogglePathTesting + ': toggle map path testing' });
-        this.world = new World(this.chat, this.onUpdate.bind(this));
+        this.chat.print({ message: 'Use -c <IP address here> to connect to a server.' });
+        this.chat.print({ message: 'Use -d to disconnect from any connected server.' });
+
+        this.world = new World();
         this.setDefaultCamera();
         this.world.graphicsLoop();
         this.network = new Network(this.chat);
@@ -92,8 +95,6 @@ class Workruft {
             }
         }.bind(this), 4000);
 
-        //this.network.connect();
-
         setInterval(this.onUpdate.bind(this), 30);
         this.updateStatusBox();
     }
@@ -141,6 +142,14 @@ class Workruft {
 
     onChatEntry(text) {
         this.chat.print({ message: 'You: ' + text });
+        let trimText = text.trim();
+        if (trimText == '-c') {
+            this.network.connect('localhost');
+        } else if (trimText.substring(0, 3) == '-c ') {
+            this.network.connect(trimText.substring(3));
+        } else if (trimText == '-d') {
+            this.network.disconnect();
+        }
     }
 
     updateStatusBox() {
