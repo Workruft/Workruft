@@ -1,15 +1,21 @@
 const WebSocket = require('ws');
+const publicIP = require('public-ip');
 require('../Common/StatusCodes');
 
 let serverPort = 1337;
-let messageOfTheDay = 'Why, hello, and welcome to my crap server!';
+let messageOfTheDay = 'Hallo thar!';
 
 let serverAddress;
 const server = new WebSocket.Server({ port: serverPort, clientTracking: true }, function() {
     //On server listening.
     serverAddress = server.address();
     console.log('Server ready and listening! ' + JSON.stringify(serverAddress));
-    console.log();
+    console.log('Gettin yo IP...');
+    //publicIP.v6()
+    publicIP.v4().then(function(yoIP) {
+        console.log('Yo IP address is: ' + yoIP);
+        console.log();
+    });
 });
 
 server.on('connection', function(socket, request) {
